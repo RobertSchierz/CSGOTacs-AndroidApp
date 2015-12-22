@@ -3,6 +3,7 @@ package app.black0ut.de.map_service_android;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +14,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("https://p4dme.shaula.uberspace.de");
+        } catch (URISyntaxException e) {}
+    }
+
+    //TODO
+    //Testnachricht senden
+    private void attemptSend() {
+        String json = "{x: 1, y: 2}";
+        if (TextUtils.isEmpty(json)) {
+            return;
+        }
+        mSocket.emit("json", json);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +46,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //Socket verbinden
+        mSocket.connect();
+
+        attemptSend();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -98,4 +127,5 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }
