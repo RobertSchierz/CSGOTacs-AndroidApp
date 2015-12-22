@@ -22,6 +22,7 @@ import io.socket.client.Socket;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+
     private Socket mSocket;
     {
         try {
