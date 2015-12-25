@@ -1,6 +1,6 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;

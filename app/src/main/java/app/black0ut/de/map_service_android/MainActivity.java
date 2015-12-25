@@ -1,11 +1,10 @@
 package app.black0ut.de.map_service_android;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -117,12 +116,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //Fragments ersetzen
-        Fragment fragment = new MapsFragment();
-        FragmentManager fragmentManager = getFragmentManager();
+        Fragment fragment;
 
         if (id == R.id.nav_maps) {
             Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
             fragment = new MapsFragment();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
         } else if (id == R.id.nav_groups) {
 
         } else if (id == R.id.nav_strategies) {
@@ -130,8 +131,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
 
         }
-
-        fragmentManager.beginTransaction().replace(R.id.content_main, fragment);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
