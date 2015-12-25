@@ -1,5 +1,8 @@
 package app.black0ut.de.map_service_android;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,9 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
+import app.black0ut.de.map_service_android.fragments.MapsFragment;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity
         //Socket verbinden
         mSocket.connect();
 
+        //Methode zum Nachrichten senden aufrufen
         attemptSend();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -110,8 +116,13 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        //Fragments ersetzen
+        Fragment fragment = new MapsFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+
         if (id == R.id.nav_maps) {
-            // Handle the camera action
+            Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
+            fragment = new MapsFragment();
         } else if (id == R.id.nav_groups) {
 
         } else if (id == R.id.nav_strategies) {
@@ -119,6 +130,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
 
         }
+
+        fragmentManager.beginTransaction().replace(R.id.content_main, fragment);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
