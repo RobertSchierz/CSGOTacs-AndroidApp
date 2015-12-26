@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_maps) {
             // Handle the camera action
         } else if (id == R.id.nav_groups) {
-
+            //TODO
         } else if (id == R.id.nav_strategies) {
 
         } else if (id == R.id.nav_profile) {
