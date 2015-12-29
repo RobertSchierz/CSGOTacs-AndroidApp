@@ -122,8 +122,7 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
             fragment = new MapsFragment();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
-            ft.commit();
+            ft.replace(R.id.content_frame, fragment).commit();
         } else if (id == R.id.nav_groups) {
             //TODO
         } else if (id == R.id.nav_strategies) {
