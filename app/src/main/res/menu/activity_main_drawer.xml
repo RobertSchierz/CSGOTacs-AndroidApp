@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_maps"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_map_orange_600_18dp"
             android:title="@string/nav_maps" />
         <item
             android:id="@+id/nav_groups"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_group_orange_600_18dp"
             android:title="@string/nav_groups" />
         <item
             android:id="@+id/nav_strategies"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_mode_edit_orange_600_18dp"
             android:title="@string/nav_strategies" />
         <item
             android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_account_circle_orange_600_18dp"
             android:title="@string/nav_profile" />
     </group>
 <!--

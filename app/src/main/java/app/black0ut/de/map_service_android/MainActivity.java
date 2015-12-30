@@ -19,10 +19,10 @@ import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
-import app.black0ut.de.map_service_android.fragments.MainContentFragment;
+import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
-import app.black0ut.de.map_service_android.fragments.MapsFragment;
 import app.black0ut.de.map_service_android.fragments.MapsFragment_;
+import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
@@ -132,9 +132,13 @@ public class MainActivity extends AppCompatActivity
             fragment = new MapsFragment_();
             ft.replace(R.id.mainFrame, fragment).commit();
         } else if (id == R.id.nav_groups) {
-            //TODO
+            Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
+            fragment = new GroupsFragment_();
+            ft.replace(R.id.mainFrame, fragment).commit();
         } else if (id == R.id.nav_strategies) {
-
+            Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
+            fragment = new StrategiesFragment_();
+            ft.replace(R.id.mainFrame, fragment).commit();
         } else if (id == R.id.nav_profile) {
 
         }
