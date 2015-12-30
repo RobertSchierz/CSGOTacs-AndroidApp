@@ -18,13 +18,15 @@ import app.black0ut.de.map_service_android.R;
  * Created by Jan-Philipp Altenhof on 24.12.15.
  */
 
+@EFragment(R.layout.fragment_maps)
 public class MapsFragment extends Fragment {
 
+    /*
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_maps, container, false);
     }
-
+*/
 }

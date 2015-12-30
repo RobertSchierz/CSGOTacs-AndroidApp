@@ -19,7 +19,10 @@ import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
+import app.black0ut.de.map_service_android.fragments.MainContentFragment;
+import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
 import app.black0ut.de.map_service_android.fragments.MapsFragment;
+import app.black0ut.de.map_service_android.fragments.MapsFragment_;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
@@ -51,6 +54,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Fragment mainFragment = new MainContentFragment_();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.mainFrame, mainFragment).commit();
+
 
         //Socket verbinden
         mSocket.connect();
@@ -117,12 +125,12 @@ public class MainActivity extends AppCompatActivity
 
         //Fragments ersetzen
         Fragment fragment;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         if (id == R.id.nav_maps) {
             Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
-            fragment = new MapsFragment();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment).commit();
+            fragment = new MapsFragment_();
+            ft.replace(R.id.mainFrame, fragment).commit();
         } else if (id == R.id.nav_groups) {
             //TODO
         } else if (id == R.id.nav_strategies) {
