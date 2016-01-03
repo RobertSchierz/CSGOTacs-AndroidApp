@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.View;
@@ -27,8 +28,12 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
+
+    FragmentManager mFt;
+    Fragment mCurrentFragment;
+    ActionBarDrawerToggle mToggle;
 
     private Socket mSocket;
     {
@@ -40,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     //TODO
     //Testnachricht senden
     private void attemptSend() {
-        String json = "{x: 1, y: 2}";
+        String json = "{x: 666, y: 69}";
         if (TextUtils.isEmpty(json)) {
             return;
         }
@@ -55,9 +60,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Fragment mainFragment = new MainContentFragment_();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.mainFrame, mainFragment).commit();
+        mFt = getSupportFragmentManager();
+        mFt.addOnBackStackChangedListener(this);
+
+        //Initiales Fragment erstellen
+        if(savedInstanceState == null) {
+            mCurrentFragment = new MainContentFragment_();
+            mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
+        }
 
 
         //Socket verbinden
@@ -77,10 +87,10 @@ public class MainActivity extends AppCompatActivity
         });
         */
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        mToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer.setDrawerListener(mToggle);
+        mToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -94,6 +104,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -125,21 +136,21 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //Fragments ersetzen
-        Fragment fragment;
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         if (id == R.id.nav_maps) {
             Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
-            fragment = new MapsFragment_();
-            ft.replace(R.id.mainFrame, fragment).commit();
+            mCurrentFragment = new MapsFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_groups) {
             Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
-            fragment = new GroupsFragment_();
-            ft.replace(R.id.mainFrame, fragment).commit();
+            mCurrentFragment = new GroupsFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_strategies) {
             Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
-            fragment = new StrategiesFragment_();
-            ft.replace(R.id.mainFrame, fragment).commit();
+            mCurrentFragment = new StrategiesFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_profile) {
 
         }
@@ -149,4 +160,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onBackStackChanged() {
+        mToggle.setDrawerIndicatorEnabled(mFt.getBackStackEntryCount() == 0);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(mFt.getBackStackEntryCount() > 0);
+        mToggle.syncState();
+    }
 }

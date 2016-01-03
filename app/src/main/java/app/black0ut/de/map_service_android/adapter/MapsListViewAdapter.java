@@ -39,21 +39,21 @@ public class MapsListViewAdapter extends BaseAdapter{
     @AfterInject
     void initAdapter() {
         maps = new ArrayList<>();
-        maps.add(new Map("Dust 2", R.drawable.de_dust2));
-        maps.add(new Map("Train", R.drawable.de_train));
-        maps.add(new Map("Mirage", R.drawable.de_mirage));
-        maps.add(new Map("Inferno", R.drawable.de_inferno));
-        maps.add(new Map("Cobblestone", R.drawable.gd_cbble));
-        maps.add(new Map("Overpass", R.drawable.de_overpass));
-        maps.add(new Map("Cache", R.drawable.de_cache));
-        maps.add(new Map("Aztec", R.drawable.de_aztec));
-        maps.add(new Map("Dust", R.drawable.de_dust));
-        maps.add(new Map("Vertigo", R.drawable.de_vertigo));
-        maps.add(new Map("Nuke", R.drawable.de_nuke));
-        maps.add(new Map("Office", R.drawable.cs_office));
-        maps.add(new Map("Italy", R.drawable.cs_italy));
-        maps.add(new Map("Assault", R.drawable.cs_assault));
-        maps.add(new Map("Militia", R.drawable.cs_militia));
+        maps.add(new Map(Map.DUST2, R.drawable.de_dust2));
+        maps.add(new Map(Map.TRAIN, R.drawable.de_train));
+        maps.add(new Map(Map.MIRAGE, R.drawable.de_mirage));
+        maps.add(new Map(Map.INFERNO, R.drawable.de_inferno));
+        maps.add(new Map(Map.COBBLESTONE, R.drawable.gd_cbble));
+        maps.add(new Map(Map.OVERPASS, R.drawable.de_overpass));
+        maps.add(new Map(Map.CACHE, R.drawable.de_cache));
+        maps.add(new Map(Map.AZTEC, R.drawable.de_aztec));
+        maps.add(new Map(Map.DUST, R.drawable.de_dust));
+        maps.add(new Map(Map.VERTIGO, R.drawable.de_vertigo));
+        maps.add(new Map(Map.NUKE, R.drawable.de_nuke));
+        maps.add(new Map(Map.OFFICE, R.drawable.cs_office));
+        maps.add(new Map(Map.ITALY, R.drawable.cs_italy));
+        maps.add(new Map(Map.ASSAULT, R.drawable.cs_assault));
+        maps.add(new Map(Map.MILITIA, R.drawable.cs_militia));
 
         //Die Liste alphabetisch sortieren
         Collections.sort(maps, new Comparator<Map>() {

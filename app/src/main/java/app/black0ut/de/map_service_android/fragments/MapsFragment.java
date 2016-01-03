@@ -2,6 +2,8 @@ package app.black0ut.de.map_service_android.fragments;
 
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -23,7 +25,8 @@ import app.black0ut.de.map_service_android.data.Map;
 @EFragment(R.layout.fragment_maps)
 public class MapsFragment extends Fragment {
 
-    String[] maps;
+    @ViewById(R.id.map_image)
+    ImageView mapImage;
 
     @ViewById(R.id.maps_listview)
     ListView mapsListView;
@@ -34,12 +37,30 @@ public class MapsFragment extends Fragment {
     @AfterViews
     public void bindAdapter(){
         //hier werden die Vorschau-Bilder der Karten gespeichert
-        //adapter = new MapsListViewAdapter(this.getContext(), maps);
         mapsListView.setAdapter(adapter);
     }
 
+    /**
+     * Diese Methode behandelt das Tippen auf die verschiedenen Listenelemente.
+     * @param map Ein Parameter vom Typ Map, welcher die geklickte Karte beinhaltet.
+     */
     @ItemClick(R.id.maps_listview)
     void mapsListViewItemClicked(Map map){
+        //Fragments ersetzen
+        Fragment fragment;
+        /*
+        switch(map.mapName){
+            case Map.ASSAULT: mapImage.setImageResource(R.drawable.de_cbble_radar_callout);
+                break;
+            default: mapImage.setImageResource(R.drawable.de_dust2_radar_callout);
+        }*/
+
+        fragment = new MapsDetailFragment_();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack(null);
+        ft.replace(R.id.mainFrame, fragment).commit();
+
+
         Toast.makeText(this.getContext(), map.mapName, Toast.LENGTH_SHORT).show();
     }
 }
