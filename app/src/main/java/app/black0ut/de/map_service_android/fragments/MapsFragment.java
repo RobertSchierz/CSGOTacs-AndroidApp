@@ -3,6 +3,7 @@ package app.black0ut.de.map_service_android.fragments;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -46,20 +47,16 @@ public class MapsFragment extends Fragment {
      */
     @ItemClick(R.id.maps_listview)
     void mapsListViewItemClicked(Map map){
+        //Den Namen der geklickten Map global speichern
+        Map.clickedMapName = map.mapName;
+
         //Fragments ersetzen
         Fragment fragment;
-        /*
-        switch(map.mapName){
-            case Map.ASSAULT: mapImage.setImageResource(R.drawable.de_cbble_radar_callout);
-                break;
-            default: mapImage.setImageResource(R.drawable.de_dust2_radar_callout);
-        }*/
 
         fragment = new MapsDetailFragment_();
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.addToBackStack(null);
         ft.replace(R.id.mainFrame, fragment).commit();
-
 
         Toast.makeText(this.getContext(), map.mapName, Toast.LENGTH_SHORT).show();
     }

@@ -1,6 +1,5 @@
 package app.black0ut.de.map_service_android.data;
 
-import app.black0ut.de.map_service_android.R;
 
 /**
  * Created by Jan-Philipp Altenhof on 02.01.2016.
@@ -23,6 +22,8 @@ public class Map {
     public static final String ASSAULT = "Assault";
     public static final String MILITIA = "Militia";
 
+    //Variable zum speichern der geklickten Map im MapsFragment
+    public static String clickedMapName = "";
 
     public final String mapName;
     public final int mapPreviewId;
