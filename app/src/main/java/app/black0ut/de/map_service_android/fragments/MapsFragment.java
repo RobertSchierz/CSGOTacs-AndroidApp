@@ -26,9 +26,6 @@ import app.black0ut.de.map_service_android.data.Map;
 @EFragment(R.layout.fragment_maps)
 public class MapsFragment extends Fragment {
 
-    @ViewById(R.id.map_image)
-    ImageView mapImage;
-
     @ViewById(R.id.maps_listview)
     ListView mapsListView;
 
@@ -58,6 +55,6 @@ public class MapsFragment extends Fragment {
         ft.addToBackStack(null);
         ft.replace(R.id.mainFrame, fragment).commit();
 
-        Toast.makeText(this.getContext(), map.mapName, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getContext(), map.mapName, Toast.LENGTH_SHORT).show();
     }
 }

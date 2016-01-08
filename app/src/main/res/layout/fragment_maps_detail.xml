@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    >
 
-    <!-- ImageView für das Detailbild einer Karte -->
-    <ImageView
-        android:id="@+id/map_image"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/de_dust2_radar_callout"/>
+        android:layout_centerInParent="true">
+
+        <!-- ImageView für das Detailbild einer Karte -->
+        <ImageView
+            android:id="@+id/map_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/de_dust2_radar_callout"/>
+
+        <LinearLayout
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent">
+        </LinearLayout>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/edit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Strat" />
+
+
 
 </RelativeLayout>
