@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Map-Service-Android.iml" filepath="$PROJECT_DIR$/Map-Service-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/map-service-android.iml" filepath="$PROJECT_DIR$/map-service-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/map-service-android.iml" filepath="$PROJECT_DIR$/map-service-android.iml" />
     </modules>
   </component>

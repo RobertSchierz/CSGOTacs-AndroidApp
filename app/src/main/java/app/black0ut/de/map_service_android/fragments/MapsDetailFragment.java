@@ -108,10 +108,12 @@ public class MapsDetailFragment extends Fragment{
                 break;
             case Map.DUST2:
                 Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_dust2_radar_spectate);
                 break;
             case Map.INFERNO:
                 Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_inferno_radar_spectate);
                 break;
             case Map.ITALY:
@@ -124,6 +126,7 @@ public class MapsDetailFragment extends Fragment{
                 break;
             case Map.MIRAGE:
                 Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_mirage_radar_spectate);
                 break;
             case Map.NUKE:
@@ -136,10 +139,12 @@ public class MapsDetailFragment extends Fragment{
                 break;
             case Map.OVERPASS:
                 Picasso.with(getContext()).load(R.drawable.de_overpass_radar).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_overpass_radar_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_overpass_radar);
                 break;
             case Map.TRAIN:
                 Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_train_radar_spectate);
                 break;
             case Map.VERTIGO:
