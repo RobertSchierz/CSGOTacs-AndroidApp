@@ -15,8 +15,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -39,13 +42,31 @@ public class MapsDetailFragment extends Fragment{
     @ViewById(R.id.map_image)
     ImageView mapImage;
 
+    @ViewById(R.id.map_callouts)
+    ImageView mapCallouts;
+
     @ViewById(R.id.canvas)
     LinearLayout canvas;
+
+    @ViewById(R.id.show_callouts_button)
+    ToggleButton showCallouts;
 
     @AfterViews
     public void afterViews(){
 
         checkMapName();
+
+        showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mapCallouts.setVisibility(View.VISIBLE);
+                    //Toast.makeText(getContext(), "Show clicked", Toast.LENGTH_SHORT).show();
+                } else {
+                    // The toggle is disabled
+                    mapCallouts.setVisibility(View.GONE);
+                }
+            }
+        });
 
         DrawingView.mPaint.setAntiAlias(true);
         DrawingView.mPaint.setDither(true);
@@ -73,10 +94,12 @@ public class MapsDetailFragment extends Fragment{
                 break;
             case Map.CACHE:
                 Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_cache_radar_spectate);
                 break;
             case Map.COBBLESTONE:
                 Picasso.with(getContext()).load(R.drawable.de_cbble_radar).into(mapImage);
+                Picasso.with(getContext()).load(R.drawable.de_cbble_radar_callout).into(mapCallouts);
                 //mapImage.setImageResource(R.drawable.de_cbble_radar);
                 break;
             case Map.DUST:
@@ -130,7 +153,23 @@ public class MapsDetailFragment extends Fragment{
 
     @Click(R.id.edit_button)
     public void onEditButtonClick(){
+        Toast.makeText(getContext(), "Edit Strat clicked", Toast.LENGTH_SHORT).show();
+    }
 
+    /*
+    @Click(R.id.show_callouts_button)
+    public void onShowCalloutsButtonClick(){
+
+        mapCallouts.setVisibility(View.VISIBLE);
+        Toast.makeText(getContext(), "Show clicked", Toast.LENGTH_SHORT).show();
+    }*/
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mapImage.setImageDrawable(null);
+        mapCallouts.setImageDrawable(null);
     }
 
     /*

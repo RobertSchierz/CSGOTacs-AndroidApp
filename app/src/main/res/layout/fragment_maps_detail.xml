@@ -8,14 +8,23 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-        <!-- ImageView für das Detailbild einer Karte -->
+        <!-- ImageView für das Detailbild einer Karte ohne callouts -->
         <ImageView
             android:id="@+id/map_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:layout_centerInParent="true"
-            android:src="@drawable/de_dust2_radar_callout"/>
+            android:src="@drawable/de_cbble_radar"/>
+
+        <!-- ImageView für das Bild mit den callouts ohne Karte -->
+        <ImageView
+            android:id="@+id/map_callouts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/canvas"
@@ -32,6 +41,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Edit Strat" />
+    <ToggleButton
+        android:id="@+id/show_callouts_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/edit_button"
+        android:textOff="Show Callouts"
+        android:textOn="Hide Callouts"/>
 
 
 
