@@ -14,7 +14,7 @@ import app.black0ut.de.map_service_android.data.Map;
  * Created by Jan-Philipp Altenhof on 02.01.2016.
  */
 @EViewGroup(R.layout.listview_icon_text)
-public class MapListItemView extends RelativeLayout{
+public class MapListItemView extends RelativeLayout {
 
     @ViewById(R.id.map_preview)
     ImageView mapPreview;

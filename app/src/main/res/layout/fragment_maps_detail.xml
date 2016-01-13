@@ -13,16 +13,13 @@
             android:id="@+id/map_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/de_cbble_radar"/>
+            android:layout_centerInParent="true"/>
 
         <!-- ImageView für das Bild mit den callouts ohne Karte -->
         <ImageView
             android:id="@+id/map_callouts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:adjustViewBounds="true"
             android:layout_centerInParent="true"
             android:visibility="gone"/>
 
