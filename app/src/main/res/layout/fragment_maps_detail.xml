@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/maps_details_background"
     >
 
     <RelativeLayout
@@ -12,25 +13,26 @@
         <ImageView
             android:id="@+id/map_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:layout_centerInParent="true"/>
 
         <!-- ImageView für das Bild mit den callouts ohne Karte -->
         <ImageView
             android:id="@+id/map_callouts"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:layout_centerInParent="true"
             android:visibility="gone"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/canvas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="@android:color/transparent">
-        </LinearLayout>
+            >
+        </RelativeLayout>
     </RelativeLayout>
 
     <Button

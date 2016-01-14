@@ -3,15 +3,20 @@ package app.black0ut.de.map_service_android.fragments;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -45,7 +50,7 @@ public class MapsDetailFragment extends Fragment{
     ImageView mapCallouts;
 
     @ViewById(R.id.canvas)
-    LinearLayout canvas;
+    RelativeLayout canvas;
 
     @ViewById(R.id.show_callouts_button)
     ToggleButton showCallouts;
@@ -53,10 +58,36 @@ public class MapsDetailFragment extends Fragment{
     private int BITMAP_WIDHT = 256;
     private int BITMAP_HEIGHT = 256;
 
+    public int mapImageHeight;
+    public int mapImageWidth;
+    public Bitmap bitmap;
+
     @AfterViews
     public void afterViews(){
 
+
+
         checkMapName();
+
+        /*
+        ViewTreeObserver vto = mapImage.getViewTreeObserver();
+        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                mapImage.getViewTreeObserver().removeOnPreDrawListener(this);
+                Log.d("TEST", " MeasuredHeight: " + mapImage.getMeasuredHeight() + " Width: " + mapImage.getMeasuredHeight());
+                Log.d("TEST", " Height: " + mapImage.getHeight() + " Width: " + mapImage.getHeight());
+                mapImageHeight = mapImage.getHeight();
+                mapImageWidth = mapImage.getWidth();
+                //DrawingView.mapImageWidth = mapImageWidth;
+                //DrawingView.mapImageHeight = mapImageHeight;
+
+                return true;
+            }
+        });
+        */
+
+        //Log.d("TEST", "Height: " + mapImage.getHeight() + "Widht: "+ mapImage.getWidth());
+
 
         showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -80,8 +111,10 @@ public class MapsDetailFragment extends Fragment{
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
 
-        DrawingView mDrawingView = new DrawingView(getContext());
-        canvas.addView(mDrawingView);
+
+
+
+
     }
 
     public void loadMapBitmap(int resId, ImageView imageView) {
@@ -238,7 +271,18 @@ public class MapsDetailFragment extends Fragment{
 
     @Click(R.id.edit_button)
     public void onEditButtonClick(){
-        Toast.makeText(getContext(), "Edit Strat clicked", Toast.LENGTH_SHORT).show();
+        mapImageWidth = mapImage.getWidth();
+        mapImageHeight = mapImage.getHeight();
+
+        DrawingView mDrawingView = new DrawingView(getContext());
+        //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
+        canvas.addView(mDrawingView, params);
+
+
+        Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
     }
 
     @Override

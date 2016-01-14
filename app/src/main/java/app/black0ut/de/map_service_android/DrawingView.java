@@ -6,18 +6,26 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+
+import org.androidannotations.annotations.EView;
+import org.androidannotations.annotations.ViewById;
 
 /**
  * Created by Jan-Philipp Altenhof on 08.01.2016.
  */
+
 public class DrawingView extends View {
+
     //DrawingView dv ;
     public static Paint mPaint = new Paint();
 
     public int width;
     public  int height;
+
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Path mPath;

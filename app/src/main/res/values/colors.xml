@@ -11,4 +11,6 @@
 
     <color name="nav_menu_background">#1a1a1a</color>
     <color name="nav_menuitem_text">#F98B01</color>
+
+    <color name="maps_details_background">#333333</color>
 </resources>
