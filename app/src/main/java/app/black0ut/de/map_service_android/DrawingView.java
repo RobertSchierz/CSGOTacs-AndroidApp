@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,11 @@ import android.widget.ImageView;
 
 import org.androidannotations.annotations.EView;
 import org.androidannotations.annotations.ViewById;
+
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 /**
  * Created by Jan-Philipp Altenhof on 08.01.2016.
@@ -34,6 +40,27 @@ public class DrawingView extends View {
     private Paint circlePaint;
     private Path circlePath;
 
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("https://p4dme.shaula.uberspace.de");
+        } catch (URISyntaxException e) {}
+    }
+
+    //TODO
+    //Testnachricht senden
+    private void attemptSend(String coords) {
+        //String json = "{x: 666, y: 69}";
+        if (TextUtils.isEmpty(coords)) {
+            return;
+        }
+        mSocket.emit("json", coords);
+    }
+
+    /**
+     * Konstruktor
+     * @param c Kontext der instanziierenden Klasse
+     */
     public DrawingView(Context c) {
         super(c);
         context=c;
@@ -71,20 +98,38 @@ public class DrawingView extends View {
     private void touch_start(float x, float y) {
         mPath.reset();
         mPath.moveTo(x, y);
+        Log.d("TEST", "touch_start: x " + x + " y " + y);
         mX = x;
         mY = y;
+
+        String startCoords = "{x: " + x + ", y: " + y + "}";
+
+        //Socket verbinden
+        mSocket.connect();
+
+        //Methode zum Nachrichten senden aufrufen
+        attemptSend(startCoords);
     }
 
     private void touch_move(float x, float y) {
+        if(x > mCanvas.getWidth() || x < 0) {
+            mCanvas.drawPath(mPath, mPaint);
+            return;
+        }else if(y > mCanvas.getHeight() || y < 0){
+            mCanvas.drawPath(mPath,  mPaint);
+            return;
+        }
+
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
+            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            Log.d("TEST", "touch_move: x " + x + " y " + y);
             mX = x;
             mY = y;
 
-            circlePath.reset();
-            circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
+            //circlePath.reset();
+            //circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
         }
     }
 

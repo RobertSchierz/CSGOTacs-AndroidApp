@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +27,13 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.ref.WeakReference;
+import java.net.URISyntaxException;
 
 import app.black0ut.de.map_service_android.DrawingView;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Map;
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 /**
  * Created by Jan-Philipp Altenhof on 03.01.16.
@@ -64,8 +68,6 @@ public class MapsDetailFragment extends Fragment{
 
     @AfterViews
     public void afterViews(){
-
-
 
         checkMapName();
 
@@ -278,7 +280,7 @@ public class MapsDetailFragment extends Fragment{
         //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-
+        //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
         canvas.addView(mDrawingView, params);
 
 

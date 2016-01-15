@@ -30,28 +30,9 @@ import io.socket.client.Socket;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
-
     FragmentManager mFt;
     Fragment mCurrentFragment;
     ActionBarDrawerToggle mToggle;
-
-    private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de");
-        } catch (URISyntaxException e) {}
-    }
-
-    //TODO
-    //Testnachricht senden
-    private void attemptSend() {
-        String json = "{x: 666, y: 69}";
-        if (TextUtils.isEmpty(json)) {
-            return;
-        }
-        mSocket.emit("json", json);
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +49,6 @@ public class MainActivity extends AppCompatActivity
             mCurrentFragment = new MainContentFragment_();
             mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
         }
-
-
-        //Socket verbinden
-        mSocket.connect();
-
-        //Methode zum Nachrichten senden aufrufen
-        attemptSend();
 
         /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -140,19 +114,16 @@ public class MainActivity extends AppCompatActivity
         //ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         if (id == R.id.nav_maps) {
-            Toast.makeText(this, "nav_maps clicked", Toast.LENGTH_SHORT).show();
             mCurrentFragment = new MapsFragment_();
             ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_groups) {
-            Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
             mCurrentFragment = new GroupsFragment_();
             ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_strategies) {
-            Toast.makeText(this, "nav_groups clicked", Toast.LENGTH_SHORT).show();
             mCurrentFragment = new StrategiesFragment_();
             ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_profile) {
-
+            Toast.makeText(this, "nav_profile clicked", Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
