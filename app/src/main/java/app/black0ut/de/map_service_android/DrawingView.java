@@ -1,5 +1,6 @@
 package app.black0ut.de.map_service_android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,11 +15,14 @@ import android.widget.ImageView;
 
 import org.androidannotations.annotations.EView;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by Jan-Philipp Altenhof on 08.01.2016.
@@ -43,18 +47,11 @@ public class DrawingView extends View {
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de");
-        } catch (URISyntaxException e) {}
-    }
-
-    //TODO
-    //Testnachricht senden
-    private void attemptSend(String coords) {
-        //String json = "{x: 666, y: 69}";
-        if (TextUtils.isEmpty(coords)) {
-            return;
+            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            //mSocket = IO.socket("http://chat.socket.io");
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
         }
-        mSocket.emit("json", coords);
     }
 
     /**
@@ -73,6 +70,10 @@ public class DrawingView extends View {
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
+
+        mSocket.on("json", json);
+        mSocket.connect();
+        mSocket.emit("appTest");
     }
 
     @Override
@@ -102,12 +103,10 @@ public class DrawingView extends View {
         mX = x;
         mY = y;
 
-        String startCoords = "{x: " + x + ", y: " + y + "}";
+        String startCoords = "{x: " + x + ", y: " + y + ", startx: " + x + ", starty: " + y + "}";
 
-        //Socket verbinden
-        mSocket.connect();
 
-        //Methode zum Nachrichten senden aufrufen
+        //Methode zum Koordinaten senden aufrufen
         attemptSend(startCoords);
     }
 
@@ -125,8 +124,14 @@ public class DrawingView extends View {
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             Log.d("TEST", "touch_move: x " + x + " y " + y);
+
+            String moveCoords = "{x: " + x + ", y: " + y + ", startx: " + mX + ", starty: " + mY + "}";
+            attemptSend(moveCoords);
+
             mX = x;
             mY = y;
+
+            //String moveCoords = "{x: " + x + ", y: " + y + "}";
 
             //circlePath.reset();
             //circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
@@ -140,6 +145,8 @@ public class DrawingView extends View {
         mCanvas.drawPath(mPath,  mPaint);
         // kill this so we don't double draw
         mPath.reset();
+        String upCoords = "{x: " + mX + ", y: " + mY + "}";
+        //attemptSend(upCoords);
     }
 
     @Override
@@ -163,5 +170,63 @@ public class DrawingView extends View {
         }
         return true;
     }
+
+    //TODO
+    //Testnachricht senden
+    private void attemptSend(String json) {
+        //String json = "{x: 666, y: 69}";
+        if (TextUtils.isEmpty(json)) {
+            return;
+        }
+
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(json);
+            //Log.d("TEST", "attemptSend: " + jsonObject.getDouble("x") + " y: " + jsonObject.getDouble("y"));
+        } catch (JSONException e) {
+            Log.d("TEST", "JSONObject Failed");
+            return;
+        }
+        mSocket.emit("json", jsonObject);
+    }
+
+    private Emitter.Listener json = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            Activity activity = (Activity) context;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    float x;
+                    float y;
+                    float startx;
+                    float starty;
+                    try {
+                        x = (float)data.getDouble("x");
+                        y = (float)data.getDouble("y");
+                        startx = (float)data.getDouble("startx");
+                        starty = (float)data.getDouble("starty");
+                        Log.d("TEST xy", "x: " + x + " y: " + y);
+                    } catch (JSONException e) {
+                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
+                        return;
+                    }
+
+                    // add the message to view
+                    //addCoords(x, y);
+                    //mPath.quadTo(x, y, (x) / 2, (y) / 2);
+                    mPath.moveTo(startx, starty);
+                    //TODO eventuell noch quadTo draus machen
+                    mPath.lineTo(x, y);
+                    mCanvas.drawPath(mPath,  mPaint);
+                    invalidate();
+                    mPath.reset();
+
+
+                }
+            });
+        }
+    };
 }
 
