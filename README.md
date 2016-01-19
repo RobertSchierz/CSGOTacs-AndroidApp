@@ -1,6 +1,6 @@
 # README #
 
-Dieses Repository beinhaltet eine Android App, welche es dem Nutzer ermöglicht Strategien in Echtzeit mit anderen Nutzern zu planen.
+Dieses Repository beinhaltet eine Android App, welche es dem Nutzer ermöglicht, Strategien in Echtzeit mit anderen Nutzern zu planen.
 
 ### What is this repository for? ###
 
