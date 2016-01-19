@@ -1,10 +1,10 @@
 package app.black0ut.de.map_service_android;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.text.TextUtils;
-import android.view.View;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,33 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
+import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
+import app.black0ut.de.map_service_android.fragments.MapsFragment_;
+import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
-import java.net.URISyntaxException;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
-
-    private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de");
-        } catch (URISyntaxException e) {}
-    }
-
-    //TODO
-    //Testnachricht senden
-    private void attemptSend() {
-        String json = "{x: 1, y: 2}";
-        if (TextUtils.isEmpty(json)) {
-            return;
-        }
-        mSocket.emit("json", json);
-    }
-
+    FragmentManager mFt;
+    Fragment mCurrentFragment;
+    ActionBarDrawerToggle mToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +34,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Socket verbinden
-        mSocket.connect();
+        mFt = getSupportFragmentManager();
+        mFt.addOnBackStackChangedListener(this);
 
-        attemptSend();
+        //Initiales Fragment erstellen
+        if(savedInstanceState == null) {
+            mCurrentFragment = new MainContentFragment_();
+            mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
+        }
 
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,12 +52,13 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+        */
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        mToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer.setDrawerListener(mToggle);
+        mToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -80,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -98,6 +91,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(this, "Settings pressed", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -110,18 +104,21 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        //Fragments ersetzen
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_maps) {
+            mCurrentFragment = new MapsFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+        } else if (id == R.id.nav_groups) {
+            mCurrentFragment = new GroupsFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+        } else if (id == R.id.nav_strategies) {
+            mCurrentFragment = new StrategiesFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+        } else if (id == R.id.nav_profile) {
+            Toast.makeText(this, "nav_profile clicked", Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -129,4 +126,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onBackStackChanged() {
+        mToggle.setDrawerIndicatorEnabled(mFt.getBackStackEntryCount() == 0);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(mFt.getBackStackEntryCount() > 0);
+        mToggle.syncState();
+    }
 }

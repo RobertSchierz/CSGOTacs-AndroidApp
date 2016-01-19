@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#1a1a1a</color>
+    <color name="colorPrimaryDark">#1a1a1a</color>
+    <color name="colorAccent">#F98B01</color>
+    <color name="title_text">#F98B01</color>
+
+    <color name="nav_menu_header_gradient_start">#1a1a1a</color>
+    <color name="nav_menu_header_gradient_center">#333333</color>
+    <color name="nav_menu_header_gradient_end">#FFFFFF</color>
+
+    <color name="nav_menu_background">#1a1a1a</color>
+    <color name="nav_menuitem_text">#F98B01</color>
+
+    <color name="maps_details_background">#333333</color>
 </resources>

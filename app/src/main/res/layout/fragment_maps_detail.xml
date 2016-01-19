@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/maps_details_background"
+    >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <!-- ImageView für das Detailbild einer Karte ohne callouts -->
+        <ImageView
+            android:id="@+id/map_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"/>
+
+        <!-- ImageView für das Bild mit den callouts ohne Karte -->
+        <ImageView
+            android:id="@+id/map_callouts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
+        <RelativeLayout
+            android:id="@+id/canvas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            >
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/edit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Strat" />
+    <ToggleButton
+        android:id="@+id/show_callouts_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/edit_button"
+        android:textOff="Show Callouts"
+        android:textOn="Hide Callouts"/>
+
+
+
+</RelativeLayout>

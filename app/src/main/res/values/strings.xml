@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">Map-Service-Android</string>
+    <string name="app_name">GoStrats</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings1</string>
+
+    <!-- Nav menu -->
+    <string name="nav_maps">Karten</string>
+    <string name="nav_groups">Gruppen</string>
+    <string name="nav_strategies">Strategien</string>
+    <string name="nav_profile">Mein Profil</string>
+
 </resources>
