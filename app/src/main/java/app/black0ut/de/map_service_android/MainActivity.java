@@ -17,6 +17,8 @@ import android.widget.Toast;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
 import app.black0ut.de.map_service_android.fragments.MapsFragment_;
+import app.black0ut.de.map_service_android.fragments.MyProfileFragment;
+import app.black0ut.de.map_service_android.fragments.MyProfileFragment_;
 import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
 
@@ -118,7 +120,8 @@ public class MainActivity extends AppCompatActivity
             mCurrentFragment = new StrategiesFragment_();
             ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         } else if (id == R.id.nav_profile) {
-            Toast.makeText(this, "nav_profile clicked", Toast.LENGTH_SHORT).show();
+            mCurrentFragment = new MyProfileFragment_();
+            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
