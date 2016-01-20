@@ -174,7 +174,6 @@ public class DrawingView extends View {
     //TODO
     //Testnachricht senden
     private void attemptSend(String json) {
-        //String json = "{x: 666, y: 69}";
         if (TextUtils.isEmpty(json)) {
             return;
         }

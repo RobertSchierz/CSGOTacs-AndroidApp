@@ -23,11 +23,11 @@
         android:layout_centerInParent="true"
         android:id="@+id/relativeLayout">
         <EditText
+            android:id="@+id/editTextName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:ems="15"
-            android:id="@+id/editTextName"
             android:textColor="@color/title_text"
             android:background="@color/edit_text_background"
             android:layout_marginBottom="20dp"
@@ -37,11 +37,11 @@
             />
 
         <EditText
+            android:id="@+id/editTextPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="15"
-            android:id="@+id/editTextPassword"
             android:layout_below="@+id/editTextName"
             android:textColor="@color/title_text"
             android:background="@color/edit_text_background"

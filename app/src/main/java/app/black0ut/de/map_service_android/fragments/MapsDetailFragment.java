@@ -1,5 +1,7 @@
 package app.black0ut.de.map_service_android.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,11 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
@@ -37,7 +41,7 @@ import io.socket.client.Socket;
 
 /**
  * Created by Jan-Philipp Altenhof on 03.01.16.
- *
+ * <p/>
  * Diese Klasse beschreibt das Fragment, welches für das Darstellen einer ausgewählten Karte zuständig ist.
  * Es beinhaltet ein Layout mit zwei 'ImageViews' welche zum einen das Bild der Karte ohne Callouts
  * und zum Anderen die Karte inklusive Callouts anzeigen.
@@ -45,7 +49,7 @@ import io.socket.client.Socket;
  */
 
 @EFragment(R.layout.fragment_maps_detail)
-public class MapsDetailFragment extends Fragment{
+public class MapsDetailFragment extends Fragment {
 
     @ViewById(R.id.map_image)
     ImageView mapImage;
@@ -59,15 +63,15 @@ public class MapsDetailFragment extends Fragment{
     @ViewById(R.id.show_callouts_button)
     ToggleButton showCallouts;
 
-    private int BITMAP_WIDHT = 256;
-    private int BITMAP_HEIGHT = 256;
+    private int BITMAP_WIDHT = 1024;
+    private int BITMAP_HEIGHT = 1024;
 
     public int mapImageHeight;
     public int mapImageWidth;
     public Bitmap bitmap;
 
     @AfterViews
-    public void afterViews(){
+    public void afterViews() {
 
         checkMapName();
 
@@ -87,18 +91,45 @@ public class MapsDetailFragment extends Fragment{
             }
         });
         */
-
         //Log.d("TEST", "Height: " + mapImage.getHeight() + "Widht: "+ mapImage.getWidth());
-
 
         showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    mapCallouts.setVisibility(View.VISIBLE);
-                    //Toast.makeText(getContext(), "Show clicked", Toast.LENGTH_SHORT).show();
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        // get the center for the clipping circle
+                        int cx = mapCallouts.getWidth() / 2;
+                        int cy = mapCallouts.getHeight() / 2;
+                        // get the final radius for the clipping circle
+                        float finalRadius = (float) Math.hypot(cx, cy);
+                        // create the animator for this view (the start radius is zero)
+                        Animator anim =
+                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, 0, finalRadius);
+                        // make the view visible and start the animation
+                        mapCallouts.setVisibility(View.VISIBLE);
+                        anim.start();
+                    } else {
+                        mapCallouts.setVisibility(View.VISIBLE);
+                    }
                 } else {
-                    // The toggle is disabled
-                    mapCallouts.setVisibility(View.GONE);
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        int cx = mapCallouts.getWidth() / 2;
+                        int cy = mapCallouts.getHeight() / 2;
+                        float initialRadius = (float) Math.hypot(cx, cy);
+                        Animator anim =
+                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, initialRadius, 0);
+                        anim.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                mapCallouts.setVisibility(View.GONE);
+                            }
+                        });
+                        anim.start();
+                    } else {
+                        // The toggle is disabled
+                        mapCallouts.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -112,29 +143,21 @@ public class MapsDetailFragment extends Fragment{
         DrawingView.mPaint.setStrokeWidth(12);
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
-
-
-
-
-
     }
 
     public void loadMapBitmap(int resId, ImageView imageView) {
-        BITMAP_WIDHT = 256;
-        BITMAP_HEIGHT = 256;
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
         task.execute(resId);
     }
 
     public void loadCalloutBitmap(int resId, ImageView imageView) {
-        BITMAP_WIDHT = 1024;
-        BITMAP_HEIGHT = 1024;
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
         task.execute(resId);
     }
 
     /**
      * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+     *
      * @param options
      * @param reqWidth
      * @param reqHeight
@@ -165,6 +188,7 @@ public class MapsDetailFragment extends Fragment{
 
     /**
      * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+     *
      * @param res
      * @param resId
      * @param reqWidth
@@ -190,8 +214,8 @@ public class MapsDetailFragment extends Fragment{
     /**
      * Prüft den Namen der geklickten Karte und setzt dann die ImageResource der ImageView auf das passende Bild.
      */
-    private void checkMapName(){
-        switch(Map.clickedMapName){
+    private void checkMapName() {
+        switch (Map.clickedMapName) {
             case Map.ASSAULT:
                 //Picasso.with(getContext()).load(R.drawable.cs_assault_radar).into(mapImage);
                 loadMapBitmap(R.drawable.cs_assault_radar, mapImage);
@@ -272,7 +296,7 @@ public class MapsDetailFragment extends Fragment{
     }
 
     @Click(R.id.edit_button)
-    public void onEditButtonClick(){
+    public void onEditButtonClick() {
         mapImageWidth = mapImage.getWidth();
         mapImageHeight = mapImage.getHeight();
 

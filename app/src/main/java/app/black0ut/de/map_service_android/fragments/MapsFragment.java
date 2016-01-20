@@ -1,6 +1,7 @@
 package app.black0ut.de.map_service_android.fragments;
 
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -16,6 +17,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.activities.MapsDetailActivity_;
 import app.black0ut.de.map_service_android.adapter.MapsListViewAdapter;
 import app.black0ut.de.map_service_android.data.Map;
 
@@ -47,6 +49,8 @@ public class MapsFragment extends Fragment {
         //Den Namen der geklickten Map global speichern
         Map.clickedMapName = map.mapName;
 
+        //Intent intent = new Intent(getActivity(), MapsDetailActivity_.class);
+        //getActivity().startActivity(intent);
         //Fragments ersetzen
         Fragment fragment;
 
@@ -54,6 +58,9 @@ public class MapsFragment extends Fragment {
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.addToBackStack(null);
         ft.replace(R.id.mainFrame, fragment).commit();
+
+
+
 
         //Toast.makeText(this.getContext(), map.mapName, Toast.LENGTH_SHORT).show();
     }

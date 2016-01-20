@@ -7,6 +7,7 @@
     <string name="action_settings">Settings1</string>
 
     <!-- Nav menu -->
+    <string name="nav_home">Home</string>
     <string name="nav_maps">Karten</string>
     <string name="nav_groups">Gruppen</string>
     <string name="nav_strategies">Strategien</string>
