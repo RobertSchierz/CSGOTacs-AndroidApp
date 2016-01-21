@@ -2,6 +2,8 @@ package app.black0ut.de.map_service_android.fragments;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -69,16 +71,39 @@ public class MyProfileFragment extends Fragment {
             //mSocket.on("auth", auth);
             //mSocket.connect();
             //mSocket.emit("appTest");
+            Fragment fragment = new MyProfileDetailsFragment_();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                    .replace(R.id.mainFrame, fragment)
+                    .commit();
+            fragmentManager.executePendingTransactions();
         }
 
     }
 
     @Click
     public void registerButtonClicked() {
-        Toast.makeText(getContext(), "Registrieren", Toast.LENGTH_SHORT).show();
+        String username = editTextName.getText().toString();
+        String password = editTextPassword.getText().toString();
+        if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
+            Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
+        }else{
+            String regString = "{ user : \"" + username + "\", pw : \"" + password +"\" }";
+            JSONObject reg;
+            try {
+                reg = new JSONObject(regString);
+            } catch (JSONException e) {
+                Log.d("TEST", "JSONObject Failed");
+                return;
+            }
+            mSocket.on("regStatus", regEmitter);
+            mSocket.connect();
+            mSocket.emit("reg", reg);
+        }
     }
 
-    private Emitter.Listener auth = new Emitter.Listener() {
+    private Emitter.Listener regEmitter = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             Activity activity = (Activity) getContext();
@@ -86,14 +111,15 @@ public class MyProfileFragment extends Fragment {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
-                    String username;
-                    String password;
+                    String regStatus;
                     try {
-                        username = data.getString("user");
-                        password = data.getString("pw");
+                        regStatus = data.getString("regStatus");
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
+                    }
+                    if (regStatus.equals("regSuccess")){
+
                     }
 
                 }

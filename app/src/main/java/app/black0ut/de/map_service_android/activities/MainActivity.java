@@ -20,7 +20,6 @@ import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
 import app.black0ut.de.map_service_android.fragments.MapsFragment_;
-import app.black0ut.de.map_service_android.fragments.MyProfileFragment;
 import app.black0ut.de.map_service_android.fragments.MyProfileFragment_;
 import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .replace(R.id.mainFrame, fragment)
                 .disallowAddToBackStack()
                 .commit();
