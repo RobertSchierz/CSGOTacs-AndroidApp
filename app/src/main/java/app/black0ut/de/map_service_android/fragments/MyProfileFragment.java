@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -28,6 +29,10 @@ import io.socket.emitter.Emitter;
 @EFragment(R.layout.fragment_my_profile)
 public class MyProfileFragment extends Fragment {
 
+    public static String username;
+    public static String password;
+    public String mCurrentStatus = "";
+
     @ViewById
     TextView submitButton;
     @ViewById
@@ -36,8 +41,11 @@ public class MyProfileFragment extends Fragment {
     EditText editTextName;
     @ViewById
     EditText editTextPassword;
+    @ViewById
+    TextView navHeaderUsername;
 
     private Socket mSocket;
+
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -45,6 +53,12 @@ public class MyProfileFragment extends Fragment {
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+    }
+
+    @AfterViews
+    public void afterViews() {
+        mSocket.on("status", status);
+        mSocket.connect();
     }
 
     //androidannotations erkennt die ID automatisch durch den Namen
@@ -61,35 +75,31 @@ public class MyProfileFragment extends Fragment {
     @Click
     public void submitButtonClicked() {
         //{ user : 'Benutzername', pw : 'Passwort' }
-        String username = editTextName.getText().toString();
-        String password = editTextPassword.getText().toString();
+        setUsernamePassword();
         Log.d("TEST", "Username: " + username + " Password: " + password);
-
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
-        }else{
-            //mSocket.on("auth", auth);
-            //mSocket.connect();
-            //mSocket.emit("appTest");
-            Fragment fragment = new MyProfileDetailsFragment_();
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
-                    .replace(R.id.mainFrame, fragment)
-                    .commit();
-            fragmentManager.executePendingTransactions();
+        } else {
+            String authString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
+            JSONObject auth;
+            try {
+                auth = new JSONObject(authString);
+            } catch (JSONException e) {
+                Log.d("TEST", "JSONObject Failed");
+                return;
+            }
+            mSocket.emit("auth", auth);
         }
 
     }
 
     @Click
     public void registerButtonClicked() {
-        String username = editTextName.getText().toString();
-        String password = editTextPassword.getText().toString();
+        setUsernamePassword();
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
-            Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
-        }else{
-            String regString = "{ user : \"" + username + "\", pw : \"" + password +"\" }";
+            Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
+        } else {
+            String regString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
             JSONObject reg;
             try {
                 reg = new JSONObject(regString);
@@ -97,13 +107,11 @@ public class MyProfileFragment extends Fragment {
                 Log.d("TEST", "JSONObject Failed");
                 return;
             }
-            mSocket.on("regStatus", regEmitter);
-            mSocket.connect();
             mSocket.emit("reg", reg);
         }
     }
 
-    private Emitter.Listener regEmitter = new Emitter.Listener() {
+    private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             Activity activity = (Activity) getContext();
@@ -111,19 +119,59 @@ public class MyProfileFragment extends Fragment {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
-                    String regStatus;
+                    String emitterStatus;
                     try {
-                        regStatus = data.getString("regStatus");
+                        emitterStatus = data.getString("status");
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
                     }
-                    if (regStatus.equals("regSuccess")){
-
+                    if (emitterStatus.equals("regSuccess")) {
+                        setStatus("regSuccess");
+                        Toast.makeText(getContext(), "Du hast Dich erfolgreich registriert.", Toast.LENGTH_SHORT).show();
+                        //navHeaderUsername.setText(username);
+                        swapFragment();
+                    } else if (emitterStatus.equals("regFailed")) {
+                        setStatus("regFailed");
+                        Toast.makeText(getContext(), "Der Benutzername ist bereits vergeben.", Toast.LENGTH_SHORT).show();
                     }
-
+                    if (emitterStatus.equals("authSuccess")) {
+                        setStatus("authSuccess");
+                        Toast.makeText(getContext(), "Du hast Dich erfolgreich angemeldet.", Toast.LENGTH_SHORT).show();
+                        //navHeaderUsername.setText(username);
+                        swapFragment();
+                    } else if (emitterStatus.equals("authFailed")) {
+                        setStatus("authFailed");
+                        Toast.makeText(getContext(), "Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
     };
+
+    /**
+     * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
+     *
+     * @param status Der zu setztende Status.
+     */
+    public void setStatus(String status) {
+        if (status != null && status.isEmpty())
+            Log.d("TEST", "Current status: " + status);
+        this.mCurrentStatus = status;
+    }
+
+    public void setUsernamePassword(){
+        username = editTextName.getText().toString();
+        password = editTextPassword.getText().toString();
+    }
+
+    public void swapFragment(){
+        Fragment fragment = new MyProfileDetailsFragment_();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.mainFrame, fragment)
+                .commit();
+        fragmentManager.executePendingTransactions();
+    }
 }

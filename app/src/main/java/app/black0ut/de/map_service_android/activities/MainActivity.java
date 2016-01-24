@@ -1,7 +1,6 @@
 package app.black0ut.de.map_service_android.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -64,6 +63,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
+        //Quelle: http://stackoverflow.com/questions/28930501/back-navigation-with-fragments-toolbar
         mToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
