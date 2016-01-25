@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -60,8 +61,8 @@ public class MapsDetailFragment extends Fragment {
     @ViewById(R.id.canvas)
     RelativeLayout canvas;
 
-    @ViewById(R.id.show_callouts_button)
-    ToggleButton showCallouts;
+    @ViewById
+    FloatingActionButton fabShowCallouts;
 
     private int BITMAP_WIDHT = 1024;
     private int BITMAP_HEIGHT = 1024;
@@ -69,6 +70,7 @@ public class MapsDetailFragment extends Fragment {
     public int mapImageHeight;
     public int mapImageWidth;
     public Bitmap bitmap;
+    private boolean showCalloutsClicked = false;
 
     @AfterViews
     public void afterViews() {
@@ -92,7 +94,7 @@ public class MapsDetailFragment extends Fragment {
         });
         */
         //Log.d("TEST", "Height: " + mapImage.getHeight() + "Widht: "+ mapImage.getWidth());
-
+        /*
         showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -133,7 +135,7 @@ public class MapsDetailFragment extends Fragment {
                 }
             }
         });
-
+        */
         DrawingView.mPaint.setAntiAlias(true);
         DrawingView.mPaint.setDither(true);
         DrawingView.mPaint.setColor(Color.GREEN);
@@ -295,8 +297,8 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
-    @Click(R.id.edit_button)
-    public void onEditButtonClick() {
+    @Click
+    public void fabEditStratClicked() {
         mapImageWidth = mapImage.getWidth();
         mapImageHeight = mapImage.getHeight();
 
@@ -307,8 +309,20 @@ public class MapsDetailFragment extends Fragment {
         //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
         canvas.addView(mDrawingView, params);
 
-
         Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
+    }
+
+    @Click
+    public void fabShowCalloutsClicked(){
+        if (!showCalloutsClicked){
+            mapCallouts.setVisibility(View.VISIBLE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
+            showCalloutsClicked = true;
+        }else{
+            mapCallouts.setVisibility(View.GONE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
+            showCalloutsClicked = false;
+        }
     }
 
     @Override
