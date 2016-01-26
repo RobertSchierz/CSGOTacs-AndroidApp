@@ -17,7 +17,7 @@
             android:textColor="@color/my_profile_background"
             android:textSize="24sp"
             android:gravity="center"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/avatar_circle"
             android:layout_gravity="center_horizontal"
             />
@@ -29,6 +29,20 @@
             android:textSize="30sp"
             android:textColor="@color/orangePrimary"
             android:layout_gravity="center_horizontal"/>
+        <TextView
+            android:id="@+id/logoutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:ems="8"
+            android:text="@string/my_profile_logout_button"
+            android:textColor="@drawable/selector_orange_text"
+            android:padding="15dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/ripple_button_rounded"
+            android:gravity="center"
+            android:clickable="true"/>
         <RelativeLayout
             android:id="@+id/editTextRelativeLayout"
             android:layout_width="wrap_content"
