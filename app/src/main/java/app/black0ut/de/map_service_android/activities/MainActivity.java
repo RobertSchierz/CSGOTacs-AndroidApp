@@ -1,5 +1,7 @@
 package app.black0ut.de.map_service_android.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,9 +18,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.User;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
 import app.black0ut.de.map_service_android.fragments.MapsFragment_;
+import app.black0ut.de.map_service_android.fragments.MyProfileDetailsFragment_;
 import app.black0ut.de.map_service_android.fragments.MyProfileFragment_;
 import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
@@ -26,6 +30,7 @@ import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
+    SharedPreferences sharedPreferences;
     FragmentManager mFt;
     Fragment mCurrentFragment;
     ActionBarDrawerToggle mToggle;
@@ -121,24 +126,26 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             mCurrentFragment = MainContentFragment_.builder().build();
             getSupportActionBar().setTitle(R.string.nav_home);
-            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_maps) {
             mCurrentFragment = MapsFragment_.builder().build();
             getSupportActionBar().setTitle(R.string.nav_maps);
-            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_groups) {
             getSupportActionBar().setTitle(R.string.nav_groups);
             mCurrentFragment = GroupsFragment_.builder().build();
-            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_strategies) {
             getSupportActionBar().setTitle(R.string.nav_strategies);
             mCurrentFragment = StrategiesFragment_.builder().build();
-            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_profile) {
             getSupportActionBar().setTitle(R.string.nav_profile);
-            mCurrentFragment = MyProfileFragment_.builder().build();
-            swapFragment(mCurrentFragment);
+            sharedPreferences = getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+            if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)){
+                mCurrentFragment = MyProfileDetailsFragment_.builder().build();
+            }else{
+                mCurrentFragment = MyProfileFragment_.builder().build();
+            }
         }
+
+        swapFragment(mCurrentFragment);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

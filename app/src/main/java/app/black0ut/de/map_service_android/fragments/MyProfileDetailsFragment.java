@@ -2,6 +2,8 @@ package app.black0ut.de.map_service_android.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -17,12 +19,15 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.User;
 
 /**
  * Created by Jan-Philipp Altenhof on 20.01.2016.
  */
 @EFragment(R.layout.fragment_my_profile_details)
 public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
+
+    public SharedPreferences sharedPrefs;
 
     @ViewById
     FloatingActionButton fabEdit;
@@ -43,8 +48,8 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
 
     @AfterViews
     public void afterViews() {
-
-        username.setText(MyProfileFragment.username);
+        sharedPrefs = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        username.setText(sharedPrefs.getString(User.USERNAME, null));
         /*fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,7 +85,7 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
         //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
         //        .setAction("Action", null).show();
         //Animation Quelle: http://stackoverflow.com/questions/22454839/android-adding-simple-animations-while-setvisibilityview-gone
-        editTextNameSignedIn.setText(MyProfileFragment.username);
+        editTextNameSignedIn.setText(sharedPrefs.getString(User.USERNAME, null));
         editTextPasswordSignedIn.setText(MyProfileFragment.password);
         avatarImage.setText("+");
         username.setVisibility(View.GONE);
