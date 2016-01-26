@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/my_profile_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="@string/my_profile_login_description"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/relativeLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center"
+        android:textColor="@color/title_text"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/relativeLayout">
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="15"
+            android:textColor="@color/title_text"
+            android:background="@color/edit_text_background"
+            android:layout_marginBottom="20dp"
+            android:padding="10dp"
+            android:hint="@string/username_hint"
+            android:textColorHint="@color/title_text"
+            />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="15"
+            android:layout_below="@+id/editTextName"
+            android:textColor="@color/title_text"
+            android:background="@color/edit_text_background"
+            android:padding="10dp"
+            android:hint="@string/password_hint"
+            android:textColorHint="@color/title_text"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:id="@+id/registerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:ems="8"
+            android:text="@string/my_profile_register_button"
+            android:textColor="@drawable/selector_orange_text"
+            android:padding="15dp"
+            android:background="@drawable/ripple_button_rounded"
+            android:gravity="center"
+            android:clickable="true"/>
+        <TextView
+            android:id="@+id/submitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:ems="8"
+            android:text="@string/my_profile_submit_button"
+            android:textColor="@drawable/selector_orange_text"
+            android:padding="15dp"
+            android:layout_toEndOf="@+id/registerButton"
+            android:layout_toRightOf="@+id/registerButton"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/ripple_button_rounded"
+            android:gravity="center"
+            android:clickable="true"/>
+    </RelativeLayout>
+</RelativeLayout>

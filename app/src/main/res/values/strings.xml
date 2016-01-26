@@ -6,10 +6,24 @@
 
     <string name="action_settings">Settings1</string>
 
+    <!-- Main Content -->
+    <string name="no_main_content">Zur Zeit gibt es leider keine Aktivitäten.</string>
+
+    <!-- Strategies Fragment -->
+    <string name="no_strategies">Du hast leider keine Strategien gespeichert.</string>
+
     <!-- Nav menu -->
+    <string name="nav_home">Home</string>
     <string name="nav_maps">Karten</string>
     <string name="nav_groups">Gruppen</string>
     <string name="nav_strategies">Strategien</string>
     <string name="nav_profile">Mein Profil</string>
+
+    <!-- My Profile Login -->
+    <string name="my_profile_login_description">Bitte melde dich mit deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
+    <string name="my_profile_submit_button">Anmelden</string>
+    <string name="my_profile_register_button">Registrieren</string>
+    <string name="password_hint">Passwort</string>
+    <string name="username_hint">Benutzername</string>
 
 </resources>

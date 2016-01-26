@@ -1,7 +1,6 @@
-package app.black0ut.de.map_service_android;
+package app.black0ut.de.map_service_android.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -13,10 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+
+import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.fragments.MainContentFragment_;
 import app.black0ut.de.map_service_android.fragments.MapsFragment_;
+import app.black0ut.de.map_service_android.fragments.MyProfileFragment_;
 import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
 
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity
         mFt.addOnBackStackChangedListener(this);
 
         //Initiales Fragment erstellen
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             mCurrentFragment = new MainContentFragment_();
             mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
         }
@@ -60,6 +63,13 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
+        //Quelle: http://stackoverflow.com/questions/28930501/back-navigation-with-fragments-toolbar
+        mToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -75,13 +85,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
+    */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -94,7 +105,6 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Settings pressed", Toast.LENGTH_SHORT).show();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -108,22 +118,49 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         //ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
-        if (id == R.id.nav_maps) {
-            mCurrentFragment = new MapsFragment_();
-            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+        if (id == R.id.nav_home) {
+            mCurrentFragment = MainContentFragment_.builder().build();
+            getSupportActionBar().setTitle(R.string.nav_home);
+            swapFragment(mCurrentFragment);
+        } else if (id == R.id.nav_maps) {
+            mCurrentFragment = MapsFragment_.builder().build();
+            getSupportActionBar().setTitle(R.string.nav_maps);
+            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_groups) {
-            mCurrentFragment = new GroupsFragment_();
-            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+            getSupportActionBar().setTitle(R.string.nav_groups);
+            mCurrentFragment = GroupsFragment_.builder().build();
+            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_strategies) {
-            mCurrentFragment = new StrategiesFragment_();
-            ft.replace(R.id.mainFrame, mCurrentFragment).commit();
+            getSupportActionBar().setTitle(R.string.nav_strategies);
+            mCurrentFragment = StrategiesFragment_.builder().build();
+            swapFragment(mCurrentFragment);
         } else if (id == R.id.nav_profile) {
-            Toast.makeText(this, "nav_profile clicked", Toast.LENGTH_SHORT).show();
+            getSupportActionBar().setTitle(R.string.nav_profile);
+            mCurrentFragment = MyProfileFragment_.builder().build();
+            swapFragment(mCurrentFragment);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Tauscht die gelieferten Fragments mit dem mainFrame aus
+     *
+     * @param fragment Das mit dem mainFrame auszutauschende Fragment.
+     */
+    protected void swapFragment(final Fragment fragment) {
+        if (fragment == null) {
+            return;
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .replace(R.id.mainFrame, fragment)
+                .disallowAddToBackStack()
+                .commit();
+        fragmentManager.executePendingTransactions();
     }
 
     @Override
