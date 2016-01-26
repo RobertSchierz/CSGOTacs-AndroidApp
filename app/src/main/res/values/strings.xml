@@ -6,6 +6,12 @@
 
     <string name="action_settings">Settings1</string>
 
+    <!-- Main Content -->
+    <string name="no_main_content">Zur Zeit gibt es leider keine Aktivitäten.</string>
+
+    <!-- Strategies Fragment -->
+    <string name="no_strategies">Du hast leider keine Strategien gespeichert.</string>
+
     <!-- Nav menu -->
     <string name="nav_home">Home</string>
     <string name="nav_maps">Karten</string>
