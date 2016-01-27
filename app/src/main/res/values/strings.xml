@@ -27,4 +27,8 @@
     <string name="password_hint">Passwort</string>
     <string name="username_hint">Benutzername</string>
 
+    <!-- Groups -->
+    <string name="group_name_hint">Gruppenname</string>
+    <string name="group_password_hint">Gruppenpasswort</string>
+
 </resources>

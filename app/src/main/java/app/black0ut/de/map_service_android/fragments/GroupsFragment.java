@@ -8,10 +8,15 @@ import android.content.SharedPreferences;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -42,6 +47,7 @@ public class GroupsFragment extends Fragment {
     SharedPreferences sharedPreferences;
     private String groupName;
     private String groupPasswort;
+    private String username;
 
     @ViewById
     public RecyclerView mGroupsRecyclerView;
@@ -80,41 +86,23 @@ public class GroupsFragment extends Fragment {
 
     @Click
     public void fabNewGroupClicked() {
-        String username = sharedPreferences.getString(User.USERNAME, null);
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            username = sharedPreferences.getString(User.USERNAME, null);
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newGroupLayout = factory.inflate(R.layout.new_group, null);
 
-        /*
-        new MaterialDialog.Builder(getContext())
-                .title("Gruppennamen vergeben")
-                        //.content(R.string.input_content)
-                .positiveText("Weiter")
-                .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Gruppenname", null, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        groupName = input.toString();
-                    }
-                }).dismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                new MaterialDialog.Builder(getContext())
-                        .title("Gruppenpasswort vergeben")
-                                //.content(R.string.input_content)
-                        .positiveText("Erstellen")
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input("Gruppenpasswort", null, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog dialog, CharSequence input) {
-                                groupPasswort = input.toString();
-                            }
-                        }).dismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        Toast.makeText(getContext(), "Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
-                    }
-                }).show();
-            }
-        }).show();
-        */
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setPositiveButton("Erstellen", null)
+                    .setNegativeButton("Abbrechen", null)
+                    .create();
+            builder.setTitle("Gruppe erstellen");
+            builder.setView(newGroupLayout);
+            builder.show();
+        }else{
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+
+
         //mSocket.on("status", status);
         //mSocket.connect();
         //{ 'user' : 'Erstellender Benutzer', 'name' : 'Gruppenname', 'pw' : 'Gruppenpasswort' }
@@ -126,7 +114,6 @@ public class GroupsFragment extends Fragment {
             Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
             return;
         }*/
-        Toast.makeText(getContext(), "fabNewGroup Clicked!", Toast.LENGTH_SHORT).show();
     }
 
     public void swapFragment() {
