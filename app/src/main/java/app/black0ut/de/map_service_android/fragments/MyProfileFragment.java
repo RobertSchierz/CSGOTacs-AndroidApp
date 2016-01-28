@@ -111,6 +111,8 @@ public class MyProfileFragment extends Fragment {
         @Override
         public void call(final Object... args) {
             //Activity activity = (Activity) getContext();
+            if(getActivity() == null)
+                return;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

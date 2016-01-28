@@ -177,6 +177,8 @@ public class GroupsFragment extends Fragment {
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
+            if(getActivity() == null)
+                return;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
