@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.activities.MainActivity;
 import app.black0ut.de.map_service_android.adapter.GroupsRecyclerViewAdapter;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
@@ -168,10 +169,10 @@ public class GroupsFragment extends Fragment {
         fragmentManager.executePendingTransactions();
     }
 
-    String name;
-    String[] member;
-    String admin;
-    String[] mods;
+    private String name;
+    private String[] member;
+    private String admin;
+    private String[] mods;
 
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
@@ -193,6 +194,7 @@ public class GroupsFragment extends Fragment {
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
+                        mSocket.off("status", status);
                     } else if (emitterStatus.equals("provideGroups")) {
                         try {
                             JSONArray groups = data.getJSONArray("groups");
@@ -219,6 +221,7 @@ public class GroupsFragment extends Fragment {
                             mAdapter = new GroupsRecyclerViewAdapter(myGroups);
                             mGroupsRecyclerView.setAdapter(mAdapter);
                             mSocket.disconnect();
+                            mSocket.off("status", status);
                         } catch (JSONException e) {
                             Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         }

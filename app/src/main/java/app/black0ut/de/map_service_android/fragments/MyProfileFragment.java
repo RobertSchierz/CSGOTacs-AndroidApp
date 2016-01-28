@@ -124,28 +124,36 @@ public class MyProfileFragment extends Fragment {
                     }
                     if (emitterStatus.equals("regSuccess")) {
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich registriert.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
+                        disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("regFailed")) {
                         Toast.makeText(getContext(), "Der Benutzername ist bereits vergeben.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
+                        disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(false, null);
                     }
                     if (emitterStatus.equals("authSuccess")) {
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich angemeldet.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
+                        disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("authFailed")) {
                         Toast.makeText(getContext(), "Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
+                        disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(false, null);
                     }
                 }
             });
         }
     };
+
+    /**
+     * Schaltet die Socket Verbindung sowie die Listener aus.
+     */
+    private void disconnectSocketAndListener(){
+        mSocket.disconnect();
+        mSocket.off("status", status);
+    }
 
     /**
      * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
