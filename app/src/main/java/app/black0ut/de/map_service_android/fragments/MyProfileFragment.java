@@ -3,6 +3,7 @@ package app.black0ut.de.map_service_android.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
+import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
@@ -84,17 +86,8 @@ public class MyProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
         } else {
             String authString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            JSONObject auth;
-            try {
-                auth = new JSONObject(authString);
-                Log.d("TEST", "Anmelde JSON: " + auth.toString());
-            } catch (JSONException e) {
-                Log.d("TEST", "JSONObject Failed");
-                return;
-            }
-            mSocket.emit("auth", auth);
+            mSocket.emit("auth", JSONCreator.createJSON("auth", authString));
         }
-
     }
 
     @Click
@@ -105,14 +98,7 @@ public class MyProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
         } else {
             String regString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            JSONObject reg;
-            try {
-                reg = new JSONObject(regString);
-            } catch (JSONException e) {
-                Log.d("TEST", "JSONObject Failed");
-                return;
-            }
-            mSocket.emit("reg", reg);
+            mSocket.emit("reg", JSONCreator.createJSON("reg", regString));
         }
     }
 
@@ -139,28 +125,22 @@ public class MyProfileFragment extends Fragment {
                     if (emitterStatus.equals("regSuccess")) {
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich registriert.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
-                        User.setsIsLoggedIn(true);
-                        User.setsUsername(username);
-                        User.saveUserSharedPrefs(getContext());
+                        setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("regFailed")) {
                         Toast.makeText(getContext(), "Der Benutzername ist bereits vergeben.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
-                        User.setsIsLoggedIn(false);
-                        User.saveUserSharedPrefs(getContext());
+                        setUserStatusAndUsernameInPrefs(false, null);
                     }
                     if (emitterStatus.equals("authSuccess")) {
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich angemeldet.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
-                        User.setsIsLoggedIn(true);
-                        User.setsUsername(username);
-                        User.saveUserSharedPrefs(getContext());
+                        setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("authFailed")) {
                         Toast.makeText(getContext(), "Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
-                        User.setsIsLoggedIn(false);
-                        User.saveUserSharedPrefs(getContext());
+                        setUserStatusAndUsernameInPrefs(false, null);
                     }
                 }
             });
@@ -168,8 +148,19 @@ public class MyProfileFragment extends Fragment {
     };
 
     /**
+     * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
+     * @param isLoggedIn Boolean, ob der nutzer eingeloggt ist oder nicht.
+     * @param username Der Username des Benutzers.
+     */
+    private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username){
+        User.setsIsLoggedIn(isLoggedIn);
+        if (username != null)
+            User.setsUsername(username);
+        User.saveUserSharedPrefs(getContext());
+    }
+
+    /**
      * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
-     *
      * @param status Der zu setztende Status.
      */
     public void setStatus(String status) {

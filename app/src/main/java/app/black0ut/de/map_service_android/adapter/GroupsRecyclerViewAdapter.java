@@ -10,6 +10,8 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.ViewById;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 import app.black0ut.de.map_service_android.R;
 
 /**
@@ -18,7 +20,7 @@ import app.black0ut.de.map_service_android.R;
 
 public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> {
 
-    private String[] mDataset;
+    private ArrayList<String> mDataset = new ArrayList<>();
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -35,7 +37,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupsRecyclerViewAdapter(String[] myDataset) {
+    public GroupsRecyclerViewAdapter(ArrayList<String> myDataset) {
         mDataset = myDataset;
     }
 
@@ -57,13 +59,13 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.groupName.setText(mDataset[position]);
+        holder.groupName.setText(mDataset.get(position));
 
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 }

@@ -20,7 +20,7 @@
     <string name="nav_profile">Mein Profil</string>
 
     <!-- My Profile Login -->
-    <string name="my_profile_login_description">Bitte melde dich mit deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
+    <string name="my_profile_login_description">Bitte melde Dich mit Deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
     <string name="my_profile_submit_button">Anmelden</string>
     <string name="my_profile_logout_button">Abmelden</string>
     <string name="my_profile_register_button">Registrieren</string>
