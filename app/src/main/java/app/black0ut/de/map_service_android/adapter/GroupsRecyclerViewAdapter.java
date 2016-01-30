@@ -10,6 +10,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.ViewById;
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.R;
@@ -21,6 +22,7 @@ import app.black0ut.de.map_service_android.R;
 public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<String> mDataset = new ArrayList<>();
+    private ArrayList<Integer> memberCount;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -29,16 +31,19 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         // each data item is just a string in this case
 
         public TextView groupName;
+        public TextView groupMemberCount;
 
         public ViewHolder(View v) {
             super(v);
             groupName = (TextView) v.findViewById(R.id.groupName);
+            groupMemberCount = (TextView) v.findViewById(R.id.groupMemberCount);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupsRecyclerViewAdapter(ArrayList<String> myDataset) {
+    public GroupsRecyclerViewAdapter(ArrayList<String> myDataset, ArrayList<Integer> memberCount) {
         mDataset = myDataset;
+        this.memberCount = memberCount;
     }
 
     // Create new views (invoked by the layout manager)
@@ -60,6 +65,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.groupName.setText(mDataset.get(position));
+        holder.groupMemberCount.setText(memberCount.get(position).toString());
 
     }
 

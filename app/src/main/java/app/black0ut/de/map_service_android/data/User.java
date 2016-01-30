@@ -12,10 +12,12 @@ public class User {
     //http://source.android.com/source/code-style.html#follow-field-naming-conventions
     public static String sUsername = "";
     public static boolean sIsLoggedIn = false;
+    public static boolean sIsGroupsOpenedFirstTime = true;
 
     public static final String PREFERENCES = "userPrefs" ;
     public static final String USERNAME = "usernameKey";
     public static final String IS_LOGGED_IN = "isLoggedInKey";
+    public static final String OPENS_GROUPS_FIRST_TIME = "sIsGroupsOpenedFirstTime";
 
     public static void saveUserSharedPrefs(Context context){
         SharedPreferences sharedPrefs =
@@ -24,6 +26,7 @@ public class User {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(USERNAME, getsUsername());
         editor.putBoolean(IS_LOGGED_IN, issIsLoggedIn());
+        editor.putBoolean(OPENS_GROUPS_FIRST_TIME, issIsGroupsOpenedFirstTime());
         editor.apply();
 
         Log.d("TEST", "SharedPrefs saved - Username: " + sharedPrefs.getString(USERNAME, null) + " IsLoggedIn: " + sharedPrefs.getBoolean(IS_LOGGED_IN, false));
@@ -43,5 +46,13 @@ public class User {
 
     public static void setsIsLoggedIn(boolean sIsLoggedIn) {
         User.sIsLoggedIn = sIsLoggedIn;
+    }
+
+    public static boolean issIsGroupsOpenedFirstTime() {
+        return sIsGroupsOpenedFirstTime;
+    }
+
+    public static void setsIsGroupsOpenedFirstTime(boolean sIsGroupsOpenedFirstTime) {
+        User.sIsGroupsOpenedFirstTime = sIsGroupsOpenedFirstTime;
     }
 }

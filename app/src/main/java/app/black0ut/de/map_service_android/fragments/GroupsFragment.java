@@ -15,23 +15,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
-import app.black0ut.de.map_service_android.activities.MainActivity;
 import app.black0ut.de.map_service_android.adapter.GroupsRecyclerViewAdapter;
+import app.black0ut.de.map_service_android.data.Status;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -48,6 +51,8 @@ public class GroupsFragment extends Fragment {
     private String groupName;
     private String groupPassword;
     private String username;
+    private Status gsonStatus;
+    private boolean openedFirstTime;
     /*
         @ViewById
         EditText etGroupName;
@@ -61,11 +66,14 @@ public class GroupsFragment extends Fragment {
 
     @ViewById
     SwipeRefreshLayout swipeRefreshLayout;
+    @ViewById
+    TextView pullToRefreshText;
 
     /*private String[] myGroups = {"Gruppe 1", "Gruppe 2", "Gruppe 3", "Gruppe 4", "Gruppe 5",
             "Gruppe 6", "Gruppe 7", "Gruppe 8", "Gruppe 9", "Gruppe 10"};
             */
     private ArrayList<String> myGroups = new ArrayList<>();
+    private ArrayList<Integer> memberCount = new ArrayList<>();
 
     private Socket mSocket;
 
@@ -80,12 +88,17 @@ public class GroupsFragment extends Fragment {
     @AfterViews
     public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
-
+        pullToRefreshText.setVisibility(View.VISIBLE);
         username = sharedPreferences.getString(User.USERNAME, null);
+        openedFirstTime = sharedPreferences.getBoolean(User.OPENS_GROUPS_FIRST_TIME, true);
 
-        mSocket.on("status", status);
-        mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
+        if (openedFirstTime) {
+            mSocket.on("status", status);
+            mSocket.connect();
+            mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
+            User.setsIsGroupsOpenedFirstTime(false);
+            User.saveUserSharedPrefs(getContext());
+        }
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -96,8 +109,8 @@ public class GroupsFragment extends Fragment {
         mGroupsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-
-
+        mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount);
+        mGroupsRecyclerView.setAdapter(mAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -110,15 +123,16 @@ public class GroupsFragment extends Fragment {
     }
 
     void refreshItems() {
-
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
         // Load complete
-        onItemsLoadComplete();
     }
 
     void onItemsLoadComplete() {
+        pullToRefreshText.setVisibility(View.GONE);
         // Update the adapter and notify data set changed
-        // ...
-
+        mAdapter.notifyDataSetChanged();
         // Stop refresh animation
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -126,7 +140,6 @@ public class GroupsFragment extends Fragment {
     @Click
     public void fabNewGroupClicked() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-
             LayoutInflater factory = LayoutInflater.from(getContext());
             final View newGroupLayout = factory.inflate(R.layout.new_group, null);
             final EditText etGroupName = (EditText) newGroupLayout.findViewById(R.id.etGroupName);
@@ -169,15 +182,10 @@ public class GroupsFragment extends Fragment {
         fragmentManager.executePendingTransactions();
     }
 
-    private String name;
-    private String[] member;
-    private String admin;
-    private String[] mods;
-
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            if(getActivity() == null)
+            if (getActivity() == null)
                 return;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -193,40 +201,24 @@ public class GroupsFragment extends Fragment {
                     if (emitterStatus.equals("createGroupSuccess")) {
                         Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
+                        mSocket.off("status", status);
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
                         mSocket.off("status", status);
                     } else if (emitterStatus.equals("provideGroups")) {
-                        try {
-                            JSONArray groups = data.getJSONArray("groups");
-                            for (int i = 0; i < groups.length(); i++) {
-                                JSONObject group = groups.getJSONObject(i);
-
-                                name = group.getString("name");
-                                myGroups.add(name);
-
-                                JSONArray memberArray = group.getJSONArray("member");
-                                member = new String[memberArray.length()];
-                                for (int j = 0; j < memberArray.length(); j++) {
-                                    member[j] = memberArray.getString(j);
-                                }
-
-                                admin = group.getString("admin");
-
-                                JSONArray modsArray = group.getJSONArray("mods");
-                                mods = new String[modsArray.length()];
-                                for (int j = 0; j < modsArray.length(); j++) {
-                                    mods[j] = modsArray.getString(j);
-                                }
-                            }
-                            mAdapter = new GroupsRecyclerViewAdapter(myGroups);
-                            mGroupsRecyclerView.setAdapter(mAdapter);
-                            mSocket.disconnect();
-                            mSocket.off("status", status);
-                        } catch (JSONException e) {
-                            Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
+                        //Mapped den ankommenden JSON in ein neues Status Objekt
+                        gsonStatus = new Gson().fromJson(data.toString(), Status.class);
+                        myGroups.clear();
+                        memberCount.clear();
+                        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+                        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+                            myGroups.add(gsonStatus.getGroups()[i].getName());
+                            memberCount.add(gsonStatus.getGroups()[i].getMember().length);
                         }
+                        onItemsLoadComplete();
+                        mSocket.disconnect();
+                        mSocket.off("status", status);
                     }
                 }
             });

@@ -30,5 +30,7 @@
     <!-- Groups -->
     <string name="group_name_hint">Gruppenname</string>
     <string name="group_password_hint">Gruppenpasswort</string>
+    <string name="group_member_count">%s Mitglieder</string>
+    <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
 
 </resources>

@@ -13,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.rest.RestService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +25,7 @@ import java.net.URISyntaxException;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.RestClient;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -90,6 +93,9 @@ public class MyProfileFragment extends Fragment {
         }
     }
 
+    @RestService
+    RestClient mRestClient;
+
     @Click
     public void registerButtonClicked() {
         setupSocket();
@@ -97,9 +103,14 @@ public class MyProfileFragment extends Fragment {
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
         } else {
-            String regString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            mSocket.emit("reg", JSONCreator.createJSON("reg", regString));
+            String regString = "{ 'status' : 'regRest', 'user' : '" + username + "', 'pw' : '" + password + "' }";
+            addReg(JSONCreator.createJSON("regString", regString));
+            //mSocket.emit("reg", JSONCreator.createJSON("reg", regString));
         }
+    }
+    @Background
+    void addReg(JSONObject regString){
+        mRestClient.addReg(regString);
     }
 
     private void setupSocket(){
