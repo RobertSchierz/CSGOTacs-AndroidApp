@@ -27,7 +27,6 @@ import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -53,12 +52,6 @@ public class GroupsFragment extends Fragment {
     private String username;
     private Status gsonStatus;
     private boolean openedFirstTime;
-    /*
-        @ViewById
-        EditText etGroupName;
-        @ViewById
-        EditText etGroupPassword;
-    */
     @ViewById
     public RecyclerView mGroupsRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -92,6 +85,12 @@ public class GroupsFragment extends Fragment {
         username = sharedPreferences.getString(User.USERNAME, null);
         openedFirstTime = sharedPreferences.getBoolean(User.OPENS_GROUPS_FIRST_TIME, true);
 
+        if (gsonStatus == null) {
+            pullToRefreshText.setVisibility(View.VISIBLE);
+        } else {
+            pullToRefreshText.setVisibility(View.GONE);
+        }
+
         if (openedFirstTime) {
             mSocket.on("status", status);
             mSocket.connect();
@@ -109,7 +108,7 @@ public class GroupsFragment extends Fragment {
         mGroupsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount);
+        mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount, getActivity().getSupportFragmentManager());
         mGroupsRecyclerView.setAdapter(mAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -125,7 +124,7 @@ public class GroupsFragment extends Fragment {
     void refreshItems() {
         mSocket.on("status", status);
         mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
         // Load complete
     }
 
@@ -173,7 +172,7 @@ public class GroupsFragment extends Fragment {
     }
 
     public void swapFragment() {
-        Fragment fragment = new MyProfileDetailsFragment_();
+        Fragment fragment = new GroupDetailsFragment_();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
@@ -214,9 +213,10 @@ public class GroupsFragment extends Fragment {
                         //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
                         for (int i = 0; i < gsonStatus.getGroups().length; i++) {
                             myGroups.add(gsonStatus.getGroups()[i].getName());
-                            memberCount.add(gsonStatus.getGroups()[i].getMember().length);
+                            memberCount.add(gsonStatus.getGroups()[i].getMembers().length);
                         }
                         onItemsLoadComplete();
+                        Status.setCurrentStatus(gsonStatus, getContext());
                         mSocket.disconnect();
                         mSocket.off("status", status);
                     }

@@ -21,6 +21,7 @@
         card_view:cardPreventCornerOverlap="true">
 
         <RelativeLayout
+            android:id="@+id/groupRelativeLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp">

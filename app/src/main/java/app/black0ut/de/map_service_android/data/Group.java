@@ -30,7 +30,7 @@ public class Group {
         this.name = name;
     }
 
-    public String[] getMember() {
+    public String[] getMembers() {
         return member;
     }
 
