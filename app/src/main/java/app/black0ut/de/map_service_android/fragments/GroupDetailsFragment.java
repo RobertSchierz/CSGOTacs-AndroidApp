@@ -36,9 +36,6 @@ public class GroupDetailsFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    @ViewById
-    TextView test;
-
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
     @InstanceState
     String clickedGroup;
@@ -49,7 +46,6 @@ public class GroupDetailsFragment extends Fragment {
         username = sharedPreferences.getString(User.USERNAME, null);
         openedFirstTime = sharedPreferences.getBoolean(User.OPENS_GROUPS_FIRST_TIME, true);
         clickedGroup = getArguments().getString("clickedGroup");
-        test.setText(clickedGroup);
 
         gsonStatus = Status.getCurrentStatus();
         mMembers = gsonStatus.getGroupFromName(clickedGroup).getMembers();
