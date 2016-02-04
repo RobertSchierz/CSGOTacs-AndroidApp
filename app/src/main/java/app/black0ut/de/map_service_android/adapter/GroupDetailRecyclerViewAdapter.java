@@ -2,6 +2,7 @@ package app.black0ut.de.map_service_android.adapter;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
@@ -20,6 +23,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
 
     private String[] mMembers;
     private String[] mMods;
+    private String mAdmin;
     private ArrayList<Integer> mMemberCount;
     private Status mCurrentStatus;
     private FragmentManager mFragmentManager;
@@ -30,12 +34,14 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     public static class GroupDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RelativeLayout groupDetailRelativeLayout;
         public TextView memberName;
+        public TextView userStatus;
         public ViewHolderClicks mListener;
 
         public GroupDetailViewHolder(View v, ViewHolderClicks listener) {
             super(v);
             mListener = listener;
             memberName = (TextView) v.findViewById(R.id.memberName);
+            userStatus = (TextView) v.findViewById(R.id.userStatus);
             groupDetailRelativeLayout = (RelativeLayout) v.findViewById(R.id.groupDetailRelativeLayout);
             groupDetailRelativeLayout.setOnClickListener(this);
         }
@@ -53,9 +59,10 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupDetailRecyclerViewAdapter(String[] members, String[] mods) {
+    public GroupDetailRecyclerViewAdapter(String[] members, String[] mods, String admin) {
         mMembers = members;
         mMods = mods;
+        mAdmin = admin;
         mCurrentStatus = Status.getCurrentStatus();
     }
 
@@ -69,7 +76,8 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         GroupDetailViewHolder vh = new GroupDetailViewHolder(v, new GroupDetailViewHolder.ViewHolderClicks() {
             @Override
             public void onLayout(View caller) {
-
+                TextView textView = (TextView) caller.findViewById(R.id.memberName);
+                Log.d("TEST", "Member clicked " + textView.getText().toString());
             }
         });
         return vh;
@@ -80,9 +88,23 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     public void onBindViewHolder(GroupDetailViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        //holder.groupName.setText(mMembers.get(position));
-        //holder.groupMemberCount.setText(mMemberCount.get(position).toString());
         holder.memberName.setText(mMembers[position]);
+        if (mMembers[position].equals(mAdmin)) {
+            holder.userStatus.setText("Administrator");
+            holder.userStatus.setVisibility(View.VISIBLE);
+        } else {
+            holder.userStatus.setText("");
+            holder.userStatus.setVisibility(View.GONE);
+        }
+        if (mMods.length != 0) {
+            for (String mMod : mMods) {
+                Log.d("TEST", "mMod: " + mMod);
+                if (mMembers[position].equals(mMod)) {
+                    holder.userStatus.setVisibility(View.VISIBLE);
+                    holder.userStatus.setText("Moderator");
+                }
+            }
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)

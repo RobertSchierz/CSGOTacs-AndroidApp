@@ -31,7 +31,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/orangePrimary"
-                android:textSize="25sp" />
+                android:textSize="25sp"/>
+
+            <TextView
+                android:id="@+id/userStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/orangePrimary"
+                android:textSize="15sp"/>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
