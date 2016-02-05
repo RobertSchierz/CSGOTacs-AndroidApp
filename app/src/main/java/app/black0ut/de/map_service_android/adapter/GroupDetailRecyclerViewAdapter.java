@@ -1,6 +1,10 @@
 package app.black0ut.de.map_service_android.adapter;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,13 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
+import app.black0ut.de.map_service_android.data.User;
 
 /**
  * Created by Jan-Philipp Altenhof on 03.02.2016.
@@ -27,6 +34,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     private ArrayList<Integer> mMemberCount;
     private Status mCurrentStatus;
     private FragmentManager mFragmentManager;
+    private SharedPreferences sharedPreferences;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -59,11 +67,12 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupDetailRecyclerViewAdapter(String[] members, String[] mods, String admin) {
+    public GroupDetailRecyclerViewAdapter(String[] members, String[] mods, String admin, Context context) {
         mMembers = members;
         mMods = mods;
         mAdmin = admin;
         mCurrentStatus = Status.getCurrentStatus();
+        sharedPreferences = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
     }
 
     // Create new views (invoked by the layout manager)
@@ -77,10 +86,31 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
             @Override
             public void onLayout(View caller) {
                 TextView textView = (TextView) caller.findViewById(R.id.memberName);
-                Log.d("TEST", "Member clicked " + textView.getText().toString());
+                Toast.makeText(caller.getContext(), "Member '" + textView.getText().toString() + "' clicked.", Toast.LENGTH_SHORT).show();
+                openDialog(caller, textView.getText().toString());
             }
         });
         return vh;
+    }
+
+    private void openDialog(View caller, String memberName){
+        LayoutInflater factory = LayoutInflater.from(caller.getContext());
+        final View manageUser = factory.inflate(R.layout.member_management, null);
+
+        TextView removeMember = (TextView) manageUser.findViewById(R.id.removeMember);
+        removeMember.setText(String.format(caller.getResources().getString(R.string.remove_member), memberName));
+
+        TextView promoteMember = (TextView) manageUser.findViewById(R.id.promoteMember);
+        TextView demoteMember = (TextView) manageUser.findViewById(R.id.demoteMember);
+
+        if (memberName.equals(mAdmin)){
+            promoteMember.setVisibility(View.GONE);
+        }
+
+        final AlertDialog builder = new AlertDialog.Builder(caller.getContext(), R.style.CreateGroup)
+                .setView(manageUser)
+                .create();
+        builder.show();
     }
 
     // Replace the contents of a view (invoked by the layout manager)

@@ -46,7 +46,7 @@ public class GroupDetailsFragment extends Fragment {
         mGroupsDetailsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        RecyclerView.Adapter mAdapter = new GroupDetailRecyclerViewAdapter(mMembers, mMods, mAdmin);
+        RecyclerView.Adapter mAdapter = new GroupDetailRecyclerViewAdapter(mMembers, mMods, mAdmin, getContext());
         mGroupsDetailsRecyclerView.setAdapter(mAdapter);
     }
 }

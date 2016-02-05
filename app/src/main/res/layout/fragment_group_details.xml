@@ -2,12 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@android:color/darker_gray">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/mGroupsDetailsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mGroupsDetailsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>

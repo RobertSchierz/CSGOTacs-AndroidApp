@@ -32,5 +32,11 @@
     <string name="group_password_hint">Gruppenpasswort</string>
     <string name="group_member_count">%s Mitglieder</string>
     <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
+    
+    <!-- Member Management -->
+    <string name="remove_member">\"%s\" entfernen</string>
+    <string name="promote_member">Zum Gruppenmoderator machen</string>
+    <string name="demote_member">Als Gruppenmoderator entfernen</string>
+
 
 </resources>
