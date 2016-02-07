@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/promote_member"
-        android:visibility="gone"/>
+        android:textColor="@android:color/black"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/demoteMember"
@@ -19,6 +20,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/demote_member"
+        android:textColor="@android:color/black"
         android:visibility="gone" />
 
     <TextView
@@ -27,5 +29,6 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/remove_member"
-        android:visibility="visible"/>
+        android:textColor="@android:color/black"
+        android:visibility="visible" />
 </LinearLayout>

@@ -26,7 +26,7 @@ import app.black0ut.de.map_service_android.data.User;
 /**
  * Created by Jan-Philipp Altenhof on 03.02.2016.
  */
-public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDetailRecyclerViewAdapter.GroupDetailViewHolder> {
+public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDetailRecyclerViewAdapter.GroupDetailViewHolder> implements View.OnClickListener {
 
     private String[] mMembers;
     private String[] mMods;
@@ -35,6 +35,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     private Status mCurrentStatus;
     private FragmentManager mFragmentManager;
     private SharedPreferences sharedPreferences;
+    private String mUsername;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -73,6 +74,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         mAdmin = admin;
         mCurrentStatus = Status.getCurrentStatus();
         sharedPreferences = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        mUsername = sharedPreferences.getString(User.USERNAME, null);
     }
 
     // Create new views (invoked by the layout manager)
@@ -93,7 +95,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         return vh;
     }
 
-    private void openDialog(View caller, String memberName){
+    private void openDialog(View caller, String memberName) {
         LayoutInflater factory = LayoutInflater.from(caller.getContext());
         final View manageUser = factory.inflate(R.layout.member_management, null);
 
@@ -103,14 +105,35 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         TextView promoteMember = (TextView) manageUser.findViewById(R.id.promoteMember);
         TextView demoteMember = (TextView) manageUser.findViewById(R.id.demoteMember);
 
-        if (memberName.equals(mAdmin)){
-            promoteMember.setVisibility(View.GONE);
-        }
+        removeMember.setOnClickListener(this);
+        promoteMember.setOnClickListener(this);
+        demoteMember.setOnClickListener(this);
 
-        final AlertDialog builder = new AlertDialog.Builder(caller.getContext(), R.style.CreateGroup)
-                .setView(manageUser)
-                .create();
-        builder.show();
+        boolean memberIsMod = false;
+        boolean userIsMod = false;
+
+        if (mMods.length > 0) {
+            for (String mMod : mMods) {
+                Log.d("TEST", "mMod: " + mMod);
+                if (memberName.equals(mMod)) {
+                    memberIsMod = true;
+                }
+                if (mUsername.equals(mMod)) {
+                    userIsMod = true;
+                }
+            }
+        }
+        if (!mUsername.equals(memberName) && (mUsername.equals(mAdmin) || userIsMod) && !memberName.equals(mAdmin)) {
+            if (memberIsMod){
+                demoteMember.setVisibility(View.VISIBLE);
+            }else{
+                promoteMember.setVisibility(View.VISIBLE);
+            }
+            final AlertDialog builder = new AlertDialog.Builder(caller.getContext(), R.style.CreateGroup)
+                    .setView(manageUser)
+                    .create();
+            builder.show();
+        }
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -143,4 +166,21 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         return mMembers.length;
     }
 
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id) {
+            case R.id.removeMember:
+                Toast.makeText(v.getContext(), "Remove Click", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.promoteMember:
+                Toast.makeText(v.getContext(), "Promote Click", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.demoteMember:
+                Toast.makeText(v.getContext(), "Demote Click", Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+    }
 }
