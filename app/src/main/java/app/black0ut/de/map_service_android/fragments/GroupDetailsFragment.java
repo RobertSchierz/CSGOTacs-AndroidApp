@@ -31,7 +31,7 @@ public class GroupDetailsFragment extends Fragment {
     public void afterViews() {
         clickedGroup = getArguments().getString("clickedGroup");
 
-        Status gsonStatus = Status.getCurrentStatus();
+        Status gsonStatus = Status.getCurrentStatus(getContext());
         Group currentGroup = gsonStatus.getGroupFromName(clickedGroup);
         String[] mMembers = currentGroup.getMembers();
         String[] mMods = currentGroup.getMods();
@@ -46,7 +46,7 @@ public class GroupDetailsFragment extends Fragment {
         mGroupsDetailsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        RecyclerView.Adapter mAdapter = new GroupDetailRecyclerViewAdapter(mMembers, mMods, mAdmin, getContext());
+        RecyclerView.Adapter mAdapter = new GroupDetailRecyclerViewAdapter(mMembers, mMods, mAdmin, currentGroup.getName(), getContext());
         mGroupsDetailsRecyclerView.setAdapter(mAdapter);
     }
 }

@@ -1,5 +1,6 @@
 package app.black0ut.de.map_service_android.adapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -62,10 +63,10 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupsRecyclerViewAdapter(ArrayList<String> myDataset, ArrayList<Integer> memberCount, FragmentManager fragmentManager) {
+    public GroupsRecyclerViewAdapter(ArrayList<String> myDataset, ArrayList<Integer> memberCount, FragmentManager fragmentManager, Context context) {
         mDataset = myDataset;
         mMemberCount = memberCount;
-        mCurrentStatus = Status.getCurrentStatus();
+        mCurrentStatus = Status.getCurrentStatus(context);
         mFragmentManager = fragmentManager;
     }
 

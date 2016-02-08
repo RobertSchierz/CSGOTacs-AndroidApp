@@ -14,7 +14,7 @@ public class Status {
             "'groups' : [{ 'name' : 'Gruppenname', 'member' : '[] Gruppenmitglieder', 'admin' : 'Guppenadministrator', " +
             "'mods' : '[] Gruppenmoderatoren' }], 'name' : null, 'group' : 'null', 'groups' : null }"*/
 
-    public static Status currentStatus;
+    private static SharedPreferences sharedPrefs;
     public static String CURRENT_STATUS_KEY = "currentStatus";
 
     @Expose
@@ -30,15 +30,14 @@ public class Status {
     @Expose
     Group[] groups;
 
-    public static Status getCurrentStatus() {
-        return currentStatus;
+    public static Status getCurrentStatus(Context context) {
+        sharedPrefs = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        String jsonToStatus = sharedPrefs.getString(CURRENT_STATUS_KEY, null);
+        return new Gson().fromJson(jsonToStatus, Status.class);
     }
 
     public static void setCurrentStatus(Status status, Context context) {
-        //TODO currentStatus = status; eventuell entfernen
-        currentStatus = status;
-        SharedPreferences sharedPrefs =
-                context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        sharedPrefs = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         //SharedPreferences editieren und das Status Objekt als JSON speichern
         SharedPreferences.Editor editor = sharedPrefs.edit();
         String statusToJson = new Gson().toJson(status);
@@ -93,7 +92,7 @@ public class Status {
     public Group getGroupFromName(String groupName) {
         //Gruppennamen sind eindeutig und können nicht mehrfach vergeben sein
         for (int i = 0; i < this.groups.length; i++) {
-            if (this.groups[i].getName().equals(groupName)){
+            if (this.groups[i].getName().equals(groupName)) {
                 return this.groups[i];
             }
         }

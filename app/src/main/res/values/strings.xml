@@ -37,6 +37,7 @@
     <string name="remove_member">\"%s\" entfernen</string>
     <string name="promote_member">Zum Gruppenmoderator machen</string>
     <string name="demote_member">Als Gruppenmoderator entfernen</string>
+    <string name="no_possible_action">Keine Aktion verfügbar.</string>
 
 
 </resources>

@@ -51,7 +51,6 @@ public class GroupsFragment extends Fragment {
     private String groupPassword;
     private String username;
     private Status gsonStatus;
-    private boolean openedFirstTime;
     @ViewById
     public RecyclerView mGroupsRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -62,9 +61,6 @@ public class GroupsFragment extends Fragment {
     @ViewById
     TextView pullToRefreshText;
 
-    /*private String[] myGroups = {"Gruppe 1", "Gruppe 2", "Gruppe 3", "Gruppe 4", "Gruppe 5",
-            "Gruppe 6", "Gruppe 7", "Gruppe 8", "Gruppe 9", "Gruppe 10"};
-            */
     private ArrayList<String> myGroups = new ArrayList<>();
     private ArrayList<Integer> memberCount = new ArrayList<>();
 
@@ -83,7 +79,6 @@ public class GroupsFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         pullToRefreshText.setVisibility(View.VISIBLE);
         username = sharedPreferences.getString(User.USERNAME, null);
-        openedFirstTime = sharedPreferences.getBoolean(User.OPENS_GROUPS_FIRST_TIME, true);
 
         if (gsonStatus == null) {
             pullToRefreshText.setVisibility(View.VISIBLE);
@@ -91,13 +86,9 @@ public class GroupsFragment extends Fragment {
             pullToRefreshText.setVisibility(View.GONE);
         }
 
-        if (openedFirstTime) {
-            mSocket.on("status", status);
-            mSocket.connect();
-            mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
-            User.setsIsGroupsOpenedFirstTime(false);
-            User.saveUserSharedPrefs(getContext());
-        }
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -108,7 +99,7 @@ public class GroupsFragment extends Fragment {
         mGroupsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount, getActivity().getSupportFragmentManager());
+        mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount, getActivity().getSupportFragmentManager(), getContext());
         mGroupsRecyclerView.setAdapter(mAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -199,13 +190,11 @@ public class GroupsFragment extends Fragment {
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
                         Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
-                        mSocket.off("status", status);
-                    } else if (emitterStatus.equals("createGroupFailed")) {
+                    }
+                    if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
-                        mSocket.disconnect();
-                        mSocket.off("status", status);
-                    } else if (emitterStatus.equals("provideGroups")) {
+                    }
+                    if (emitterStatus.equals("provideGroups")) {
                         //Mapped den ankommenden JSON in ein neues Status Objekt
                         gsonStatus = new Gson().fromJson(data.toString(), Status.class);
                         myGroups.clear();
@@ -217,9 +206,9 @@ public class GroupsFragment extends Fragment {
                         }
                         onItemsLoadComplete();
                         Status.setCurrentStatus(gsonStatus, getContext());
-                        mSocket.disconnect();
-                        mSocket.off("status", status);
                     }
+                    mSocket.disconnect();
+                    mSocket.off();
                 }
             });
         }

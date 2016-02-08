@@ -30,5 +30,13 @@
         android:padding="10dp"
         android:text="@string/remove_member"
         android:textColor="@android:color/black"
-        android:visibility="visible" />
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/noActionAvailable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/no_possible_action"
+        android:textColor="@android:color/black" />
 </LinearLayout>

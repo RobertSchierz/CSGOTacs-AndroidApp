@@ -22,6 +22,10 @@ public class Group {
         this.mods = mods;
     }
 
+    /**
+     * Gibt den Gruppennamen zurück.
+     * @return Der Gruppenname als String.
+     */
     public String getName() {
         return name;
     }
