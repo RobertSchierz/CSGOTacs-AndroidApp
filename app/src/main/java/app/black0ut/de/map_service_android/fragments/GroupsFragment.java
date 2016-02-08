@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -113,6 +114,7 @@ public class GroupsFragment extends Fragment {
     }
 
     void refreshItems() {
+        Log.d("TEST", "refreshItems");
         mSocket.on("status", status);
         mSocket.connect();
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
@@ -162,6 +164,41 @@ public class GroupsFragment extends Fragment {
         }
     }
 
+    @Click
+    public void fabJoinGroupClicked() {
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newGroupLayout = factory.inflate(R.layout.new_group, null);
+            final EditText etGroupName = (EditText) newGroupLayout.findViewById(R.id.etGroupName);
+            final EditText etGroupPassword = (EditText) newGroupLayout.findViewById(R.id.etGroupPassword);
+
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setTitle("Gruppe beitreten")
+                    .setView(newGroupLayout)
+                    .setPositiveButton("Beitreten", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            groupName = etGroupName.getText().toString();
+                            groupPassword = etGroupPassword.getText().toString();
+                            mSocket.on("status", status);
+                            mSocket.connect();
+                            if (groupName.equals("") || groupPassword.equals("")) {
+                                Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                //{ 'user' : 'Erstellender Benutzer', 'name' : 'Gruppenname', 'pw' : 'Gruppenpasswort' }
+                                String createGroupString = "{ 'user' : '" + username + "', 'name' : '" + groupName + "', 'pw' : '" + groupPassword + "' }";
+                                mSocket.emit("authGroup", JSONCreator.createJSON("authGroup", createGroupString));
+                            }
+                        }
+                    })
+                    .setNegativeButton("Abbrechen", null)
+                    .create();
+            builder.show();
+        } else {
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void swapFragment() {
         Fragment fragment = new GroupDetailsFragment_();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
@@ -182,30 +219,27 @@ public class GroupsFragment extends Fragment {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     String emitterStatus;
+                    String group;
                     try {
                         emitterStatus = data.getString("status");
+                        group = data.getString("group");
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
-                        Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
-                    }
-                    if (emitterStatus.equals("createGroupFailed")) {
-                        Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
-                    }
-                    if (emitterStatus.equals("provideGroups")) {
-                        //Mapped den ankommenden JSON in ein neues Status Objekt
-                        gsonStatus = new Gson().fromJson(data.toString(), Status.class);
-                        myGroups.clear();
-                        memberCount.clear();
-                        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
-                        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
-                            myGroups.add(gsonStatus.getGroups()[i].getName());
-                            memberCount.add(gsonStatus.getGroups()[i].getMembers().length);
-                        }
+                        myGroups.add(group);
+                        memberCount.add(1);
                         onItemsLoadComplete();
-                        Status.setCurrentStatus(gsonStatus, getContext());
+                        Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
+                    }else if (emitterStatus.equals("createGroupFailed")) {
+                        Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
+                    }else if (emitterStatus.equals("provideGroups")) {
+                        getGsonStatus(data.toString());
+                    }else if (emitterStatus.equals("authGroupSuccess")) {
+                        getGsonStatus(data.toString());
+                    }else if (emitterStatus.equals("authGroupFailed")) {
+                        Toast.makeText(getContext(), "Du konntest der Gruppe " + groupName + " nicht beitreten.", Toast.LENGTH_SHORT).show();
                     }
                     mSocket.disconnect();
                     mSocket.off();
@@ -213,6 +247,20 @@ public class GroupsFragment extends Fragment {
             });
         }
     };
+    public void getGsonStatus(String data){
+        //Mapped den ankommenden JSON in ein neues Status Objekt
+        gsonStatus = new Gson().fromJson(data, Status.class);
+        myGroups.clear();
+        memberCount.clear();
+        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+            myGroups.add(gsonStatus.getGroups()[i].getName());
+            memberCount.add(gsonStatus.getGroups()[i].getMembers().length);
+        }
+        onItemsLoadComplete();
+        Status.setCurrentStatus(gsonStatus, getContext());
+    }
+
 /*
     @Override
     public void onDetach() {
