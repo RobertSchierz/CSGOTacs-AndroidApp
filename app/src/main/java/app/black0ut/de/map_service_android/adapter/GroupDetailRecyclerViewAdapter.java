@@ -36,15 +36,12 @@ import io.socket.emitter.Emitter;
  */
 public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDetailRecyclerViewAdapter.GroupDetailViewHolder> implements View.OnClickListener {
 
-    private String[] mMembers;
+    private List<String> mMembers;
     private String[] mMods;
     private String mAdmin;
-    private ArrayList<Integer> mMemberCount;
     private Status mCurrentStatus;
-    private FragmentManager mFragmentManager;
-    private SharedPreferences sharedPreferences;
-    private String mUsername;
-    private Context mContext;
+    private final String mUsername;
+    private final Context mContext;
     private String mMemberName;
     private String mGroupName;
     private AlertDialog mBuilder;
@@ -89,10 +86,9 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public GroupDetailRecyclerViewAdapter(String[] members, String[] mods, String admin, String groupName, Context context) {
-        sharedPreferences = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
-        mUsername = sharedPreferences.getString(User.USERNAME, null);
-
+    public GroupDetailRecyclerViewAdapter(final String username, final ArrayList<String> members, final String[] mods,
+                                          final String admin, final String groupName, final Context context) {
+        mUsername = username;
         mMembers = members;
         mMods = mods;
         mAdmin = admin;
@@ -169,8 +165,8 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     public void onBindViewHolder(GroupDetailViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.memberName.setText(mMembers[position]);
-        if (mMembers[position].equals(mAdmin)) {
+        holder.memberName.setText(mMembers.get(position));
+        if (mMembers.get(position).equals(mAdmin)) {
             holder.userStatus.setText("Administrator");
             holder.userStatus.setVisibility(View.VISIBLE);
         } else {
@@ -180,7 +176,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         if (mMods.length != 0) {
             for (String mMod : mMods) {
                 Log.d("TEST", "mMod: " + mMod);
-                if (mMembers[position].equals(mMod)) {
+                if (mMembers.get(position).equals(mMod)) {
                     holder.userStatus.setVisibility(View.VISIBLE);
                     holder.userStatus.setText("Moderator");
                 }
@@ -191,7 +187,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mMembers.length;
+        return mMembers.size();
     }
 
     @Override
@@ -266,10 +262,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
 
                     }
                     if (emitterStatus.equals("kickUserSuccess")) {
-                        List<String> list = new ArrayList<>();
-                        Collections.addAll(list, mMembers);
-                        list.removeAll(Collections.singletonList(mMemberName));
-                        mMembers = list.toArray(new String[list.size()]);
+                        mMembers.removeAll(Collections.singletonList(mMemberName));
                     }
                     if (emitterStatus.equals("kickUserFailed")) {
 
