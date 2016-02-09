@@ -1,6 +1,9 @@
 package app.black0ut.de.map_service_android.fragments;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,7 +21,9 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
+import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -28,6 +33,8 @@ import io.socket.emitter.Emitter;
  */
 @EFragment(R.layout.fragment_my_profile)
 public class MyProfileFragment extends Fragment {
+
+    SharedPreferences sharedPreferences;
 
     public static String username;
     public static String password;
@@ -45,11 +52,9 @@ public class MyProfileFragment extends Fragment {
     TextView navHeaderUsername;
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-            //mSocket = IO.socket("http://chat.socket.io");
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
@@ -57,8 +62,7 @@ public class MyProfileFragment extends Fragment {
 
     @AfterViews
     public void afterViews() {
-        mSocket.on("status", status);
-        mSocket.connect();
+
     }
 
     //androidannotations erkennt die ID automatisch durch den Namen
@@ -74,6 +78,7 @@ public class MyProfileFragment extends Fragment {
     */
     @Click
     public void submitButtonClicked() {
+        setupSocket();
         //{ user : 'Benutzername', pw : 'Passwort' }
         setUsernamePassword();
         Log.d("TEST", "Username: " + username + " Password: " + password);
@@ -81,41 +86,34 @@ public class MyProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
         } else {
             String authString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            JSONObject auth;
-            try {
-                auth = new JSONObject(authString);
-            } catch (JSONException e) {
-                Log.d("TEST", "JSONObject Failed");
-                return;
-            }
-            mSocket.emit("auth", auth);
+            mSocket.emit("auth", JSONCreator.createJSON("auth", authString));
         }
-
     }
 
     @Click
     public void registerButtonClicked() {
+        setupSocket();
         setUsernamePassword();
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
         } else {
             String regString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            JSONObject reg;
-            try {
-                reg = new JSONObject(regString);
-            } catch (JSONException e) {
-                Log.d("TEST", "JSONObject Failed");
-                return;
-            }
-            mSocket.emit("reg", reg);
+            mSocket.emit("reg", JSONCreator.createJSON("reg", regString));
         }
+    }
+
+    private void setupSocket(){
+        mSocket.on("status", status);
+        mSocket.connect();
     }
 
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Activity activity = (Activity) getContext();
-            activity.runOnUiThread(new Runnable() {
+            //Activity activity = (Activity) getContext();
+            if(getActivity() == null)
+                return;
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
@@ -127,22 +125,24 @@ public class MyProfileFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("regSuccess")) {
-                        setStatus("regSuccess");
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich registriert.", Toast.LENGTH_SHORT).show();
-                        //navHeaderUsername.setText(username);
+                        disconnectSocketAndListener();
+                        setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("regFailed")) {
-                        setStatus("regFailed");
                         Toast.makeText(getContext(), "Der Benutzername ist bereits vergeben.", Toast.LENGTH_SHORT).show();
+                        disconnectSocketAndListener();
+                        setUserStatusAndUsernameInPrefs(false, null);
                     }
                     if (emitterStatus.equals("authSuccess")) {
-                        setStatus("authSuccess");
                         Toast.makeText(getContext(), "Du hast Dich erfolgreich angemeldet.", Toast.LENGTH_SHORT).show();
-                        //navHeaderUsername.setText(username);
+                        disconnectSocketAndListener();
+                        setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("authFailed")) {
-                        setStatus("authFailed");
                         Toast.makeText(getContext(), "Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
+                        disconnectSocketAndListener();
+                        setUserStatusAndUsernameInPrefs(false, null);
                     }
                 }
             });
@@ -150,8 +150,27 @@ public class MyProfileFragment extends Fragment {
     };
 
     /**
+     * Schaltet die Socket Verbindung sowie die Listener aus.
+     */
+    private void disconnectSocketAndListener(){
+        mSocket.disconnect();
+        mSocket.off("status", status);
+    }
+
+    /**
+     * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
+     * @param isLoggedIn Boolean, ob der nutzer eingeloggt ist oder nicht.
+     * @param username Der Username des Benutzers.
+     */
+    private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username){
+        User.setsIsLoggedIn(isLoggedIn);
+        if (username != null)
+            User.setsUsername(username);
+        User.saveUserSharedPrefs(getContext());
+    }
+
+    /**
      * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
-     *
      * @param status Der zu setztende Status.
      */
     public void setStatus(String status) {

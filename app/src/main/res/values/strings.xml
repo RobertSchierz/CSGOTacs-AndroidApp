@@ -20,10 +20,26 @@
     <string name="nav_profile">Mein Profil</string>
 
     <!-- My Profile Login -->
-    <string name="my_profile_login_description">Bitte melde dich mit deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
+    <string name="my_profile_login_description">Bitte melde Dich mit Deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
     <string name="my_profile_submit_button">Anmelden</string>
+    <string name="my_profile_logout_button">Abmelden</string>
     <string name="my_profile_register_button">Registrieren</string>
     <string name="password_hint">Passwort</string>
     <string name="username_hint">Benutzername</string>
+
+    <!-- Groups -->
+    <string name="group_name_hint">Gruppenname</string>
+    <string name="group_password_hint">Gruppenpasswort</string>
+    <string name="group_member_count">%s Mitglieder</string>
+    <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
+    <string name="button_leave_group">Gruppe verlassen</string>
+    <string name="button_delete_group">Gruppe löschen</string>
+
+    <!-- Member Management -->
+    <string name="remove_member">\"%s\" entfernen</string>
+    <string name="promote_member">Zum Gruppenmoderator machen</string>
+    <string name="demote_member">Als Gruppenmoderator entfernen</string>
+    <string name="no_possible_action">Keine Aktion verfügbar.</string>
+
 
 </resources>

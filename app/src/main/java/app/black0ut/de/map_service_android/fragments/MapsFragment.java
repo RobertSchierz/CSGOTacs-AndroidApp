@@ -17,7 +17,6 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import app.black0ut.de.map_service_android.R;
-import app.black0ut.de.map_service_android.activities.MapsDetailActivity_;
 import app.black0ut.de.map_service_android.adapter.MapsListViewAdapter;
 import app.black0ut.de.map_service_android.data.Map;
 

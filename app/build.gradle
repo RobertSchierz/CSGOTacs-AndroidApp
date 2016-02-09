@@ -13,16 +13,16 @@ buildscript {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url "https://jitpack.io" }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 def AAVersion = '3.3.2'
 
-
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "app.black0ut.de.map_service_android"
@@ -40,6 +40,16 @@ android {
     lintOptions {
         abortOnError false
     }
+    //ignore duplicate files
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+    }
 }
 
 dependencies {
@@ -51,7 +61,18 @@ dependencies {
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
     compile 'io.socket:socket.io-client:0.6.2'
+    compile 'com.google.code.gson:gson:2.4'
     //compile 'com.squareup.picasso:picasso:2.5.2'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.3@aar') {
+        transitive = true
+    }
+    //enthält ColorChooser Dialog
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.3@aar') {
+        transitive = true
+    }
 }
 
 apt {
