@@ -24,6 +24,8 @@ import java.util.List;
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
+import app.black0ut.de.map_service_android.fragments.GroupDetailsFragment_;
+import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailFooterViewHolder;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailViewHolder;
 import io.socket.client.IO;
@@ -292,13 +294,15 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
 
                     }
                     if (emitterStatus.equals("leaveGroupSuccess")) {
-                        mFragmentManager.popBackStackImmediate();
+                        mFragmentManager.popBackStack();
+                        //swapFragment();
                     }
                     if (emitterStatus.equals("leaveGroupFailed")) {
                         Toast.makeText(mContext, "Die Gruppe konnte nicht verlassen werden.", Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("deleteGroupSuccess")) {
-                        mFragmentManager.popBackStackImmediate();
+                        mFragmentManager.popBackStack();
+                        //swapFragment();
                     }
                     if (emitterStatus.equals("leaveGroupFailed")) {
                         Toast.makeText(mContext, "Die Gruppe konnte nicht gelöscht werden.", Toast.LENGTH_SHORT).show();
@@ -311,4 +315,13 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             });
         }
     };
+
+    public void swapFragment() {
+        Fragment fragment = new GroupsFragment_();
+        mFragmentManager.beginTransaction()
+                .disallowAddToBackStack()
+                .replace(R.id.mainFrame, fragment)
+                .commit();
+        mFragmentManager.executePendingTransactions();
+    }
 }

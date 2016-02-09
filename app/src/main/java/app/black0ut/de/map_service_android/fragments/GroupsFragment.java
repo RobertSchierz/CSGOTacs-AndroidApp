@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,12 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
@@ -87,9 +90,7 @@ public class GroupsFragment extends Fragment {
             pullToRefreshText.setVisibility(View.GONE);
         }
 
-        mSocket.on("status", status);
-        mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ 'user' : '" + username + "' }"));
+
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -103,6 +104,8 @@ public class GroupsFragment extends Fragment {
         mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount, getActivity().getSupportFragmentManager(), getContext());
         mGroupsRecyclerView.setAdapter(mAdapter);
 
+        refreshItems();
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -110,14 +113,16 @@ public class GroupsFragment extends Fragment {
                 refreshItems();
             }
         });
-
     }
 
     void refreshItems() {
         Log.d("TEST", "refreshItems");
+        myGroups.clear();
+        memberCount.clear();
         mSocket.on("status", status);
         mSocket.connect();
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
+        onItemsLoadComplete();
         // Load complete
     }
 
@@ -257,8 +262,8 @@ public class GroupsFragment extends Fragment {
             myGroups.add(gsonStatus.getGroups()[i].getName());
             memberCount.add(gsonStatus.getGroups()[i].getMembers().length);
         }
-        onItemsLoadComplete();
         Status.setCurrentStatus(gsonStatus, getContext());
+        onItemsLoadComplete();
     }
 
 /*
