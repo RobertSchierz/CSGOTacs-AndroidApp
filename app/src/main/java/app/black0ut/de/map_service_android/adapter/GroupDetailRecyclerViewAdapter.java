@@ -2,7 +2,7 @@ package app.black0ut.de.map_service_android.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,14 +18,14 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
-import app.black0ut.de.map_service_android.data.User;
+import app.black0ut.de.map_service_android.viewholder.GroupDetailFooterViewHolder;
+import app.black0ut.de.map_service_android.viewholder.GroupDetailViewHolder;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -34,7 +33,10 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Jan-Philipp Altenhof on 03.02.2016.
  */
-public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDetailRecyclerViewAdapter.GroupDetailViewHolder> implements View.OnClickListener {
+public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
+
+    private static final int TYPE_ITEM = 0;
+    private static final int TYPE_FOOTER = 1;
 
     private List<String> mMembers;
     private String[] mMods;
@@ -45,8 +47,10 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     private String mMemberName;
     private String mGroupName;
     private AlertDialog mBuilder;
+    private FragmentManager mFragmentManager;
 
     private Socket mSocket;
+
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -58,36 +62,11 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class GroupDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public RelativeLayout groupDetailRelativeLayout;
-        public TextView memberName;
-        public TextView userStatus;
-        public ViewHolderClicks mListener;
 
-        public GroupDetailViewHolder(View v, ViewHolderClicks listener) {
-            super(v);
-            mListener = listener;
-            memberName = (TextView) v.findViewById(R.id.memberName);
-            userStatus = (TextView) v.findViewById(R.id.userStatus);
-            groupDetailRelativeLayout = (RelativeLayout) v.findViewById(R.id.groupDetailRelativeLayout);
-            groupDetailRelativeLayout.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (v instanceof RelativeLayout) {
-                mListener.onLayout(v);
-            }
-        }
-
-        public interface ViewHolderClicks {
-            void onLayout(View caller);
-        }
-    }
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public GroupDetailRecyclerViewAdapter(final String username, final ArrayList<String> members, final String[] mods,
-                                          final String admin, final String groupName, final Context context) {
+                                          final String admin, final String groupName,final FragmentManager fragmentManager, final Context context) {
         mUsername = username;
         mMembers = members;
         mMods = mods;
@@ -95,25 +74,31 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
         mCurrentStatus = Status.getCurrentStatus(context);
         mContext = context;
         mGroupName = groupName;
+        mFragmentManager = fragmentManager;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public GroupDetailRecyclerViewAdapter.GroupDetailViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                                   int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        final View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.group_detail_cardview, parent, false);
-        GroupDetailViewHolder vh = new GroupDetailViewHolder(v, new GroupDetailViewHolder.ViewHolderClicks() {
-            @Override
-            public void onLayout(View caller) {
-                TextView textView = (TextView) caller.findViewById(R.id.memberName);
-                mMemberName = textView.getText().toString();
-                Toast.makeText(caller.getContext(), "Member '" + mMemberName + "' clicked.", Toast.LENGTH_SHORT).show();
-                openDialog(caller);
-            }
-        });
-        return vh;
+        if (viewType == TYPE_ITEM) {
+            final View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.group_detail_cardview, parent, false);
+            return new GroupDetailViewHolder(v, new GroupDetailViewHolder.ViewHolderClicks() {
+                @Override
+                public void onLayout(View caller) {
+                    TextView textView = (TextView) caller.findViewById(R.id.memberName);
+                    mMemberName = textView.getText().toString();
+                    Toast.makeText(caller.getContext(), "Member '" + mMemberName + "' clicked.", Toast.LENGTH_SHORT).show();
+                    openDialog(caller);
+                }
+            });
+        } else if (viewType == TYPE_FOOTER) {
+            final View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.group_leave_delete, parent, false);
+            return new GroupDetailFooterViewHolder(v);
+        }
+        return null;
     }
 
     private void openDialog(View caller) {
@@ -162,33 +147,57 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(GroupDetailViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.memberName.setText(mMembers.get(position));
-        if (mMembers.get(position).equals(mAdmin)) {
-            holder.userStatus.setText("Administrator");
-            holder.userStatus.setVisibility(View.VISIBLE);
-        } else {
-            holder.userStatus.setText("");
-            holder.userStatus.setVisibility(View.GONE);
-        }
-        if (mMods.length != 0) {
-            for (String mMod : mMods) {
-                Log.d("TEST", "mMod: " + mMod);
-                if (mMembers.get(position).equals(mMod)) {
-                    holder.userStatus.setVisibility(View.VISIBLE);
-                    holder.userStatus.setText("Moderator");
+        if (holder instanceof GroupDetailFooterViewHolder) {
+            GroupDetailFooterViewHolder footerHolder = (GroupDetailFooterViewHolder) holder;
+            footerHolder.mDeleteGroup.setOnClickListener(this);
+            footerHolder.mLeaveGroup.setOnClickListener(this);
+            if (mUsername.equals(mAdmin)) {
+                footerHolder.mDeleteGroup.setVisibility(View.VISIBLE);
+            }
+        } else if (holder instanceof GroupDetailViewHolder) {
+            GroupDetailViewHolder itemHolder = (GroupDetailViewHolder) holder;
+            String currentMember = getMember(position);
+            itemHolder.memberName.setText(currentMember);
+            if (currentMember.equals(mAdmin)) {
+                itemHolder.userStatus.setText("Administrator");
+                itemHolder.userStatus.setVisibility(View.VISIBLE);
+            } else {
+                itemHolder.userStatus.setText("");
+                itemHolder.userStatus.setVisibility(View.GONE);
+            }
+            if (mMods.length != 0) {
+                for (String mMod : mMods) {
+                    Log.d("TEST", "mMod: " + mMod);
+                    if (currentMember.equals(mMod)) {
+                        itemHolder.userStatus.setVisibility(View.VISIBLE);
+                        itemHolder.userStatus.setText("Moderator");
+                    }
                 }
             }
         }
     }
 
+    private String getMember(int position) {
+        return mMembers.get(position);
+    }
+
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mMembers.size();
+        return mMembers.size() + 1;
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == mMembers.size()) {
+            return TYPE_FOOTER;
+        }
+        return TYPE_ITEM;
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -202,18 +211,16 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
                 mSocket.emit("kickUser",
                         JSONCreator.createJSON("kickUser",
                                 "{ 'user' : '" + mUsername +
-                                "', 'name': '" + mGroupName +
-                                "', 'kick': '" + mMemberName +
-                                "' }"));
-                Toast.makeText(v.getContext(), "Remove Click", Toast.LENGTH_SHORT).show();
+                                        "', 'name': '" + mGroupName +
+                                        "', 'kick': '" + mMemberName +
+                                        "' }"));
                 break;
             case R.id.promoteMember:
                 mSocket.emit("setGroupMod",
                         JSONCreator.createJSON("setGroupMod",
                                 "{ 'user' : '" + mMemberName +
-                                "', 'name': '" + mGroupName +
-                                "' }"));
-                Toast.makeText(v.getContext(), "Promote Click", Toast.LENGTH_SHORT).show();
+                                        "', 'name': '" + mGroupName +
+                                        "' }"));
                 break;
             case R.id.demoteMember:
                 mSocket.emit("unsetGroupMod",
@@ -221,8 +228,22 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
                                 "{ 'user' : '" + mMemberName +
                                         "', 'name': '" + mGroupName +
                                         "' }"));
-                Toast.makeText(v.getContext(), "Demote Click", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.buttonDeleteGroup:
+                mSocket.emit("deleteGroup",
+                        JSONCreator.createJSON("deleteGroup",
+                                "{ 'user' : '" + mUsername +
+                                        "', 'name': '" + mGroupName +
+                                        "' }"));
+                break;
+            case R.id.buttonLeaveGroup:
+                mSocket.emit("leaveGroup",
+                        JSONCreator.createJSON("leaveGroup",
+                                "{ 'user' : '" + mUsername +
+                                        "', 'name': '" + mGroupName +
+                                        "' }"));
+                break;
+
         }
     }
 
@@ -248,26 +269,40 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<GroupDe
                         Collections.addAll(list, mMods);
                         list.addAll(Collections.singletonList(mMemberName));
                         mMods = list.toArray(new String[list.size()]);
+                        mBuilder.cancel();
                     }
                     if (emitterStatus.equals("setGroupModFailed")) {
 
                     }
-                    if (emitterStatus.equals("unsetGroupModSuccess")){
+                    if (emitterStatus.equals("unsetGroupModSuccess")) {
                         List<String> list = new ArrayList<>();
                         Collections.addAll(list, mMods);
                         list.removeAll(Collections.singletonList(mMemberName));
                         mMods = list.toArray(new String[list.size()]);
+                        mBuilder.cancel();
                     }
-                    if (emitterStatus.equals("unsetGroupModFailed")){
+                    if (emitterStatus.equals("unsetGroupModFailed")) {
 
                     }
                     if (emitterStatus.equals("kickUserSuccess")) {
                         mMembers.removeAll(Collections.singletonList(mMemberName));
+                        mBuilder.cancel();
                     }
                     if (emitterStatus.equals("kickUserFailed")) {
 
                     }
-                    mBuilder.cancel();
+                    if (emitterStatus.equals("leaveGroupSuccess")) {
+                        mFragmentManager.popBackStackImmediate();
+                    }
+                    if (emitterStatus.equals("leaveGroupFailed")) {
+                        Toast.makeText(mContext, "Die Gruppe konnte nicht verlassen werden.", Toast.LENGTH_SHORT).show();
+                    }
+                    if (emitterStatus.equals("deleteGroupSuccess")) {
+                        mFragmentManager.popBackStackImmediate();
+                    }
+                    if (emitterStatus.equals("leaveGroupFailed")) {
+                        Toast.makeText(mContext, "Die Gruppe konnte nicht gelöscht werden.", Toast.LENGTH_SHORT).show();
+                    }
                     notifyDataSetChanged();
                     mSocket.disconnect();
                     mSocket.off();

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -54,6 +55,8 @@ public class GroupDetailsFragment extends Fragment {
     public RecyclerView mGroupsDetailsRecyclerView;
     @ViewById
     SwipeRefreshLayout swipeRefreshLayout;
+    @ViewById
+    LinearLayout leaveDeleteLayout;
 
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
     @InstanceState
@@ -90,7 +93,7 @@ public class GroupDetailsFragment extends Fragment {
         mGroupsDetailsRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new GroupDetailRecyclerViewAdapter(username, mMembers, mMods, mAdmin, currentGroup.getName(), getContext());
+        mAdapter = new GroupDetailRecyclerViewAdapter(username, mMembers, mMods, mAdmin, currentGroup.getName(),getActivity().getSupportFragmentManager(), getContext());
         mGroupsDetailsRecyclerView.setAdapter(mAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

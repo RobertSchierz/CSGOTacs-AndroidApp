@@ -32,7 +32,9 @@
     <string name="group_password_hint">Gruppenpasswort</string>
     <string name="group_member_count">%s Mitglieder</string>
     <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
-    
+    <string name="button_leave_group">Gruppe verlassen</string>
+    <string name="button_delete_group">Gruppe löschen</string>
+
     <!-- Member Management -->
     <string name="remove_member">\"%s\" entfernen</string>
     <string name="promote_member">Zum Gruppenmoderator machen</string>
