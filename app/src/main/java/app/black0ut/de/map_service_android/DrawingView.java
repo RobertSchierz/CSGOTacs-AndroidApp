@@ -2,6 +2,7 @@ package app.black0ut.de.map_service_android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,15 +12,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
-import org.androidannotations.annotations.EView;
-import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 
+import app.black0ut.de.map_service_android.data.LocalStrategy;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -34,7 +33,9 @@ public class DrawingView extends View {
     public static Paint mPaint = new Paint();
 
     public int width;
-    public  int height;
+    public int height;
+
+    public LocalStrategy localStrategy;
 
     private Bitmap mBitmap;
     private Canvas mCanvas;
@@ -45,6 +46,7 @@ public class DrawingView extends View {
     private Path circlePath;
 
     private Socket mSocket;
+
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -56,11 +58,12 @@ public class DrawingView extends View {
 
     /**
      * Konstruktor
+     *
      * @param c Kontext der instanziierenden Klasse
      */
     public DrawingView(Context c) {
         super(c);
-        context=c;
+        context = c;
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
@@ -71,9 +74,19 @@ public class DrawingView extends View {
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
 
+        localStrategy = LocalStrategy.getInstance();
+
         mSocket.on("json", json);
         mSocket.connect();
         mSocket.emit("appTest");
+    }
+
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
     @Override
@@ -88,9 +101,9 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawBitmap( mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawPath( mPath,  mPaint);
-        canvas.drawPath( circlePath,  circlePaint);
+        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        canvas.drawPath(mPath, mPaint);
+        canvas.drawPath(circlePath, circlePaint);
     }
 
     private float mX, mY;
@@ -111,11 +124,11 @@ public class DrawingView extends View {
     }
 
     private void touch_move(float x, float y) {
-        if(x > mCanvas.getWidth() || x < 0) {
+        if (x > mCanvas.getWidth() || x < 0) {
             mCanvas.drawPath(mPath, mPaint);
             return;
-        }else if(y > mCanvas.getHeight() || y < 0){
-            mCanvas.drawPath(mPath,  mPaint);
+        } else if (y > mCanvas.getHeight() || y < 0) {
+            mCanvas.drawPath(mPath, mPaint);
             return;
         }
 
@@ -142,7 +155,7 @@ public class DrawingView extends View {
         mPath.lineTo(mX, mY);
         circlePath.reset();
         // commit the path to our offscreen
-        mCanvas.drawPath(mPath,  mPaint);
+        mCanvas.drawPath(mPath, mPaint);
         // kill this so we don't double draw
         mPath.reset();
         String upCoords = "{x: " + mX + ", y: " + mY + "}";
@@ -154,16 +167,28 @@ public class DrawingView extends View {
         float x = event.getX();
         float y = event.getY();
 
+        if (x < mCanvas.getWidth() || x >= 0) {
+            localStrategy.addListX((int) x);
+        }
+        if (y < mCanvas.getHeight() || y >= 0) {
+            localStrategy.addListY((int) y);
+        }
+        Log.d("TEST", "onTouchEvent x: " + x);
+        Log.d("TEST", "onTouchEvent y: " + y);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                localStrategy.addDragList(false);
                 touch_start(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
+                localStrategy.addDragList(true);
                 touch_move(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                localStrategy.addDragList(true);
                 touch_up();
                 invalidate();
                 break;
@@ -202,10 +227,10 @@ public class DrawingView extends View {
                     float startx;
                     float starty;
                     try {
-                        x = (float)data.getDouble("x");
-                        y = (float)data.getDouble("y");
-                        startx = (float)data.getDouble("startx");
-                        starty = (float)data.getDouble("starty");
+                        x = (float) data.getDouble("x");
+                        y = (float) data.getDouble("y");
+                        startx = (float) data.getDouble("startx");
+                        starty = (float) data.getDouble("starty");
                         Log.d("TEST xy", "x: " + x + " y: " + y);
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
@@ -218,7 +243,7 @@ public class DrawingView extends View {
                     mPath.moveTo(startx, starty);
                     //TODO eventuell noch quadTo draus machen
                     mPath.lineTo(x, y);
-                    mCanvas.drawPath(mPath,  mPaint);
+                    mCanvas.drawPath(mPath, mPaint);
                     invalidate();
                     mPath.reset();
 

@@ -91,7 +91,6 @@ public class GroupsFragment extends Fragment {
         }
 
 
-
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mGroupsRecyclerView.setHasFixedSize(true);
@@ -237,13 +236,13 @@ public class GroupsFragment extends Fragment {
                         memberCount.add(1);
                         onItemsLoadComplete();
                         Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
-                    }else if (emitterStatus.equals("createGroupFailed")) {
+                    } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
-                    }else if (emitterStatus.equals("provideGroups")) {
+                    } else if (emitterStatus.equals("provideGroups")) {
                         getGsonStatus(data.toString());
-                    }else if (emitterStatus.equals("authGroupSuccess")) {
+                    } else if (emitterStatus.equals("authGroupSuccess")) {
                         getGsonStatus(data.toString());
-                    }else if (emitterStatus.equals("authGroupFailed")) {
+                    } else if (emitterStatus.equals("authGroupFailed")) {
                         Toast.makeText(getContext(), "Du konntest der Gruppe " + groupName + " nicht beitreten.", Toast.LENGTH_SHORT).show();
                     }
                     mSocket.disconnect();
@@ -252,7 +251,8 @@ public class GroupsFragment extends Fragment {
             });
         }
     };
-    public void getGsonStatus(String data){
+
+    public void getGsonStatus(String data) {
         //Mapped den ankommenden JSON in ein neues Status Objekt
         gsonStatus = new Gson().fromJson(data, Status.class);
         myGroups.clear();

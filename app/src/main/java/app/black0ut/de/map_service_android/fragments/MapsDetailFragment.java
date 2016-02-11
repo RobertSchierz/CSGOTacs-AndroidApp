@@ -2,6 +2,8 @@ package app.black0ut.de.map_service_android.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +15,7 @@ import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,19 +29,29 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.gson.Gson;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.DrawingView;
+import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.data.Map;
+import app.black0ut.de.map_service_android.data.Strategy;
+import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by Jan-Philipp Altenhof on 03.01.16.
@@ -63,6 +76,8 @@ public class MapsDetailFragment extends Fragment {
 
     @ViewById
     FloatingActionButton fabShowCallouts;
+    @ViewById
+    FloatingActionButton fabSaveStrat;
 
     private int BITMAP_WIDHT = 1024;
     private int BITMAP_HEIGHT = 1024;
@@ -72,79 +87,46 @@ public class MapsDetailFragment extends Fragment {
     public Bitmap bitmap;
     private boolean showCalloutsClicked = false;
 
+    public LocalStrategy localStrategy;
+    SharedPreferences sharedPrefs;
+    private String mUsername;
+
+    private Socket mSocket;
+
+    {
+        try {
+            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            //mSocket = IO.socket("http://chat.socket.io");
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
+        }
+    }
+
     @AfterViews
     public void afterViews() {
 
         checkMapName();
 
-        /*
-        ViewTreeObserver vto = mapImage.getViewTreeObserver();
-        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            public boolean onPreDraw() {
-                mapImage.getViewTreeObserver().removeOnPreDrawListener(this);
-                Log.d("TEST", " MeasuredHeight: " + mapImage.getMeasuredHeight() + " Width: " + mapImage.getMeasuredHeight());
-                Log.d("TEST", " Height: " + mapImage.getHeight() + " Width: " + mapImage.getHeight());
-                mapImageHeight = mapImage.getHeight();
-                mapImageWidth = mapImage.getWidth();
-                //DrawingView.mapImageWidth = mapImageWidth;
-                //DrawingView.mapImageHeight = mapImageHeight;
+        sharedPrefs = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        mUsername = sharedPrefs.getString(User.USERNAME, null);
 
-                return true;
-            }
-        });
-        */
-        //Log.d("TEST", "Height: " + mapImage.getHeight() + "Widht: "+ mapImage.getWidth());
-        /*
-        showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        // get the center for the clipping circle
-                        int cx = mapCallouts.getWidth() / 2;
-                        int cy = mapCallouts.getHeight() / 2;
-                        // get the final radius for the clipping circle
-                        float finalRadius = (float) Math.hypot(cx, cy);
-                        // create the animator for this view (the start radius is zero)
-                        Animator anim =
-                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, 0, finalRadius);
-                        // make the view visible and start the animation
-                        mapCallouts.setVisibility(View.VISIBLE);
-                        anim.start();
-                    } else {
-                        mapCallouts.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        int cx = mapCallouts.getWidth() / 2;
-                        int cy = mapCallouts.getHeight() / 2;
-                        float initialRadius = (float) Math.hypot(cx, cy);
-                        Animator anim =
-                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, initialRadius, 0);
-                        anim.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                mapCallouts.setVisibility(View.GONE);
-                            }
-                        });
-                        anim.start();
-                    } else {
-                        // The toggle is disabled
-                        mapCallouts.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-        */
         DrawingView.mPaint.setAntiAlias(true);
         DrawingView.mPaint.setDither(true);
-        DrawingView.mPaint.setColor(Color.GREEN);
+        DrawingView.mPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
         DrawingView.mPaint.setStyle(Paint.Style.STROKE);
         DrawingView.mPaint.setStrokeJoin(Paint.Join.ROUND);
         DrawingView.mPaint.setStrokeCap(Paint.Cap.ROUND);
-        DrawingView.mPaint.setStrokeWidth(12);
+        DrawingView.mPaint.setStrokeWidth(pxToDp(14));
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
+    }
+
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
     public void loadMapBitmap(int resId, ImageView imageView) {
@@ -219,77 +201,55 @@ public class MapsDetailFragment extends Fragment {
     private void checkMapName() {
         switch (Map.clickedMapName) {
             case Map.ASSAULT:
-                //Picasso.with(getContext()).load(R.drawable.cs_assault_radar).into(mapImage);
                 loadMapBitmap(R.drawable.cs_assault_radar, mapImage);
                 break;
             case Map.AZTEC:
-                //Picasso.with(getContext()).load(R.drawable.de_aztec_radar_spectate).into(mapImage);
                 loadMapBitmap(R.drawable.de_aztec_radar_spectate, mapImage);
                 break;
             case Map.CACHE:
-                //Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_cache_radar_spectate, mapImage);
                 loadCalloutBitmap(R.drawable.de_cache_radar_spectate_callout, mapCallouts);
                 break;
             case Map.COBBLESTONE:
-                //Picasso.with(getContext()).load(R.drawable.de_cbble_radar).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_cbble_radar_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_cbble_radar, mapImage);
                 loadCalloutBitmap(R.drawable.de_cbble_radar_callout, mapCallouts);
                 break;
             case Map.DUST:
-                //Picasso.with(getContext()).load(R.drawable.de_dust_radar_spectate).into(mapImage);
                 loadMapBitmap(R.drawable.de_dust_radar_spectate, mapImage);
                 break;
             case Map.DUST2:
-                //Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_dust2_radar_spectate, mapImage);
                 loadCalloutBitmap(R.drawable.de_dust2_radar_spectate_callout, mapCallouts);
                 break;
             case Map.INFERNO:
-                //Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_inferno_radar_spectate, mapImage);
                 loadCalloutBitmap(R.drawable.de_inferno_radar_spectate_callout, mapCallouts);
                 break;
             case Map.ITALY:
-                //Picasso.with(getContext()).load(R.drawable.cs_italy_radar).into(mapImage);
                 loadMapBitmap(R.drawable.cs_italy_radar, mapImage);
                 break;
             case Map.MILITIA:
-                //Picasso.with(getContext()).load(R.drawable.cs_militia_radar_spectate).into(mapImage);
                 loadMapBitmap(R.drawable.cs_militia_radar_spectate, mapImage);
                 break;
             case Map.MIRAGE:
-                //Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_mirage_radar_spectate, mapImage);
                 loadCalloutBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts);
                 break;
             case Map.NUKE:
-                //Picasso.with(getContext()).load(R.drawable.de_nuke_radar_spectate).into(mapImage);
                 loadMapBitmap(R.drawable.de_nuke_radar_spectate, mapImage);
                 break;
             case Map.OFFICE:
-                //Picasso.with(getContext()).load(R.drawable.cs_office_radar).into(mapImage);
                 loadMapBitmap(R.drawable.cs_office_radar, mapImage);
                 break;
             case Map.OVERPASS:
-                //Picasso.with(getContext()).load(R.drawable.de_overpass_radar).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_overpass_radar_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_overpass_radar, mapImage);
                 loadCalloutBitmap(R.drawable.de_overpass_radar_callout, mapCallouts);
                 break;
             case Map.TRAIN:
-                //Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate_callout).into(mapCallouts);
                 loadMapBitmap(R.drawable.de_train_radar_spectate, mapImage);
                 loadCalloutBitmap(R.drawable.de_train_radar_spectate_callout, mapCallouts);
                 break;
             case Map.VERTIGO:
-                //Picasso.with(getContext()).load(R.drawable.de_vertigo_radar).into(mapImage);
                 loadMapBitmap(R.drawable.de_vertigo_radar, mapImage);
                 break;
             default:
@@ -309,20 +269,58 @@ public class MapsDetailFragment extends Fragment {
         //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
         canvas.addView(mDrawingView, params);
 
+        fabSaveStrat.setVisibility(View.VISIBLE);
+
         Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
     }
 
     @Click
-    public void fabShowCalloutsClicked(){
-        if (!showCalloutsClicked){
+    public void fabShowCalloutsClicked() {
+        if (!showCalloutsClicked) {
             mapCallouts.setVisibility(View.VISIBLE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
             showCalloutsClicked = true;
-        }else{
+        } else {
             mapCallouts.setVisibility(View.GONE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
             showCalloutsClicked = false;
         }
+    }
+
+    @Click
+    public void fabSaveStratClicked() {
+        localStrategy = LocalStrategy.getInstance();
+
+                /*"{ 'id' : '" + System.currentTimeMillis() +
+                        "', 'user' : '" + mUsername +
+                        "', 'map' : '" + Map.clickedMapName +
+                        "', 'name' : 'Apptaktik', " +
+                        "'drag' : '" + localStrategy.getDragList() +
+                        "', 'x' : '" + localStrategy.getListX() + "', " +
+                        "'y' : '" + localStrategy.getListY() + "' }";*/
+        ArrayList<Boolean> dragList = localStrategy.getDragList();
+        Boolean [] dragArray = dragList.toArray(new Boolean[dragList.size()]);
+        ArrayList<Integer> xList = localStrategy.getListX();
+        Integer [] xArray = xList.toArray(new Integer[xList.size()]);
+        ArrayList<Integer> yList = localStrategy.getListY();
+        Integer [] yArray = yList.toArray(new Integer[yList.size()]);
+        Strategy strategy = new Strategy();
+        strategy.id = 1;
+        strategy.user = mUsername;
+        strategy.map = Map.clickedMapName;
+        strategy.name = "sdlkfkasdjkgj";
+        strategy.drag = dragArray;
+        strategy.x = xArray;
+        strategy.y = yArray;
+        Gson gson = new Gson();
+        String createMap = gson.toJson(strategy);
+        Log.d("TEST", createMap);
+
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("createMap", createMap);
+
+
     }
 
     @Override
@@ -364,5 +362,34 @@ public class MapsDetailFragment extends Fragment {
             }
         }
     }
+
+    private Emitter.Listener status = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            if (getActivity() == null)
+                return;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String emitterStatus;
+                    try {
+                        emitterStatus = data.getString("status");
+                    } catch (JSONException e) {
+                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
+                        return;
+                    }
+                    if (emitterStatus.equals("createMapSuccess")) {
+                        Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
+                    } else if (emitterStatus.equals("createMapFailed")) {
+                        Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    mSocket.disconnect();
+                    mSocket.off();
+                }
+            });
+        }
+    };
 
 }

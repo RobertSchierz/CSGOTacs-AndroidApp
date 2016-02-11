@@ -13,4 +13,12 @@
         android:textColor="@color/orangePrimary"
         android:textSize="25sp" />
 
+    <ListView
+        android:id="@+id/strategiesListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:divider="@color/maps_divider_color"
+        android:dividerHeight="1dp"/>
+
 </RelativeLayout>
