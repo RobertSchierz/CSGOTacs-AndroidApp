@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,16 +14,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -33,6 +29,7 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
@@ -53,7 +50,7 @@ public class GroupsFragment extends Fragment {
     SharedPreferences sharedPreferences;
     private String groupName;
     private String groupPassword;
-    private String username;
+    private String mUsername;
     private Status gsonStatus;
     @ViewById
     public RecyclerView mGroupsRecyclerView;
@@ -82,7 +79,7 @@ public class GroupsFragment extends Fragment {
     public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         pullToRefreshText.setVisibility(View.VISIBLE);
-        username = sharedPreferences.getString(User.USERNAME, null);
+        mUsername = sharedPreferences.getString(User.USERNAME, null);
 
         if (gsonStatus == null) {
             pullToRefreshText.setVisibility(View.VISIBLE);
@@ -115,14 +112,21 @@ public class GroupsFragment extends Fragment {
     }
 
     void refreshItems() {
-        Log.d("TEST", "refreshItems");
-        myGroups.clear();
-        memberCount.clear();
-        mSocket.on("status", status);
-        mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
-        onItemsLoadComplete();
-        // Load complete
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            Log.d("TEST", "refreshItems");
+            myGroups.clear();
+            memberCount.clear();
+            HashMap<String, String> getGroupsMap = new HashMap<>();
+            getGroupsMap.put("user", mUsername);
+
+            mSocket.on("status", status);
+            mSocket.connect();
+            mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
+            onItemsLoadComplete();
+            // Load complete
+        } else {
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     void onItemsLoadComplete() {
@@ -154,9 +158,11 @@ public class GroupsFragment extends Fragment {
                             if (groupName.equals("") || groupPassword.equals("")) {
                                 Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
                             } else {
-                                //{ 'user' : 'Erstellender Benutzer', 'name' : 'Gruppenname', 'pw' : 'Gruppenpasswort' }
-                                String createGroupString = "{ 'user' : '" + username + "', 'name' : '" + groupName + "', 'pw' : '" + groupPassword + "' }";
-                                mSocket.emit("createGroup", JSONCreator.createJSON("createGroup", createGroupString));
+                                HashMap<String, String> createGroupMap = new HashMap<>();
+                                createGroupMap.put("user", mUsername);
+                                createGroupMap.put("name", groupName);
+                                createGroupMap.put("pw", groupPassword);
+                                mSocket.emit("createGroup", JSONCreator.createJSON("createGroup", createGroupMap).toString());
                             }
                         }
                     })
@@ -189,9 +195,11 @@ public class GroupsFragment extends Fragment {
                             if (groupName.equals("") || groupPassword.equals("")) {
                                 Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
                             } else {
-                                //{ 'user' : 'Erstellender Benutzer', 'name' : 'Gruppenname', 'pw' : 'Gruppenpasswort' }
-                                String createGroupString = "{ 'user' : '" + username + "', 'name' : '" + groupName + "', 'pw' : '" + groupPassword + "' }";
-                                mSocket.emit("authGroup", JSONCreator.createJSON("authGroup", createGroupString));
+                                HashMap<String, String> joinGroupMap = new HashMap<>();
+                                joinGroupMap.put("user", mUsername);
+                                joinGroupMap.put("name", groupName);
+                                joinGroupMap.put("pw", groupPassword);
+                                mSocket.emit("authGroup", JSONCreator.createJSON("authGroup", joinGroupMap).toString());
                             }
                         }
                     })

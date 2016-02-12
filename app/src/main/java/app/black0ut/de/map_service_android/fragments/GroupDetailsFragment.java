@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import app.black0ut.de.map_service_android.JSONCreator;
@@ -106,9 +107,12 @@ public class GroupDetailsFragment extends Fragment {
     }
 
     void refreshItems(String username) {
+        HashMap<String, String> getGroupsMap = new HashMap<>();
+        getGroupsMap.put("user", username);
+
         mSocket.on("status", status);
         mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
     }
 
     void onItemsLoadComplete() {

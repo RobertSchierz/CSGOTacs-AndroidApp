@@ -1,33 +1,24 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 
@@ -88,7 +79,7 @@ public class MapsDetailFragment extends Fragment {
     private boolean showCalloutsClicked = false;
 
     public LocalStrategy localStrategy;
-    SharedPreferences sharedPrefs;
+    SharedPreferences sharedPreferences;
     private String mUsername;
 
     private Socket mSocket;
@@ -107,8 +98,8 @@ public class MapsDetailFragment extends Fragment {
 
         checkMapName();
 
-        sharedPrefs = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
-        mUsername = sharedPrefs.getString(User.USERNAME, null);
+        sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        mUsername = sharedPreferences.getString(User.USERNAME, null);
 
         DrawingView.mPaint.setAntiAlias(true);
         DrawingView.mPaint.setDither(true);
@@ -257,6 +248,9 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Klick Listener für den Button, welcher den Modus des Zeichnens auf einer Karte aktiviert.
+     */
     @Click
     public void fabEditStratClicked() {
         mapImageWidth = mapImage.getWidth();
@@ -274,6 +268,9 @@ public class MapsDetailFragment extends Fragment {
         Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
     }
 
+    /**
+     * Klick Listener für den Button, welcher die Callouts anzeigt.
+     */
     @Click
     public void fabShowCalloutsClicked() {
         if (!showCalloutsClicked) {
@@ -287,17 +284,47 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Klick Listener für den Button, welcher eine gezeichnete Strategie speichert.
+     */
     @Click
     public void fabSaveStratClicked() {
-        localStrategy = LocalStrategy.getInstance();
+        showDialog();
+    }
 
-                /*"{ 'id' : '" + System.currentTimeMillis() +
-                        "', 'user' : '" + mUsername +
-                        "', 'map' : '" + Map.clickedMapName +
-                        "', 'name' : 'Apptaktik', " +
-                        "'drag' : '" + localStrategy.getDragList() +
-                        "', 'x' : '" + localStrategy.getListX() + "', " +
-                        "'y' : '" + localStrategy.getListY() + "' }";*/
+    /**
+     * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
+     */
+    private void showDialog(){
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newStratLayout = factory.inflate(R.layout.new_strat, null);
+            final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setTitle("Strategie speichern")
+                    .setView(newStratLayout)
+                    .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            String stratName = etStratName.getText().toString();
+                            if (stratName.equals("")) {
+                                Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
+                            } else {
+                                prepareStrategyJson(stratName);
+                            }
+                        }
+                    })
+                    .setNegativeButton("Abbrechen", null)
+                    .create();
+            builder.show();
+        } else {
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void prepareStrategyJson(String stratName){
+        localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
         Boolean [] dragArray = dragList.toArray(new Boolean[dragList.size()]);
         ArrayList<Integer> xList = localStrategy.getListX();
@@ -305,22 +332,20 @@ public class MapsDetailFragment extends Fragment {
         ArrayList<Integer> yList = localStrategy.getListY();
         Integer [] yArray = yList.toArray(new Integer[yList.size()]);
         Strategy strategy = new Strategy();
-        strategy.id = 1;
+        strategy.id = System.currentTimeMillis();
         strategy.user = mUsername;
         strategy.map = Map.clickedMapName;
-        strategy.name = "sdlkfkasdjkgj";
+        strategy.name = stratName;
         strategy.drag = dragArray;
         strategy.x = xArray;
         strategy.y = yArray;
         Gson gson = new Gson();
-        String createMap = gson.toJson(strategy);
-        Log.d("TEST", createMap);
+        String createTac = gson.toJson(strategy);
+        Log.d("TEST", createTac);
 
         mSocket.on("status", status);
         mSocket.connect();
-        mSocket.emit("createMap", createMap);
-
-
+        mSocket.emit("createTac", createTac);
     }
 
     @Override
@@ -375,13 +400,14 @@ public class MapsDetailFragment extends Fragment {
                     String emitterStatus;
                     try {
                         emitterStatus = data.getString("status");
+                        Log.d("TEST", emitterStatus);
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
                     }
-                    if (emitterStatus.equals("createMapSuccess")) {
+                    if (emitterStatus.equals("createTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
-                    } else if (emitterStatus.equals("createMapFailed")) {
+                    } else if (emitterStatus.equals("createTacFailed")) {
                         Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
                     }
 
