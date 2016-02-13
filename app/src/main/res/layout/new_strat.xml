@@ -18,7 +18,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:layout_marginTop="24dp"
-            android:hint="@string/group_name_hint"
+            android:hint="@string/strat_name_hint"
             android:inputType="text"
             android:lines="1"
             android:maxLines="1"

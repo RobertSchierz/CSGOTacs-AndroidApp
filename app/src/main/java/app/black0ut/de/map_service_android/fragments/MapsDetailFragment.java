@@ -5,9 +5,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -25,16 +23,16 @@ import com.google.gson.Gson;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.DrawingView;
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.tasks.BitmapWorkerTask;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.data.Map;
@@ -72,9 +70,6 @@ public class MapsDetailFragment extends Fragment {
     @ViewById
     FloatingActionButton fabEditStrat;
 
-    private int BITMAP_WIDHT = 1024;
-    private int BITMAP_HEIGHT = 1024;
-
     public int mapImageHeight;
     public int mapImageWidth;
     public Bitmap bitmap;
@@ -84,6 +79,24 @@ public class MapsDetailFragment extends Fragment {
     public LocalStrategy localStrategy;
     SharedPreferences sharedPreferences;
     private String mUsername;
+
+    //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
+    @InstanceState
+    Long stratId;
+    @InstanceState
+    String stratUser;
+    @InstanceState
+    String stratMap;
+    @InstanceState
+    String stratName;
+    @InstanceState
+    String stratGroup;
+    @InstanceState
+    boolean[] stratDrag;
+    @InstanceState
+    double[] stratX;
+    @InstanceState
+    double[] stratY;
 
     private Socket mSocket;
 
@@ -98,8 +111,18 @@ public class MapsDetailFragment extends Fragment {
 
     @AfterViews
     public void afterViews() {
+        if (getArguments() != null) {
+            stratId = getArguments().getLong("stratId");
+            stratUser = getArguments().getString("stratUser");
+            stratMap = getArguments().getString("stratMap");
+            stratName = getArguments().getString("stratName");
+            stratGroup = getArguments().getString("stratGroup");
+            stratDrag = getArguments().getBooleanArray("stratDrag");
+            stratX = getArguments().getDoubleArray("stratX");
+            stratY = getArguments().getDoubleArray("stratY");
+        }
 
-        checkMapName();
+        Map.checkMapName(mapImage, mapCallouts, getResources());
 
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
@@ -121,134 +144,6 @@ public class MapsDetailFragment extends Fragment {
 
     public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public void loadMapBitmap(int resId, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        task.execute(resId);
-    }
-
-    public void loadCalloutBitmap(int resId, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        task.execute(resId);
-    }
-
-    /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param options
-     * @param reqWidth
-     * @param reqHeight
-     * @return
-     */
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param res
-     * @param resId
-     * @param reqWidth
-     * @param reqHeight
-     * @return
-     */
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    /**
-     * Prüft den Namen der geklickten Karte und setzt dann die ImageResource der ImageView auf das passende Bild.
-     */
-    private void checkMapName() {
-        switch (Map.clickedMapName) {
-            case Map.ASSAULT:
-                loadMapBitmap(R.drawable.cs_assault_radar, mapImage);
-                break;
-            case Map.AZTEC:
-                loadMapBitmap(R.drawable.de_aztec_radar_spectate, mapImage);
-                break;
-            case Map.CACHE:
-                loadMapBitmap(R.drawable.de_cache_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_cache_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.COBBLESTONE:
-                loadMapBitmap(R.drawable.de_cbble_radar, mapImage);
-                loadCalloutBitmap(R.drawable.de_cbble_radar_callout, mapCallouts);
-                break;
-            case Map.DUST:
-                loadMapBitmap(R.drawable.de_dust_radar_spectate, mapImage);
-                break;
-            case Map.DUST2:
-                loadMapBitmap(R.drawable.de_dust2_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_dust2_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.INFERNO:
-                loadMapBitmap(R.drawable.de_inferno_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_inferno_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.ITALY:
-                loadMapBitmap(R.drawable.cs_italy_radar, mapImage);
-                break;
-            case Map.MILITIA:
-                loadMapBitmap(R.drawable.cs_militia_radar_spectate, mapImage);
-                break;
-            case Map.MIRAGE:
-                loadMapBitmap(R.drawable.de_mirage_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.NUKE:
-                loadMapBitmap(R.drawable.de_nuke_radar_spectate, mapImage);
-                break;
-            case Map.OFFICE:
-                loadMapBitmap(R.drawable.cs_office_radar, mapImage);
-                break;
-            case Map.OVERPASS:
-                loadMapBitmap(R.drawable.de_overpass_radar, mapImage);
-                loadCalloutBitmap(R.drawable.de_overpass_radar_callout, mapCallouts);
-                break;
-            case Map.TRAIN:
-                loadMapBitmap(R.drawable.de_train_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_train_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.VERTIGO:
-                loadMapBitmap(R.drawable.de_vertigo_radar, mapImage);
-                break;
-            default:
-                Log.d("MAP CLICK", "No image for the clicked Map.");
-        }
     }
 
     /**
@@ -273,7 +168,7 @@ public class MapsDetailFragment extends Fragment {
             fabEditStrat.setImageResource(R.drawable.ic_clear_orange_600_24dp);
 
             Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
-        }else{
+        } else {
             editStratClicked = false;
             fabSaveStrat.setVisibility(View.GONE);
             fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
@@ -308,45 +203,46 @@ public class MapsDetailFragment extends Fragment {
     /**
      * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
      */
-    private void showDialog(){
+    private void showDialog() {
         localStrategy = LocalStrategy.getInstance();
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
 
-                LayoutInflater factory = LayoutInflater.from(getContext());
-                final View newStratLayout = factory.inflate(R.layout.new_strat, null);
-                final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newStratLayout = factory.inflate(R.layout.new_strat, null);
+            final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
 
-                final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                        .setTitle("Strategie speichern")
-                        .setView(newStratLayout)
-                        .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int whichButton) {
-                                String stratName = etStratName.getText().toString();
-                                if (stratName.equals("")) {
-                                    Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    prepareStrategyJson(stratName);
-                                }
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setTitle("Strategie speichern")
+                    .setView(newStratLayout)
+                    .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            String stratName = etStratName.getText().toString();
+                            if (stratName.equals("")) {
+                                Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
+                            } else {
+                                prepareStrategyJson(stratName);
                             }
-                        })
-                        .setNegativeButton("Abbrechen", null)
-                        .create();
-                builder.show();
+                        }
+                    })
+                    .setNegativeButton("Abbrechen", null)
+                    .create();
+            builder.show();
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void prepareStrategyJson(String stratName){
+    private void prepareStrategyJson(String stratName) {
         localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
-        Boolean [] dragArray = dragList.toArray(new Boolean[dragList.size()]);
+        Boolean[] dragArray = dragList.toArray(new Boolean[dragList.size()]);
         ArrayList<Double> xList = localStrategy.getListX();
-        Double [] xArray = xList.toArray(new Double[xList.size()]);
+        Double[] xArray = xList.toArray(new Double[xList.size()]);
         ArrayList<Double> yList = localStrategy.getListY();
-        Double [] yArray = yList.toArray(new Double[yList.size()]);
-        Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName, stratName, null, dragArray, xArray, yArray);
+        Double[] yArray = yList.toArray(new Double[yList.size()]);
+        Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName,
+                stratName, null, dragArray, xArray, yArray);
         /*strategy.id = System.currentTimeMillis();
         strategy.user = mUsername;
         strategy.map = Map.clickedMapName;
@@ -370,37 +266,6 @@ public class MapsDetailFragment extends Fragment {
         mapImage.setImageDrawable(null);
         mapCallouts.setImageDrawable(null);
         mapCallouts.setVisibility(View.GONE);
-    }
-
-    /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     */
-    class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
-        private final WeakReference<ImageView> imageViewReference;
-        private int data = 0;
-
-        public BitmapWorkerTask(ImageView imageView) {
-            // Use a WeakReference to ensure the ImageView can be garbage collected
-            imageViewReference = new WeakReference<ImageView>(imageView);
-        }
-
-        // Decode image in background.
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            data = params[0];
-            return decodeSampledBitmapFromResource(getResources(), data, BITMAP_WIDHT, BITMAP_HEIGHT);
-        }
-
-        // Once complete, see if ImageView is still around and set bitmap.
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if (imageViewReference != null && bitmap != null) {
-                final ImageView imageView = imageViewReference.get();
-                if (imageView != null) {
-                    imageView.setImageBitmap(bitmap);
-                }
-            }
-        }
     }
 
     private Emitter.Listener status = new Emitter.Listener() {

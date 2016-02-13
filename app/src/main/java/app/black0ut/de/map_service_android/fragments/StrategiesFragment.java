@@ -1,21 +1,19 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
@@ -30,8 +28,6 @@ import java.util.List;
 
 import app.black0ut.de.map_service_android.JSONCreator;
 import app.black0ut.de.map_service_android.R;
-import app.black0ut.de.map_service_android.StrategyListItemView;
-import app.black0ut.de.map_service_android.adapter.MapsListViewAdapter;
 import app.black0ut.de.map_service_android.adapter.StrategiesListViewAdapter;
 import app.black0ut.de.map_service_android.data.Map;
 import app.black0ut.de.map_service_android.data.Strategy;
@@ -97,7 +93,52 @@ public class StrategiesFragment extends Fragment {
      */
     @ItemClick
     void strategiesListViewItemClicked(Strategy strategy) {
-        Toast.makeText(this.getContext(), "Clicked: " + strategy.name, Toast.LENGTH_SHORT).show();
+        Map.clickedMapName = strategy.map;
+        swapFragment(strategy);
+    }
+
+    /**
+     * Ersetzt das aktuelle Fragment durch ein MapsDetailFragment, welches das Bild mit der geklickten
+     * Strategie anzeigt.
+     */
+    public void swapFragment(Strategy strategy) {
+        //Das Strategy Objekt über das Bundle an das nächste Fragment weitergeben
+        Bundle bundle = new Bundle();
+        bundle.putLong("stratId", strategy.id);
+        bundle.putString("stratUser", strategy.user);
+        bundle.putString("stratMap", strategy.map);
+        bundle.putString("stratName", strategy.name);
+        bundle.putString("stratGroup", strategy.group);
+        bundle.putBooleanArray("stratDrag", toPrimitiveArray(strategy.drag));
+        bundle.putDoubleArray("stratX", toPrimitiveArray(strategy.x));
+        bundle.putDoubleArray("stratY", toPrimitiveArray(strategy.y));
+
+        Fragment fragment = new MapsDetailFragment_();
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.mainFrame, fragment)
+                .commit();
+        fragmentManager.executePendingTransactions();
+    }
+
+    private boolean[] toPrimitiveArray(final Boolean [] booleanArray) {
+        final boolean[] primitives = new boolean[booleanArray.length];
+        int index = 0;
+        for (Boolean object : booleanArray) {
+            primitives[index++] = object;
+        }
+        return primitives;
+    }
+
+    private double[] toPrimitiveArray(final Double [] doubleArray) {
+        final double[] primitives = new double[doubleArray.length];
+        int index = 0;
+        for (Double object : doubleArray) {
+            primitives[index++] = object;
+        }
+        return primitives;
     }
 
     private Emitter.Listener status = new Emitter.Listener() {

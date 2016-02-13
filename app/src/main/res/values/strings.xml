@@ -11,6 +11,7 @@
 
     <!-- Strategies Fragment -->
     <string name="no_strategies">Du hast leider keine Strategien gespeichert.</string>
+    <string name="strat_name_hint">Strategiename</string>
 
     <!-- Nav menu -->
     <string name="nav_home">Home</string>
