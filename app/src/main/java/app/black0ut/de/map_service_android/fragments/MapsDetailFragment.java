@@ -311,10 +311,6 @@ public class MapsDetailFragment extends Fragment {
     private void showDialog(){
         localStrategy = LocalStrategy.getInstance();
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-            if (localStrategy.getListX() != null &&
-                    localStrategy.getListY() != null &&
-                    localStrategy.getDragList() != null &&
-                    localStrategy.getMapName() != null) {
 
                 LayoutInflater factory = LayoutInflater.from(getContext());
                 final View newStratLayout = factory.inflate(R.layout.new_strat, null);
@@ -337,9 +333,6 @@ public class MapsDetailFragment extends Fragment {
                         .setNegativeButton("Abbrechen", null)
                         .create();
                 builder.show();
-            }else{
-                Toast.makeText(getContext(), "Du musst erst eine Strategie zeichnen.", Toast.LENGTH_SHORT).show();
-            }
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
         }

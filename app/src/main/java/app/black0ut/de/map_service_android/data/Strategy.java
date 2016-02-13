@@ -22,4 +22,5 @@ public class Strategy {
     public Float [] x;
     @Expose
     public Float [] y;
+
 }

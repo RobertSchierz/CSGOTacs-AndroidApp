@@ -6,21 +6,21 @@ package app.black0ut.de.map_service_android.data;
  */
 public class Map {
 
-    public static final String DUST2 = "Dust 2";
-    public static final String TRAIN = "Train";
-    public static final String MIRAGE = "Mirage";
-    public static final String INFERNO = "Inferno";
-    public static final String COBBLESTONE = "Cobblestone";
-    public static final String OVERPASS = "Overpass";
-    public static final String CACHE = "Cache";
-    public static final String AZTEC = "Aztec";
-    public static final String DUST = "Dust";
-    public static final String VERTIGO = "Vertigo";
-    public static final String NUKE = "Nuke";
-    public static final String OFFICE = "Office";
-    public static final String ITALY = "Italy";
-    public static final String ASSAULT = "Assault";
-    public static final String MILITIA = "Militia";
+    public static final String DUST2 = "de_dust2";
+    public static final String TRAIN = "de_train";
+    public static final String MIRAGE = "de_mirage";
+    public static final String INFERNO = "de_inferno";
+    public static final String COBBLESTONE = "gd_cbble";
+    public static final String OVERPASS = "de_overpass";
+    public static final String CACHE = "de_cache";
+    public static final String AZTEC = "de_aztec";
+    public static final String DUST = "de_dust";
+    public static final String VERTIGO = "de_vertigo";
+    public static final String NUKE = "de_nuke";
+    public static final String OFFICE = "cs_office";
+    public static final String ITALY = "cs_italy";
+    public static final String ASSAULT = "cs_assault";
+    public static final String MILITIA = "cs_militia";
 
     //Variable zum speichern der geklickten Map im MapsFragment
     public static String clickedMapName = "";

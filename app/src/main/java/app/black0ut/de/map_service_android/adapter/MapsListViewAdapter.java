@@ -33,6 +33,9 @@ public class MapsListViewAdapter extends BaseAdapter{
 
     List<Map> maps;
 
+    //You can inject the root Android component that depends on your @EBean class, using
+    // the @RootContext annotation. Please notice that it only gets injected if the context has the right type.
+    //Quelle: https://github.com/excilys/androidannotations/wiki/Enhance-custom-classes
     @RootContext
     Context context;
 
