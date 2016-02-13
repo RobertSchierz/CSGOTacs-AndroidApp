@@ -69,6 +69,8 @@ public class MapsDetailFragment extends Fragment {
     FloatingActionButton fabShowCallouts;
     @ViewById
     FloatingActionButton fabSaveStrat;
+    @ViewById
+    FloatingActionButton fabEditStrat;
 
     private int BITMAP_WIDHT = 1024;
     private int BITMAP_HEIGHT = 1024;
@@ -77,6 +79,7 @@ public class MapsDetailFragment extends Fragment {
     public int mapImageWidth;
     public Bitmap bitmap;
     private boolean showCalloutsClicked = false;
+    private boolean editStratClicked = false;
 
     public LocalStrategy localStrategy;
     SharedPreferences sharedPreferences;
@@ -253,19 +256,29 @@ public class MapsDetailFragment extends Fragment {
      */
     @Click
     public void fabEditStratClicked() {
-        mapImageWidth = mapImage.getWidth();
-        mapImageHeight = mapImage.getHeight();
+        if (!editStratClicked) {
+            editStratClicked = true;
 
-        DrawingView mDrawingView = new DrawingView(getContext());
-        //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
-        canvas.addView(mDrawingView, params);
+            mapImageWidth = mapImage.getWidth();
+            mapImageHeight = mapImage.getHeight();
 
-        fabSaveStrat.setVisibility(View.VISIBLE);
+            DrawingView mDrawingView = new DrawingView(getContext());
+            //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+            //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
+            canvas.addView(mDrawingView, params);
 
-        Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
+            fabSaveStrat.setVisibility(View.VISIBLE);
+            fabEditStrat.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+
+            Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
+        }else{
+            editStratClicked = false;
+            fabSaveStrat.setVisibility(View.GONE);
+            fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
+
+        }
     }
 
     /**
@@ -296,28 +309,37 @@ public class MapsDetailFragment extends Fragment {
      * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
      */
     private void showDialog(){
+        localStrategy = LocalStrategy.getInstance();
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-            LayoutInflater factory = LayoutInflater.from(getContext());
-            final View newStratLayout = factory.inflate(R.layout.new_strat, null);
-            final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+            if (localStrategy.getListX() != null &&
+                    localStrategy.getListY() != null &&
+                    localStrategy.getDragList() != null &&
+                    localStrategy.getMapName() != null) {
 
-            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                    .setTitle("Strategie speichern")
-                    .setView(newStratLayout)
-                    .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,
-                                            int whichButton) {
-                            String stratName = etStratName.getText().toString();
-                            if (stratName.equals("")) {
-                                Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
-                            } else {
-                                prepareStrategyJson(stratName);
+                LayoutInflater factory = LayoutInflater.from(getContext());
+                final View newStratLayout = factory.inflate(R.layout.new_strat, null);
+                final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+
+                final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                        .setTitle("Strategie speichern")
+                        .setView(newStratLayout)
+                        .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int whichButton) {
+                                String stratName = etStratName.getText().toString();
+                                if (stratName.equals("")) {
+                                    Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    prepareStrategyJson(stratName);
+                                }
                             }
-                        }
-                    })
-                    .setNegativeButton("Abbrechen", null)
-                    .create();
-            builder.show();
+                        })
+                        .setNegativeButton("Abbrechen", null)
+                        .create();
+                builder.show();
+            }else{
+                Toast.makeText(getContext(), "Du musst erst eine Strategie zeichnen.", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
         }
@@ -327,10 +349,10 @@ public class MapsDetailFragment extends Fragment {
         localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
         Boolean [] dragArray = dragList.toArray(new Boolean[dragList.size()]);
-        ArrayList<Integer> xList = localStrategy.getListX();
-        Integer [] xArray = xList.toArray(new Integer[xList.size()]);
-        ArrayList<Integer> yList = localStrategy.getListY();
-        Integer [] yArray = yList.toArray(new Integer[yList.size()]);
+        ArrayList<Float> xList = localStrategy.getListX();
+        Float [] xArray = xList.toArray(new Float[xList.size()]);
+        ArrayList<Float> yList = localStrategy.getListY();
+        Float [] yArray = yList.toArray(new Float[yList.size()]);
         Strategy strategy = new Strategy();
         strategy.id = System.currentTimeMillis();
         strategy.user = mUsername;

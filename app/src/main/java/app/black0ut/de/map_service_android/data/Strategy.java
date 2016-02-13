@@ -19,7 +19,7 @@ public class Strategy {
     @Expose
     public Boolean [] drag;
     @Expose
-    public Integer [] x;
+    public Float [] x;
     @Expose
-    public Integer [] y;
+    public Float [] y;
 }

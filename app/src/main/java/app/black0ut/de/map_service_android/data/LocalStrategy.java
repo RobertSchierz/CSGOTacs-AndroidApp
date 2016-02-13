@@ -8,17 +8,17 @@ import java.util.ArrayList;
 //Singleton
 public class LocalStrategy {
 
-    private static ArrayList<Integer> initListX = new ArrayList<>();
-    private static ArrayList<Integer> initListY = new ArrayList<>();
+    private static ArrayList<Float> initListX = new ArrayList<>();
+    private static ArrayList<Float> initListY = new ArrayList<>();
     private static ArrayList<Boolean> initDragList = new ArrayList<>();
 
-    private ArrayList<Integer> listX;
-    private ArrayList<Integer> listY;
+    private ArrayList<Float> listX;
+    private ArrayList<Float> listY;
     private ArrayList<Boolean> dragList;
     private String stratName;
     private String mapName;
 
-    private LocalStrategy(ArrayList<Integer> listX, ArrayList<Integer> listY, ArrayList<Boolean> dragList) {
+    private LocalStrategy(ArrayList<Float> listX, ArrayList<Float> listY, ArrayList<Boolean> dragList) {
         this.listX = listX;
         this.listY = listY;
         this.dragList = dragList;
@@ -32,19 +32,19 @@ public class LocalStrategy {
         return ourInstance;
     }
 
-    public ArrayList<Integer> getListX() {
+    public ArrayList<Float> getListX() {
         return listX;
     }
 
-    public void addListX(int x) {
+    public void addListX(float x) {
         this.listX.add(x);
     }
 
-    public ArrayList<Integer> getListY() {
+    public ArrayList<Float> getListY() {
         return listY;
     }
 
-    public void addListY(int y) {
+    public void addListY(float y) {
         this.listY.add(y);
     }
 

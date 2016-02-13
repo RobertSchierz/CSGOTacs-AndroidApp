@@ -168,10 +168,10 @@ public class DrawingView extends View {
         float y = event.getY();
 
         if (x < mCanvas.getWidth() || x >= 0) {
-            localStrategy.addListX((int) x);
+            localStrategy.addListX((x / mCanvas.getWidth()));
         }
         if (y < mCanvas.getHeight() || y >= 0) {
-            localStrategy.addListY((int) y);
+            localStrategy.addListY((y / mCanvas.getHeight()));
         }
         Log.d("TEST", "onTouchEvent x: " + x);
         Log.d("TEST", "onTouchEvent y: " + y);
