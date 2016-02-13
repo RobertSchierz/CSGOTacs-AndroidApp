@@ -19,8 +19,18 @@ public class Strategy {
     @Expose
     public Boolean [] drag;
     @Expose
-    public Float [] x;
+    public Double [] x;
     @Expose
-    public Float [] y;
+    public Double [] y;
 
+    public Strategy(long id, String user, String map, String name, String group, Boolean[] drag, Double[] x, Double[] y) {
+        this.id = id;
+        this.user = user;
+        this.map = map;
+        this.name = name;
+        this.group = group;
+        this.drag = drag;
+        this.x = x;
+        this.y = y;
+    }
 }

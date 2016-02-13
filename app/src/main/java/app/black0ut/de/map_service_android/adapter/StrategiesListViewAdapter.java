@@ -36,9 +36,9 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Jan-Philipp Altenhof on 11.02.2016.
  */
-@EBean
 public class StrategiesListViewAdapter extends BaseAdapter {
 
+    private Context mContext;
     private Socket mSocket;
 
     {
@@ -53,30 +53,28 @@ public class StrategiesListViewAdapter extends BaseAdapter {
     private String mUsername;
     private List<Strategy> strategies;
 
-    //You can inject the root Android component that depends on your @EBean class, using
-    // the @RootContext annotation. Please notice that it only gets injected if the context has the right type.
-    //Quelle: https://github.com/excilys/androidannotations/wiki/Enhance-custom-classes
-    @RootContext
-    Context context;
-
-    @AfterInject
-    void initAdapter() {
-        sharedPreferences = context.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
-        mUsername = sharedPreferences.getString(User.USERNAME, null);
-        strategies = new ArrayList<>();
-        refreshItems();
+    public StrategiesListViewAdapter(List<Strategy> strategies, Context context) {
+        this.strategies = strategies;
+        this.mContext = context;
     }
+
+    /*@AfterInject
+    void initAdapter() {
+        //sharedPreferences = mContext.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        //mUsername = sharedPreferences.getString(User.USERNAME, null);
+        //refreshItems();
+    }*/
 
     void refreshItems() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
             HashMap<String, String> getTacsMap = new HashMap<>();
             getTacsMap.put("user", mUsername);
 
-            mSocket.on("status", status);
+            //mSocket.on("status", status);
             mSocket.connect();
             mSocket.emit("getTacs", JSONCreator.createJSON("getTacs", getTacsMap).toString());
         } else {
-            Toast.makeText(context, "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -85,7 +83,7 @@ public class StrategiesListViewAdapter extends BaseAdapter {
 
         StrategyListItemView strategyListItemView;
         if (convertView == null) {
-            strategyListItemView = StrategyListItemView_.build(context);
+            strategyListItemView = StrategyListItemView_.build(mContext);
         } else {
             strategyListItemView = (StrategyListItemView) convertView;
         }
@@ -110,43 +108,4 @@ public class StrategiesListViewAdapter extends BaseAdapter {
         return position;
     }
 
-    private Emitter.Listener status = new Emitter.Listener() {
-        Activity activity = (Activity) context;
-
-        @Override
-        public void call(final Object... args) {
-            if (activity == null)
-                return;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    String emitterStatus;
-                    JSONArray jsonArray;
-                    Gson gson = new Gson();
-                    try {
-                        emitterStatus = data.getString("status");
-                        jsonArray = data.getJSONArray("tacs");
-                    } catch (JSONException e) {
-                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
-                        return;
-                    }
-                    if (emitterStatus.equals("provideTacs")) {
-
-                        Log.d("TEST", "provideTacs");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            try {
-                                strategies.add((Strategy)jsonArray.get(i));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    mSocket.disconnect();
-                    mSocket.off();
-                }
-            });
-        }
-    };
 }

@@ -342,18 +342,18 @@ public class MapsDetailFragment extends Fragment {
         localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
         Boolean [] dragArray = dragList.toArray(new Boolean[dragList.size()]);
-        ArrayList<Float> xList = localStrategy.getListX();
-        Float [] xArray = xList.toArray(new Float[xList.size()]);
-        ArrayList<Float> yList = localStrategy.getListY();
-        Float [] yArray = yList.toArray(new Float[yList.size()]);
-        Strategy strategy = new Strategy();
-        strategy.id = System.currentTimeMillis();
+        ArrayList<Double> xList = localStrategy.getListX();
+        Double [] xArray = xList.toArray(new Double[xList.size()]);
+        ArrayList<Double> yList = localStrategy.getListY();
+        Double [] yArray = yList.toArray(new Double[yList.size()]);
+        Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName, stratName, null, dragArray, xArray, yArray);
+        /*strategy.id = System.currentTimeMillis();
         strategy.user = mUsername;
         strategy.map = Map.clickedMapName;
         strategy.name = stratName;
         strategy.drag = dragArray;
         strategy.x = xArray;
-        strategy.y = yArray;
+        strategy.y = yArray;*/
         Gson gson = new Gson();
         String createTac = gson.toJson(strategy);
         Log.d("TEST", createTac);
