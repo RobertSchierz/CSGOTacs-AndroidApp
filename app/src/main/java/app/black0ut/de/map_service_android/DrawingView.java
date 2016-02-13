@@ -30,7 +30,11 @@ import io.socket.emitter.Emitter;
 public class DrawingView extends View {
 
     //DrawingView dv ;
-    public static Paint mPaint = new Paint();
+    public static Paint sPaint = new Paint();
+    public static boolean isStrategy = false;
+    public static boolean[] sDrag;
+    public static double[] sX;
+    public static double[] sY;
 
     public int width;
     public int height;
@@ -95,6 +99,15 @@ public class DrawingView extends View {
 
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        if (isStrategy) {
+            for (int i = 0; i < sDrag.length; i++) {
+                if (!sDrag[i]) {
+                    touch_start((float) sX[i] * w, (float) sY[i] * h);
+                } else {
+                    touch_move((float) sX[i] * w, (float) sY[i] * h);
+                }
+            }
+        }
     }
 
     @Override
@@ -102,7 +115,7 @@ public class DrawingView extends View {
         super.onDraw(canvas);
 
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawPath(mPath, mPaint);
+        canvas.drawPath(mPath, sPaint);
         canvas.drawPath(circlePath, circlePaint);
     }
 
@@ -117,18 +130,16 @@ public class DrawingView extends View {
         mY = y;
 
         String startCoords = "{x: " + x + ", y: " + y + ", startx: " + x + ", starty: " + y + "}";
-
-
         //Methode zum Koordinaten senden aufrufen
         attemptSend(startCoords);
     }
 
     private void touch_move(float x, float y) {
         if (x > mCanvas.getWidth() || x < 0) {
-            mCanvas.drawPath(mPath, mPaint);
+            mCanvas.drawPath(mPath, sPaint);
             return;
         } else if (y > mCanvas.getHeight() || y < 0) {
-            mCanvas.drawPath(mPath, mPaint);
+            mCanvas.drawPath(mPath, sPaint);
             return;
         }
 
@@ -155,7 +166,7 @@ public class DrawingView extends View {
         mPath.lineTo(mX, mY);
         circlePath.reset();
         // commit the path to our offscreen
-        mCanvas.drawPath(mPath, mPaint);
+        mCanvas.drawPath(mPath, sPaint);
         // kill this so we don't double draw
         mPath.reset();
         String upCoords = "{x: " + mX + ", y: " + mY + "}";
@@ -243,7 +254,7 @@ public class DrawingView extends View {
                     mPath.moveTo(startx, starty);
                     //TODO eventuell noch quadTo draus machen
                     mPath.lineTo(x, y);
-                    mCanvas.drawPath(mPath, mPaint);
+                    mCanvas.drawPath(mPath, sPaint);
                     invalidate();
                     mPath.reset();
 

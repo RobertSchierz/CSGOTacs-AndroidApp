@@ -32,7 +32,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import app.black0ut.de.map_service_android.DrawingView;
-import app.black0ut.de.map_service_android.tasks.BitmapWorkerTask;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.data.Map;
@@ -51,7 +50,7 @@ import io.socket.emitter.Emitter;
  * Die 'ImageView' für die Callouts kann bei Bedarf durch den Nutzer an- und abgeschaltet werden.
  */
 
-@EFragment(R.layout.fragment_maps_detail)
+@EFragment(R.layout.fragment_map_detail)
 public class MapsDetailFragment extends Fragment {
 
     @ViewById(R.id.map_image)
@@ -127,13 +126,13 @@ public class MapsDetailFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
 
-        DrawingView.mPaint.setAntiAlias(true);
-        DrawingView.mPaint.setDither(true);
-        DrawingView.mPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
-        DrawingView.mPaint.setStyle(Paint.Style.STROKE);
-        DrawingView.mPaint.setStrokeJoin(Paint.Join.ROUND);
-        DrawingView.mPaint.setStrokeCap(Paint.Cap.ROUND);
-        DrawingView.mPaint.setStrokeWidth(pxToDp(14));
+        DrawingView.sPaint.setAntiAlias(true);
+        DrawingView.sPaint.setDither(true);
+        DrawingView.sPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
+        DrawingView.sPaint.setStyle(Paint.Style.STROKE);
+        DrawingView.sPaint.setStrokeJoin(Paint.Join.ROUND);
+        DrawingView.sPaint.setStrokeCap(Paint.Cap.ROUND);
+        DrawingView.sPaint.setStrokeWidth(pxToDp(14));
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
     }
@@ -280,7 +279,6 @@ public class MapsDetailFragment extends Fragment {
                     String emitterStatus;
                     try {
                         emitterStatus = data.getString("status");
-                        Log.d("TEST", emitterStatus);
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;

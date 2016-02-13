@@ -234,16 +234,20 @@ public class GroupsFragment extends Fragment {
                     String group;
                     try {
                         emitterStatus = data.getString("status");
-                        group = data.getString("group");
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
-                        myGroups.add(group);
-                        memberCount.add(1);
-                        onItemsLoadComplete();
-                        Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
+                        try {
+                            group = data.getString("group");
+                            myGroups.add(group);
+                            memberCount.add(1);
+                            onItemsLoadComplete();
+                            Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("provideGroups")) {

@@ -44,7 +44,6 @@ import io.socket.emitter.Emitter;
 public class StrategiesFragment extends Fragment {
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -58,11 +57,11 @@ public class StrategiesFragment extends Fragment {
     private String mUsername;
 
     @ViewById
-    ListView strategiesListView;
+    public ListView strategiesListView;
     @ViewById
-    TextView noStrats;
+    public TextView noStrats;
 
-    StrategiesListViewAdapter adapter;
+    private StrategiesListViewAdapter adapter;
 
     @AfterViews
     public void bindAdapter() {
@@ -113,7 +112,7 @@ public class StrategiesFragment extends Fragment {
         bundle.putDoubleArray("stratX", toPrimitiveArray(strategy.x));
         bundle.putDoubleArray("stratY", toPrimitiveArray(strategy.y));
 
-        Fragment fragment = new MapsDetailFragment_();
+        Fragment fragment = new StrategyDetailFragment_();
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction()

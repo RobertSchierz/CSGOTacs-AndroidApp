@@ -57,9 +57,11 @@ public class Map {
         switch (Map.clickedMapName) {
             case Map.ASSAULT:
                 loadMapBitmap(R.drawable.cs_assault_radar, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.AZTEC:
                 loadMapBitmap(R.drawable.de_aztec_radar_spectate, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.CACHE:
                 loadMapBitmap(R.drawable.de_cache_radar_spectate, mapImage, resources);
@@ -71,6 +73,7 @@ public class Map {
                 break;
             case Map.DUST:
                 loadMapBitmap(R.drawable.de_dust_radar_spectate, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.DUST2:
                 loadMapBitmap(R.drawable.de_dust2_radar_spectate, mapImage, resources);
@@ -82,9 +85,11 @@ public class Map {
                 break;
             case Map.ITALY:
                 loadMapBitmap(R.drawable.cs_italy_radar, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.MILITIA:
                 loadMapBitmap(R.drawable.cs_militia_radar_spectate, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.MIRAGE:
                 loadMapBitmap(R.drawable.de_mirage_radar_spectate, mapImage, resources);
@@ -92,9 +97,11 @@ public class Map {
                 break;
             case Map.NUKE:
                 loadMapBitmap(R.drawable.de_nuke_radar_spectate, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.OFFICE:
                 loadMapBitmap(R.drawable.cs_office_radar, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.OVERPASS:
                 loadMapBitmap(R.drawable.de_overpass_radar, mapImage, resources);
@@ -106,6 +113,7 @@ public class Map {
                 break;
             case Map.VERTIGO:
                 loadMapBitmap(R.drawable.de_vertigo_radar, mapImage, resources);
+                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             default:
                 Log.d("MAP CLICK", "No image for the clicked Map.");
