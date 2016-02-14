@@ -75,4 +75,16 @@ public class LocalStrategy {
     public ArrayList<Boolean> getDragList() {
         return this.dragList;
     }
+
+    public void clearDragList(){
+        this.dragList.clear();
+    }
+
+    public void clearListX(){
+        this.listX.clear();
+    }
+
+    public void clearListY(){
+        this.listY.clear();
+    }
 }

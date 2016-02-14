@@ -42,8 +42,8 @@ public class DrawingView extends View {
     public LocalStrategy localStrategy;
 
     private Bitmap mBitmap;
-    private Canvas mCanvas;
-    private Path mPath;
+    public Canvas mCanvas;
+    public Path mPath;
     private Paint mBitmapPaint;
     Context context;
     private Paint circlePaint;
@@ -85,6 +85,16 @@ public class DrawingView extends View {
         mSocket.emit("appTest");
     }
 
+    public void clearDrawingView() {
+        localStrategy.clearListX();
+        localStrategy.clearListY();
+        localStrategy.clearDragList();
+
+        mBitmap.eraseColor(Color.TRANSPARENT);
+        mPath.reset();
+        invalidate();
+    }
+
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
@@ -99,12 +109,18 @@ public class DrawingView extends View {
 
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+
         if (isStrategy) {
+            clearDrawingView();
             for (int i = 0; i < sDrag.length; i++) {
                 if (!sDrag[i]) {
                     touch_start((float) sX[i] * w, (float) sY[i] * h);
+                    Log.d("TEST", "onSizeChanged start");
+                    invalidate();
                 } else {
                     touch_move((float) sX[i] * w, (float) sY[i] * h);
+                    Log.d("TEST", "onSizeChanged move");
+                    invalidate();
                 }
             }
         }
@@ -123,7 +139,12 @@ public class DrawingView extends View {
     private static final float TOUCH_TOLERANCE = 4;
 
     private void touch_start(float x, float y) {
-        mPath.reset();
+        if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
+            localStrategy.addListX((x / mCanvas.getWidth()));
+            localStrategy.addListY((y / mCanvas.getHeight()));
+            localStrategy.addDragList(false);
+        }
+
         mPath.moveTo(x, y);
         Log.d("TEST", "touch_start: x " + x + " y " + y);
         mX = x;
@@ -141,6 +162,12 @@ public class DrawingView extends View {
         } else if (y > mCanvas.getHeight() || y < 0) {
             mCanvas.drawPath(mPath, sPaint);
             return;
+        }
+
+        if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
+            localStrategy.addListX((x / mCanvas.getWidth()));
+            localStrategy.addListY((y / mCanvas.getHeight()));
+            localStrategy.addDragList(true);
         }
 
         float dx = Math.abs(x - mX);
@@ -163,6 +190,11 @@ public class DrawingView extends View {
     }
 
     private void touch_up() {
+        if ((mX < mCanvas.getWidth() && mX >= 0) && (mY < mCanvas.getHeight() && mY >= 0)) {
+            localStrategy.addListX((mX / mCanvas.getWidth()));
+            localStrategy.addListY((mY / mCanvas.getHeight()));
+            localStrategy.addDragList(true);
+        }
         mPath.lineTo(mX, mY);
         circlePath.reset();
         // commit the path to our offscreen
@@ -178,28 +210,19 @@ public class DrawingView extends View {
         float x = event.getX();
         float y = event.getY();
 
-        if (x < mCanvas.getWidth() || x >= 0) {
-            localStrategy.addListX((x / mCanvas.getWidth()));
-        }
-        if (y < mCanvas.getHeight() || y >= 0) {
-            localStrategy.addListY((y / mCanvas.getHeight()));
-        }
         Log.d("TEST", "onTouchEvent x: " + x);
         Log.d("TEST", "onTouchEvent y: " + y);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                localStrategy.addDragList(false);
                 touch_start(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                localStrategy.addDragList(true);
                 touch_move(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                localStrategy.addDragList(true);
                 touch_up();
                 invalidate();
                 break;

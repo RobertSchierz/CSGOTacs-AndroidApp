@@ -39,43 +39,11 @@ import io.socket.emitter.Emitter;
 public class StrategiesListViewAdapter extends BaseAdapter {
 
     private Context mContext;
-    private Socket mSocket;
-
-    {
-        try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-        } catch (URISyntaxException e) {
-            Log.d("FEHLER", "mSocket nicht verbunden!");
-        }
-    }
-
-    private SharedPreferences sharedPreferences;
-    private String mUsername;
     private List<Strategy> strategies;
 
     public StrategiesListViewAdapter(List<Strategy> strategies, Context context) {
         this.strategies = strategies;
         this.mContext = context;
-    }
-
-    /*@AfterInject
-    void initAdapter() {
-        //sharedPreferences = mContext.getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
-        //mUsername = sharedPreferences.getString(User.USERNAME, null);
-        //refreshItems();
-    }*/
-
-    void refreshItems() {
-        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-            HashMap<String, String> getTacsMap = new HashMap<>();
-            getTacsMap.put("user", mUsername);
-
-            //mSocket.on("status", status);
-            mSocket.connect();
-            mSocket.emit("getTacs", JSONCreator.createJSON("getTacs", getTacsMap).toString());
-        } else {
-            Toast.makeText(mContext, "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

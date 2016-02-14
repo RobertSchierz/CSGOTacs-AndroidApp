@@ -78,6 +78,7 @@ public class MapsDetailFragment extends Fragment {
     public LocalStrategy localStrategy;
     SharedPreferences sharedPreferences;
     private String mUsername;
+    private DrawingView mDrawingView;
 
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
     @InstanceState
@@ -156,7 +157,9 @@ public class MapsDetailFragment extends Fragment {
             mapImageWidth = mapImage.getWidth();
             mapImageHeight = mapImage.getHeight();
 
-            DrawingView mDrawingView = new DrawingView(getContext());
+            DrawingView.isStrategy = false;
+
+            mDrawingView = new DrawingView(getContext());
             //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
             params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
@@ -169,6 +172,9 @@ public class MapsDetailFragment extends Fragment {
             Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
         } else {
             editStratClicked = false;
+            mDrawingView.clearDrawingView();
+            mDrawingView = null;
+            canvas.removeAllViews();
             fabSaveStrat.setVisibility(View.GONE);
             fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
 
@@ -242,13 +248,6 @@ public class MapsDetailFragment extends Fragment {
         Double[] yArray = yList.toArray(new Double[yList.size()]);
         Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName,
                 stratName, null, dragArray, xArray, yArray);
-        /*strategy.id = System.currentTimeMillis();
-        strategy.user = mUsername;
-        strategy.map = Map.clickedMapName;
-        strategy.name = stratName;
-        strategy.drag = dragArray;
-        strategy.x = xArray;
-        strategy.y = yArray;*/
         Gson gson = new Gson();
         String createTac = gson.toJson(strategy);
         Log.d("TEST", createTac);
@@ -288,7 +287,6 @@ public class MapsDetailFragment extends Fragment {
                     } else if (emitterStatus.equals("createTacFailed")) {
                         Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
                     }
-
                     mSocket.disconnect();
                     mSocket.off();
                 }
