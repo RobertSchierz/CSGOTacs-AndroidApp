@@ -68,6 +68,8 @@ public class MapsDetailFragment extends Fragment {
     FloatingActionButton fabSaveStrat;
     @ViewById
     FloatingActionButton fabEditStrat;
+    @ViewById
+    FloatingActionButton fabLiveMode;
 
     public int mapImageHeight;
     public int mapImageWidth;
@@ -203,6 +205,14 @@ public class MapsDetailFragment extends Fragment {
     @Click
     public void fabSaveStratClicked() {
         showDialog();
+    }
+
+    /**
+     * Klick Listener für den Button, welcher den Live Modus startet.
+     */
+    @Click
+    public void fabLiveModeClicked(){
+        Toast.makeText(getContext(), "Live Mode will be available soon :-)", Toast.LENGTH_SHORT).show();
     }
 
     /**

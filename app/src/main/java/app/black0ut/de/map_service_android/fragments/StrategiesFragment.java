@@ -162,6 +162,7 @@ public class StrategiesFragment extends Fragment {
                         if (jsonArray != null) {
                             readJsonData(jsonArray);
                             noStrats.setVisibility(View.GONE);
+
                         } else {
                             Toast.makeText(getContext(), "Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.", Toast.LENGTH_LONG).show();
                         }
@@ -214,5 +215,6 @@ public class StrategiesFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+        adapter.notifyDataSetChanged();
     }
 }
