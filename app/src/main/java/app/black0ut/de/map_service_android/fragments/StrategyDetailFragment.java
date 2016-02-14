@@ -13,7 +13,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -25,6 +25,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +33,6 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import app.black0ut.de.map_service_android.DrawingView;
 import app.black0ut.de.map_service_android.JSONCreator;
@@ -76,7 +76,9 @@ public class StrategyDetailFragment extends Fragment {
     private String mUsername;
     private Status gsonStatus;
     private ArrayList<String> myGroups = new ArrayList<>();
-    GroupDialogAdapter mAdapter;
+    private GroupDialogAdapter mAdapter;
+    private AlertDialog mBuilder;
+    private String mClickedGroup;
 
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
     @InstanceState
@@ -227,12 +229,24 @@ public class StrategyDetailFragment extends Fragment {
         final ListView groupDialogListView = (ListView) shareStratLayout.findViewById(R.id.groupDialogListView);
         mAdapter = new GroupDialogAdapter(myGroups, getContext());
         groupDialogListView.setAdapter(mAdapter);
+        groupDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mClickedGroup = mAdapter.getItem(position);
+                HashMap<String, Object> bindTac = new HashMap<>();
+                bindTac.put("id", stratId);
+                bindTac.put("group", mClickedGroup);
+                mSocket.on("status", status);
+                mSocket.connect();
+                mSocket.emit("bindTac", JSONCreator.createJSON("bindTac", bindTac).toString());
+            }
+        });
 
-        final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+        mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
                 .setTitle("Strategie teilen")
                 .setView(shareStratLayout)
                 .create();
-        builder.show();
+        mBuilder.show();
     }
 
     /**
@@ -302,8 +316,12 @@ public class StrategyDetailFragment extends Fragment {
                     }
                     if (emitterStatus.equals("changeTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie erfolgreich geändert.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                    }
+                    if (emitterStatus.equals("bindTacSuccess")) {
+                        Toast.makeText(getContext(), "Strategie '" + stratName +
+                                "' erfolgreich mit der Gruppe '" + mClickedGroup +
+                                "'geteilt.", Toast.LENGTH_SHORT).show();
+                        mBuilder.cancel();
                     }
                     if (emitterStatus.equals("provideGroups")) {
                         getGsonStatus(data.toString());

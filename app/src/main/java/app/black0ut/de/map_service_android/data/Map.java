@@ -13,7 +13,7 @@ import app.black0ut.de.map_service_android.tasks.BitmapWorkerTask;
  */
 public class Map {
 
-    public static final String DUST2 = "Dust 2";
+    public static final String DUST2 = "Dust2";
     public static final String TRAIN = "Train";
     public static final String MIRAGE = "Mirage";
     public static final String INFERNO = "Inferno";

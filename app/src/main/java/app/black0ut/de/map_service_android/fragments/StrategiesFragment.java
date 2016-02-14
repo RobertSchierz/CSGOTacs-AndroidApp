@@ -64,7 +64,7 @@ public class StrategiesFragment extends Fragment {
     private StrategiesListViewAdapter adapter;
 
     @AfterViews
-    public void bindAdapter() {
+    public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
         adapter = new StrategiesListViewAdapter(strategies, getContext());
