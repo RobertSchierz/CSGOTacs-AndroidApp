@@ -1,12 +1,9 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,9 +19,8 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
-import app.black0ut.de.map_service_android.data.Map;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;

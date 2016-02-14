@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import app.black0ut.de.map_service_android.DrawingView;
+import app.black0ut.de.map_service_android.views.DrawingView;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.data.Map;

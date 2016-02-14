@@ -31,7 +31,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.GroupsRecyclerViewAdapter;
 import app.black0ut.de.map_service_android.data.Status;

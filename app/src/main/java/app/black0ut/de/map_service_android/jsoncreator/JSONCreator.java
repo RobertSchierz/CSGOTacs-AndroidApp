@@ -1,4 +1,4 @@
-package app.black0ut.de.map_service_android;
+package app.black0ut.de.map_service_android.jsoncreator;
 
 import android.util.Log;
 

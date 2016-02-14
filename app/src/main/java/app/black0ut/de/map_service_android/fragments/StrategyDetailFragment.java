@@ -25,7 +25,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,8 +33,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.DrawingView;
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.views.DrawingView;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.GroupDialogAdapter;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
@@ -216,6 +215,11 @@ public class StrategyDetailFragment extends Fragment {
         showShareDialog();
     }
 
+    /**
+     * Zeigt einen Dialog zum auswählen einer Gruppe. Dabei werden die Gruppen angezeigt, in welchen
+     * sich der Nutzer befindet. Beim Klick auf eine Gruppe wird die
+     * aktuelle Strategie mit dieser geteilt.
+     */
     private void showShareDialog() {
         HashMap<String, String> getGroupsMap = new HashMap<>();
         getGroupsMap.put("user", mUsername);
@@ -226,7 +230,8 @@ public class StrategyDetailFragment extends Fragment {
 
         LayoutInflater factory = LayoutInflater.from(getContext());
         final View shareStratLayout = factory.inflate(R.layout.group_dialog, null);
-        final ListView groupDialogListView = (ListView) shareStratLayout.findViewById(R.id.groupDialogListView);
+        final ListView groupDialogListView =
+                (ListView) shareStratLayout.findViewById(R.id.groupDialogListView);
         mAdapter = new GroupDialogAdapter(myGroups, getContext());
         groupDialogListView.setAdapter(mAdapter);
         groupDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

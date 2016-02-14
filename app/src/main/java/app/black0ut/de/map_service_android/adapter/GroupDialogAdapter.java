@@ -7,12 +7,8 @@ import android.widget.BaseAdapter;
 
 import java.util.List;
 
-import app.black0ut.de.map_service_android.GroupDialogListItemView;
-import app.black0ut.de.map_service_android.GroupDialogListItemView_;
-import app.black0ut.de.map_service_android.StrategyListItemView;
-import app.black0ut.de.map_service_android.StrategyListItemView_;
-import app.black0ut.de.map_service_android.data.Group;
-import app.black0ut.de.map_service_android.data.Strategy;
+import app.black0ut.de.map_service_android.listitemview.GroupDialogListItemView;
+import app.black0ut.de.map_service_android.listitemview.GroupDialogListItemView_;
 
 /**
  * Created by Jan-Philipp Altenhof on 14.02.2016.

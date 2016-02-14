@@ -22,10 +22,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
-import app.black0ut.de.map_service_android.fragments.GroupDetailsFragment_;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailFooterViewHolder;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailViewHolder;
@@ -220,13 +219,15 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                 break;
             case R.id.promoteMember:
                 jsonMap.clear();
-                jsonMap.put("user", mMemberName);
+                jsonMap.put("user", mUsername);
+                jsonMap.put("set", mMemberName);
                 jsonMap.put("name", mGroupName);
                 mSocket.emit("setGroupMod", JSONCreator.createJSON("setGroupMod", jsonMap).toString());
                 break;
             case R.id.demoteMember:
                 jsonMap.clear();
-                jsonMap.put("user", mMemberName);
+                jsonMap.put("user", mUsername);
+                jsonMap.put("unset", mMemberName);
                 jsonMap.put("name", mGroupName);
                 mSocket.emit("unsetGroupMod",
                         JSONCreator.createJSON("unsetGroupMod", jsonMap).toString());

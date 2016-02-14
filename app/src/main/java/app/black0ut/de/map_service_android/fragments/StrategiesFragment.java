@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.StrategiesListViewAdapter;
 import app.black0ut.de.map_service_android.data.Map;
@@ -161,8 +160,6 @@ public class StrategiesFragment extends Fragment {
                     if (emitterStatus.equals("provideTacs")) {
                         if (jsonArray != null) {
                             readJsonData(jsonArray);
-                            noStrats.setVisibility(View.GONE);
-
                         } else {
                             Toast.makeText(getContext(), "Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.", Toast.LENGTH_LONG).show();
                         }
@@ -175,7 +172,6 @@ public class StrategiesFragment extends Fragment {
         }
     };
 
-    @Background
     void readJsonData(JSONArray jsonArray){
         strategies.clear();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -215,6 +211,8 @@ public class StrategiesFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-        adapter.notifyDataSetChanged();
+        if (strategies.size() > 0){
+            noStrats.setVisibility(View.GONE);
+        }
     }
 }

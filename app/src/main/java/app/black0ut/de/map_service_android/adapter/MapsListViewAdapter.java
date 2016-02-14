@@ -1,28 +1,23 @@
 package app.black0ut.de.map_service_android.adapter;
 
 import android.content.Context;
-import android.media.Image;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
-import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import app.black0ut.de.map_service_android.MapListItemView;
-import app.black0ut.de.map_service_android.MapListItemView_;
+import app.black0ut.de.map_service_android.listitemview.MapListItemView;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Map;
+import app.black0ut.de.map_service_android.listitemview.MapListItemView_;
 
 /**
  * Created by Jan-Philipp Altenhof on 02.01.2016.
