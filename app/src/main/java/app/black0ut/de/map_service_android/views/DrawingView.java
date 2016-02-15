@@ -17,8 +17,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import app.black0ut.de.map_service_android.data.LocalStrategy;
+import app.black0ut.de.map_service_android.data.Map;
+import app.black0ut.de.map_service_android.fragments.MapsDetailFragment;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -32,12 +36,15 @@ public class DrawingView extends View {
     //DrawingView dv ;
     public static Paint sPaint = new Paint();
     public static boolean isStrategy = false;
+    public static boolean isLiveMode = false;
+
     public static boolean[] sDrag;
     public static double[] sX;
     public static double[] sY;
 
     public int width;
     public int height;
+    private boolean isLiveModeActive = false;
 
     public LocalStrategy localStrategy;
 
@@ -79,10 +86,6 @@ public class DrawingView extends View {
         circlePaint.setStrokeWidth(4f);
 
         localStrategy = LocalStrategy.getInstance();
-
-        mSocket.on("json", json);
-        mSocket.connect();
-        mSocket.emit("appTest");
     }
 
     public void clearDrawingView() {
@@ -124,6 +127,19 @@ public class DrawingView extends View {
                 }
             }
         }
+        if (isLiveMode) {
+            mSocket.connect();
+        }
+    }
+
+    public void drawLiveContent(boolean drag, double x, double y, double startX, double startY) {
+        if (!drag) {
+            touch_start((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
+            invalidate();
+        } else {
+            touch_move((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
+            invalidate();
+        }
     }
 
     @Override
@@ -143,16 +159,25 @@ public class DrawingView extends View {
             localStrategy.addListX((x / mCanvas.getWidth()));
             localStrategy.addListY((y / mCanvas.getHeight()));
             localStrategy.addDragList(false);
+
+            mPath.moveTo(x, y);
+
+            mX = x;
+            mY = y;
+
+            if (isLiveMode) {
+                HashMap<String, Object> liveContent = new HashMap<>();
+                liveContent.put("room", MapsDetailFragment.getRoom());
+                liveContent.put("user", MapsDetailFragment.getUsername());
+                liveContent.put("startX", x / mCanvas.getWidth());
+                liveContent.put("startY", y / mCanvas.getHeight());
+                liveContent.put("x", x / mCanvas.getWidth());
+                liveContent.put("y", y / mCanvas.getHeight());
+                liveContent.put("drag", false);
+
+                mSocket.emit("liveContent", JSONCreator.createJSON("liveContent", liveContent).toString());
+            }
         }
-
-        mPath.moveTo(x, y);
-        Log.d("TEST", "touch_start: x " + x + " y " + y);
-        mX = x;
-        mY = y;
-
-        String startCoords = "{x: " + x + ", y: " + y + ", startx: " + x + ", starty: " + y + "}";
-        //Methode zum Koordinaten senden aufrufen
-        attemptSend(startCoords);
     }
 
     private void touch_move(float x, float y) {
@@ -168,24 +193,29 @@ public class DrawingView extends View {
             localStrategy.addListX((x / mCanvas.getWidth()));
             localStrategy.addListY((y / mCanvas.getHeight()));
             localStrategy.addDragList(true);
-        }
 
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            Log.d("TEST", "touch_move: x " + x + " y " + y);
+            float dx = Math.abs(x - mX);
+            float dy = Math.abs(y - mY);
+            if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+                mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
 
-            String moveCoords = "{x: " + x + ", y: " + y + ", startx: " + mX + ", starty: " + mY + "}";
-            attemptSend(moveCoords);
+                if (isLiveMode) {
+                    HashMap<String, Object> liveContent = new HashMap<>();
+                    liveContent.put("status", "liveContent");
+                    liveContent.put("room", MapsDetailFragment.getRoom());
+                    liveContent.put("user", MapsDetailFragment.getUsername());
+                    liveContent.put("startX", mX / mCanvas.getWidth());
+                    liveContent.put("startY", mY / mCanvas.getHeight());
+                    liveContent.put("x", x / mCanvas.getWidth());
+                    liveContent.put("y", y / mCanvas.getHeight());
+                    liveContent.put("drag", true);
 
-            mX = x;
-            mY = y;
+                    mSocket.emit("broadcastGroupLive", JSONCreator.createJSON("broadcastGroupLive", liveContent).toString());
+                }
 
-            //String moveCoords = "{x: " + x + ", y: " + y + "}";
-
-            //circlePath.reset();
-            //circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
+                mX = x;
+                mY = y;
+            }
         }
     }
 
@@ -201,17 +231,12 @@ public class DrawingView extends View {
         mCanvas.drawPath(mPath, sPaint);
         // kill this so we don't double draw
         mPath.reset();
-        String upCoords = "{x: " + mX + ", y: " + mY + "}";
-        //attemptSend(upCoords);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-
-        Log.d("TEST", "onTouchEvent x: " + x);
-        Log.d("TEST", "onTouchEvent y: " + y);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -230,61 +255,8 @@ public class DrawingView extends View {
         return true;
     }
 
-    //TODO
-    //Testnachricht senden
-    private void attemptSend(String json) {
-        if (TextUtils.isEmpty(json)) {
-            return;
-        }
-
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(json);
-            //Log.d("TEST", "attemptSend: " + jsonObject.getDouble("x") + " y: " + jsonObject.getDouble("y"));
-        } catch (JSONException e) {
-            Log.d("TEST", "JSONObject Failed");
-            return;
-        }
-        mSocket.emit("json", jsonObject);
+    public void closeSocket(){
+        mSocket.disconnect();
     }
-
-    private Emitter.Listener json = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            Activity activity = (Activity) context;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    float x;
-                    float y;
-                    float startx;
-                    float starty;
-                    try {
-                        x = (float) data.getDouble("x");
-                        y = (float) data.getDouble("y");
-                        startx = (float) data.getDouble("startx");
-                        starty = (float) data.getDouble("starty");
-                        Log.d("TEST xy", "x: " + x + " y: " + y);
-                    } catch (JSONException e) {
-                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
-                        return;
-                    }
-
-                    // add the message to view
-                    //addCoords(x, y);
-                    //mPath.quadTo(x, y, (x) / 2, (y) / 2);
-                    mPath.moveTo(startx, starty);
-                    //TODO eventuell noch quadTo draus machen
-                    mPath.lineTo(x, y);
-                    mCanvas.drawPath(mPath, sPaint);
-                    invalidate();
-                    mPath.reset();
-
-
-                }
-            });
-        }
-    };
 }
 

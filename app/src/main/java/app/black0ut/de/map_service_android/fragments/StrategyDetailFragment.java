@@ -142,6 +142,7 @@ public class StrategyDetailFragment extends Fragment {
             DrawingView.sX = stratX;
             DrawingView.sY = stratY;
             DrawingView.isStrategy = true;
+            DrawingView.isLiveMode = false;
 
             DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
             mapImageWidth = metrics.widthPixels;

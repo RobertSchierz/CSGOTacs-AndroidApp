@@ -13,12 +13,15 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -30,7 +33,11 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.adapter.GroupDialogAdapter;
+import app.black0ut.de.map_service_android.data.Status;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.views.DrawingView;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
@@ -76,11 +83,22 @@ public class MapsDetailFragment extends Fragment {
     public Bitmap bitmap;
     private boolean showCalloutsClicked = false;
     private boolean editStratClicked = false;
+    private boolean liveModeClicked = false;
 
     public LocalStrategy localStrategy;
     SharedPreferences sharedPreferences;
-    private String mUsername;
+    private static String mUsername;
     private DrawingView mDrawingView;
+
+    //Live Modus Dialog Variablen
+    private AlertDialog mBuilder;
+    private String mClickedGroup;
+    private GroupDialogAdapter mAdapter;
+    private ArrayList<String> myGroups = new ArrayList<>();
+    private Status gsonStatus;
+
+    //Live Content Variablen
+    private static String mRoom;
 
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
     @InstanceState
@@ -160,13 +178,9 @@ public class MapsDetailFragment extends Fragment {
             mapImageHeight = mapImage.getHeight();
 
             DrawingView.isStrategy = false;
+            DrawingView.isLiveMode = false;
 
-            mDrawingView = new DrawingView(getContext());
-            //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
-            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-            //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
-            canvas.addView(mDrawingView, params);
+            addDrawingViewToCanvas();
 
             fabSaveStrat.setVisibility(View.VISIBLE);
             fabEditStrat.setImageResource(R.drawable.ic_clear_orange_600_24dp);
@@ -181,6 +195,15 @@ public class MapsDetailFragment extends Fragment {
             fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
 
         }
+    }
+
+    private void addDrawingViewToCanvas() {
+        mDrawingView = new DrawingView(getContext());
+        //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
+        canvas.addView(mDrawingView, params);
     }
 
     /**
@@ -211,8 +234,67 @@ public class MapsDetailFragment extends Fragment {
      * Klick Listener für den Button, welcher den Live Modus startet.
      */
     @Click
-    public void fabLiveModeClicked(){
-        Toast.makeText(getContext(), "Live Mode will be available soon :-)", Toast.LENGTH_SHORT).show();
+    public void fabLiveModeClicked() {
+        if (!liveModeClicked) {
+            liveModeClicked = true;
+            mapImageWidth = mapImage.getWidth();
+            mapImageHeight = mapImage.getHeight();
+            fabLiveMode.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+            fabEditStrat.setVisibility(View.GONE);
+            showLiveModeDialog();
+        } else {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+            canvas.removeAllViews();
+            leaveGroupLive();
+        }
+    }
+
+    /**
+     * Zeigt einen Dialog zum auswählen einer Gruppe. Dabei werden die Gruppen angezeigt, in welchen
+     * sich der Nutzer befindet. Beim Klick auf eine Gruppe wird der Live Modus mit dieser Gruppe
+     * gestartet.
+     */
+    private void showLiveModeDialog() {
+        HashMap<String, String> getGroupsMap = new HashMap<>();
+        getGroupsMap.put("user", mUsername);
+
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
+
+        LayoutInflater factory = LayoutInflater.from(getContext());
+        final View chooseGroupLayout = factory.inflate(R.layout.group_dialog, null);
+        final ListView groupDialogListView =
+                (ListView) chooseGroupLayout.findViewById(R.id.groupDialogListView);
+        mAdapter = new GroupDialogAdapter(myGroups, getContext());
+        groupDialogListView.setAdapter(mAdapter);
+        groupDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mClickedGroup = mAdapter.getItem(position);
+                DrawingView.isStrategy = false;
+                DrawingView.isLiveMode = true;
+                HashMap<String, String> joinGroupLive = new HashMap<>();
+                joinGroupLive.put("user", mUsername);
+                joinGroupLive.put("group", mClickedGroup);
+                joinGroupLive.put("map", Map.clickedMapName);
+                mSocket.on("status", status);
+                mSocket.connect();
+                mSocket.emit("joinGroupLive", JSONCreator.createJSON("joinGroupLive", joinGroupLive).toString());
+            }
+        });
+
+        mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                .setTitle("Live Modus starten.")
+                .setMessage("Wähle eine Gruppe für den Live Modus: ")
+                .setView(chooseGroupLayout)
+                .create();
+        mBuilder.show();
     }
 
     /**
@@ -276,6 +358,44 @@ public class MapsDetailFragment extends Fragment {
         mapCallouts.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+            canvas.removeAllViews();
+            leaveGroupLive();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+            canvas.removeAllViews();
+            leaveGroupLive();
+        }
+    }
+
+    private void leaveGroupLive(){
+        HashMap<String, String> leaveGroupLive = new HashMap<>();
+        leaveGroupLive.put("room", mRoom);
+        mSocket.emit("leaveGroupLive", JSONCreator.createJSON("leaveGroupLive", leaveGroupLive).toString());
+        mSocket.disconnect();
+        mSocket.off();
+    }
+
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -294,14 +414,69 @@ public class MapsDetailFragment extends Fragment {
                     }
                     if (emitterStatus.equals("createTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
+                        mSocket.disconnect();
+                        mSocket.off();
                     } else if (emitterStatus.equals("createTacFailed")) {
                         Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                        mSocket.disconnect();
+                        mSocket.off();
                     }
-                    mSocket.disconnect();
-                    mSocket.off();
+                    if (emitterStatus.equals("provideGroups")) {
+                        getGsonStatus(data.toString());
+                    }
+                    if (emitterStatus.equals("connectedClients")) {
+                        addDrawingViewToCanvas();
+                        mBuilder.cancel();
+                    }
+                    if (emitterStatus.equals("provideRoomName")) {
+                        try {
+                            mRoom = data.getString("room");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (emitterStatus.equals("liveContent")) {
+                        try {
+                            mRoom = data.getString("room");
+                            String user = data.getString("user");
+                            double startX = data.getDouble("startX");
+                            double startY = data.getDouble("startY");
+                            double x = data.getDouble("x");
+                            double y = data.getDouble("y");
+                            boolean drag = data.getBoolean("drag");
+                            mDrawingView.drawLiveContent(drag, x, y, startX, startY);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
             });
         }
     };
+
+    public void getGsonStatus(String data) {
+        //Mapped den ankommenden JSON in ein neues Status Objekt
+        gsonStatus = new Gson().fromJson(data, Status.class);
+        myGroups.clear();
+        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+            myGroups.add(gsonStatus.getGroups()[i].getName());
+        }
+        Status.setCurrentStatus(gsonStatus, getContext());
+        onItemsLoadComplete();
+    }
+
+    void onItemsLoadComplete() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public static String getRoom() {
+        return mRoom;
+    }
+
+    public static String getUsername() {
+        return mUsername;
+    }
 
 }
