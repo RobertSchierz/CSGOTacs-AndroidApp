@@ -1,6 +1,5 @@
 package app.black0ut.de.map_service_android.views;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -8,24 +7,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import app.black0ut.de.map_service_android.data.LocalStrategy;
-import app.black0ut.de.map_service_android.data.Map;
 import app.black0ut.de.map_service_android.fragments.MapsDetailFragment;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 /**
  * Created by Jan-Philipp Altenhof on 08.01.2016.
@@ -37,6 +30,7 @@ public class DrawingView extends View {
     public static Paint sPaint = new Paint();
     public static boolean isStrategy = false;
     public static boolean isLiveMode = false;
+    private static final float TOUCH_TOLERANCE = 4;
 
     public static boolean[] sDrag;
     public static double[] sX;
@@ -44,14 +38,19 @@ public class DrawingView extends View {
 
     public int width;
     public int height;
-    private boolean isLiveModeActive = false;
 
-    public LocalStrategy localStrategy;
+    private float mX, mY;
+    private float mLiveX, mLiveY;
+    private boolean lastDrag;
+
+    public LocalStrategy mLocalStrategy;
 
     private Bitmap mBitmap;
     public Canvas mCanvas;
     public Path mPath;
+    public Path mLivePath;
     private Paint mBitmapPaint;
+    private Paint mLivePaint;
     Context context;
     private Paint circlePaint;
     private Path circlePath;
@@ -76,6 +75,8 @@ public class DrawingView extends View {
         super(c);
         context = c;
         mPath = new Path();
+        mLivePath = new Path();
+        lastDrag = false;
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
         circlePath = new Path();
@@ -85,13 +86,20 @@ public class DrawingView extends View {
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
 
-        localStrategy = LocalStrategy.getInstance();
+        mLivePaint = new Paint();
+        mLivePaint.setAntiAlias(true);
+        mLivePaint.setColor(0xFFdf4b26);
+        mLivePaint.setStyle(Paint.Style.STROKE);
+        mLivePaint.setStrokeJoin(Paint.Join.MITER);
+        mLivePaint.setStrokeWidth(4f);
+
+        mLocalStrategy = LocalStrategy.getInstance();
     }
 
     public void clearDrawingView() {
-        localStrategy.clearListX();
-        localStrategy.clearListY();
-        localStrategy.clearDragList();
+        mLocalStrategy.clearListX();
+        mLocalStrategy.clearListY();
+        mLocalStrategy.clearDragList();
 
         mBitmap.eraseColor(Color.TRANSPARENT);
         mPath.reset();
@@ -133,13 +141,20 @@ public class DrawingView extends View {
     }
 
     public void drawLiveContent(boolean drag, double x, double y, double startX, double startY) {
+        Log.d("liveContent", "------- drag: " + drag + " x: " + x + " y: " + y + " startX: " + startX + " startY: " + startY);
+
         if (!drag) {
-            touch_start((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
+            touch_start_live((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
+                    (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
             invalidate();
+        } else if (lastDrag == true && drag == false) {
+            touch_up_live();
         } else {
-            touch_move((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
+            touch_move_live((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
+                    (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
             invalidate();
         }
+        lastDrag = drag;
     }
 
     @Override
@@ -148,17 +163,15 @@ public class DrawingView extends View {
 
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, sPaint);
+        canvas.drawPath(mLivePath, mLivePaint);
         canvas.drawPath(circlePath, circlePaint);
     }
 
-    private float mX, mY;
-    private static final float TOUCH_TOLERANCE = 4;
-
     private void touch_start(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
-            localStrategy.addListX((x / mCanvas.getWidth()));
-            localStrategy.addListY((y / mCanvas.getHeight()));
-            localStrategy.addDragList(false);
+            mLocalStrategy.addListX((x / mCanvas.getWidth()));
+            mLocalStrategy.addListY((y / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(false);
 
             mPath.moveTo(x, y);
 
@@ -167,6 +180,7 @@ public class DrawingView extends View {
 
             if (isLiveMode) {
                 HashMap<String, Object> liveContent = new HashMap<>();
+                liveContent.put("status", "liveContent");
                 liveContent.put("room", MapsDetailFragment.getRoom());
                 liveContent.put("user", MapsDetailFragment.getUsername());
                 liveContent.put("startX", x / mCanvas.getWidth());
@@ -175,7 +189,7 @@ public class DrawingView extends View {
                 liveContent.put("y", y / mCanvas.getHeight());
                 liveContent.put("drag", false);
 
-                mSocket.emit("liveContent", JSONCreator.createJSON("liveContent", liveContent).toString());
+                mSocket.emit("broadcastGroupLive", JSONCreator.createJSON("broadcastGroupLive", liveContent).toString());
             }
         }
     }
@@ -190,9 +204,9 @@ public class DrawingView extends View {
         }
 
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
-            localStrategy.addListX((x / mCanvas.getWidth()));
-            localStrategy.addListY((y / mCanvas.getHeight()));
-            localStrategy.addDragList(true);
+            mLocalStrategy.addListX((x / mCanvas.getWidth()));
+            mLocalStrategy.addListY((y / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(true);
 
             float dx = Math.abs(x - mX);
             float dy = Math.abs(y - mY);
@@ -221,9 +235,9 @@ public class DrawingView extends View {
 
     private void touch_up() {
         if ((mX < mCanvas.getWidth() && mX >= 0) && (mY < mCanvas.getHeight() && mY >= 0)) {
-            localStrategy.addListX((mX / mCanvas.getWidth()));
-            localStrategy.addListY((mY / mCanvas.getHeight()));
-            localStrategy.addDragList(true);
+            mLocalStrategy.addListX((mX / mCanvas.getWidth()));
+            mLocalStrategy.addListY((mY / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(true);
         }
         mPath.lineTo(mX, mY);
         circlePath.reset();
@@ -231,6 +245,61 @@ public class DrawingView extends View {
         mCanvas.drawPath(mPath, sPaint);
         // kill this so we don't double draw
         mPath.reset();
+    }
+
+    //Live Drawing
+    private void touch_start_live(float x, float y, float startY, float startX) {
+        if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
+            mLocalStrategy.addListX((x / mCanvas.getWidth()));
+            mLocalStrategy.addListY((y / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(false);
+
+            mLivePath.moveTo(x, y);
+            mLivePath.lineTo(x, y);
+
+            mLiveX = x;
+            mLiveY = y;
+
+        }
+    }
+
+    private void touch_move_live(float x, float y, float startX, float startY) {
+        if (x > mCanvas.getWidth() || x < 0) {
+            mCanvas.drawPath(mLivePath, sPaint);
+            return;
+        } else if (y > mCanvas.getHeight() || y < 0) {
+            mCanvas.drawPath(mLivePath, sPaint);
+            return;
+        }
+
+        if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
+            mLocalStrategy.addListX((x / mCanvas.getWidth()));
+            mLocalStrategy.addListY((y / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(true);
+
+            float dx = Math.abs(x - mLiveX);
+            float dy = Math.abs(y - mLiveY);
+            if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+                mLivePath.quadTo(mLiveX, mLiveY, (x + mLiveX) / 2, (y + mLiveY) / 2);
+
+                mLiveX = x;
+                mLiveY = y;
+            }
+        }
+    }
+
+    private void touch_up_live() {
+        if ((mLiveX < mCanvas.getWidth() && mLiveX >= 0) && (mLiveY < mCanvas.getHeight() && mLiveY >= 0)) {
+            mLocalStrategy.addListX((mX / mCanvas.getWidth()));
+            mLocalStrategy.addListY((mY / mCanvas.getHeight()));
+            mLocalStrategy.addDragList(true);
+        }
+        mPath.lineTo(mLiveX, mLiveY);
+        circlePath.reset();
+        // commit the path to our offscreen
+        mCanvas.drawPath(mLivePath, mLivePaint);
+        // kill this so we don't double draw
+        mLivePath.reset();
     }
 
     @Override
@@ -255,7 +324,7 @@ public class DrawingView extends View {
         return true;
     }
 
-    public void closeSocket(){
+    public void closeSocket() {
         mSocket.disconnect();
     }
 }
