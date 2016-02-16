@@ -227,7 +227,11 @@ public class MapsDetailFragment extends Fragment {
      */
     @Click
     public void fabSaveStratClicked() {
-        showDialog();
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            showDialog();
+        }else{
+            Toast.makeText(getContext(), "Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -235,22 +239,26 @@ public class MapsDetailFragment extends Fragment {
      */
     @Click
     public void fabLiveModeClicked() {
-        if (!liveModeClicked) {
-            liveModeClicked = true;
-            mapImageWidth = mapImage.getWidth();
-            mapImageHeight = mapImage.getHeight();
-            fabLiveMode.setImageResource(R.drawable.ic_clear_orange_600_24dp);
-            fabEditStrat.setVisibility(View.GONE);
-            showLiveModeDialog();
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            if (!liveModeClicked) {
+                liveModeClicked = true;
+                mapImageWidth = mapImage.getWidth();
+                mapImageHeight = mapImage.getHeight();
+                fabLiveMode.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+                fabEditStrat.setVisibility(View.GONE);
+                showLiveModeDialog();
+            } else {
+                liveModeClicked = false;
+                fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+                fabEditStrat.setVisibility(View.VISIBLE);
+                mDrawingView.clearDrawingView();
+                mDrawingView.closeSocket();
+                mDrawingView = null;
+                canvas.removeAllViews();
+                leaveGroupLive();
+            }
         } else {
-            liveModeClicked = false;
-            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
-            fabEditStrat.setVisibility(View.VISIBLE);
-            mDrawingView.clearDrawingView();
-            mDrawingView.closeSocket();
-            mDrawingView = null;
-            canvas.removeAllViews();
-            leaveGroupLive();
+            Toast.makeText(getContext(), "Um den Live Modus zu starten, musst du Dich anmelden.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -388,7 +396,7 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
-    private void leaveGroupLive(){
+    private void leaveGroupLive() {
         HashMap<String, String> leaveGroupLive = new HashMap<>();
         leaveGroupLive.put("room", mRoom);
         mSocket.emit("leaveGroupLive", JSONCreator.createJSON("leaveGroupLive", leaveGroupLive).toString());

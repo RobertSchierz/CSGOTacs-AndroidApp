@@ -1,6 +1,7 @@
 package app.black0ut.de.map_service_android.listitemview;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,6 +24,9 @@ public class StrategyListItemView extends RelativeLayout{
     @ViewById
     TextView stratMap;
 
+    @ViewById
+    TextView stratGroup;
+
     public StrategyListItemView(Context context) {
         super(context);
     }
@@ -34,5 +38,8 @@ public class StrategyListItemView extends RelativeLayout{
     public void bind(Strategy strategy){
         this.stratName.setText(strategy.name);
         this.stratMap.setText(strategy.map);
+        if (!strategy.group.equals("null") && !strategy.group.equals("")) {
+            this.stratGroup.setText(String.format(getResources().getString(R.string.strat_group), strategy.group));
+        }
     }
 }

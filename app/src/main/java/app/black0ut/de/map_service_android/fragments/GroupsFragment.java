@@ -122,7 +122,6 @@ public class GroupsFragment extends Fragment {
             mSocket.on("status", status);
             mSocket.connect();
             mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
-            onItemsLoadComplete();
             // Load complete
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
@@ -239,15 +238,8 @@ public class GroupsFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
-                        try {
-                            group = data.getString("group");
-                            myGroups.add(group);
-                            memberCount.add(1);
-                            onItemsLoadComplete();
+                            refreshItems();
                             Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("provideGroups")) {
@@ -257,8 +249,6 @@ public class GroupsFragment extends Fragment {
                     } else if (emitterStatus.equals("authGroupFailed")) {
                         Toast.makeText(getContext(), "Du konntest der Gruppe " + groupName + " nicht beitreten.", Toast.LENGTH_SHORT).show();
                     }
-                    mSocket.disconnect();
-                    mSocket.off();
                 }
             });
         }
@@ -278,11 +268,24 @@ public class GroupsFragment extends Fragment {
         onItemsLoadComplete();
     }
 
-/*
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroy() {
+        super.onDestroy();
         mSocket.disconnect();
+        mSocket.off();
     }
-    */
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSocket.disconnect();
+        mSocket.off();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSocket.disconnect();
+        mSocket.off();
+    }
 }
