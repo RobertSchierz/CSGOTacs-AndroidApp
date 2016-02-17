@@ -1,12 +1,9 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,8 +17,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
@@ -52,6 +50,7 @@ public class MyProfileFragment extends Fragment {
     TextView navHeaderUsername;
 
     private Socket mSocket;
+
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -85,8 +84,10 @@ public class MyProfileFragment extends Fragment {
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
         } else {
-            String authString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            mSocket.emit("auth", JSONCreator.createJSON("auth", authString));
+            HashMap<String, String> login = new HashMap<>();
+            login.put("user", username);
+            login.put("pw", password);
+            mSocket.emit("auth", JSONCreator.createJSON("auth", login).toString());
         }
     }
 
@@ -97,12 +98,14 @@ public class MyProfileFragment extends Fragment {
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
         } else {
-            String regString = "{ 'user' : '" + username + "', 'pw' : '" + password + "' }";
-            mSocket.emit("reg", JSONCreator.createJSON("reg", regString));
+            HashMap<String, String> reg = new HashMap<>();
+            reg.put("user", username);
+            reg.put("pw", password);
+            mSocket.emit("reg", JSONCreator.createJSON("reg", reg).toString());
         }
     }
 
-    private void setupSocket(){
+    private void setupSocket() {
         mSocket.on("status", status);
         mSocket.connect();
     }
@@ -111,7 +114,7 @@ public class MyProfileFragment extends Fragment {
         @Override
         public void call(final Object... args) {
             //Activity activity = (Activity) getContext();
-            if(getActivity() == null)
+            if (getActivity() == null)
                 return;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -152,17 +155,18 @@ public class MyProfileFragment extends Fragment {
     /**
      * Schaltet die Socket Verbindung sowie die Listener aus.
      */
-    private void disconnectSocketAndListener(){
+    private void disconnectSocketAndListener() {
         mSocket.disconnect();
         mSocket.off("status", status);
     }
 
     /**
      * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
+     *
      * @param isLoggedIn Boolean, ob der nutzer eingeloggt ist oder nicht.
-     * @param username Der Username des Benutzers.
+     * @param username   Der Username des Benutzers.
      */
-    private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username){
+    private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username) {
         User.setsIsLoggedIn(isLoggedIn);
         if (username != null)
             User.setsUsername(username);
@@ -171,6 +175,7 @@ public class MyProfileFragment extends Fragment {
 
     /**
      * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
+     *
      * @param status Der zu setztende Status.
      */
     public void setStatus(String status) {
@@ -179,12 +184,12 @@ public class MyProfileFragment extends Fragment {
         this.mCurrentStatus = status;
     }
 
-    public void setUsernamePassword(){
+    public void setUsernamePassword() {
         username = editTextName.getText().toString();
         password = editTextPassword.getText().toString();
     }
 
-    public void swapFragment(){
+    public void swapFragment() {
         Fragment fragment = new MyProfileDetailsFragment_();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction()

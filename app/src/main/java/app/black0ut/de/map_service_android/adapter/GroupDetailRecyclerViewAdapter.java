@@ -19,12 +19,12 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
-import app.black0ut.de.map_service_android.fragments.GroupDetailsFragment_;
 import app.black0ut.de.map_service_android.fragments.GroupsFragment_;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailFooterViewHolder;
 import app.black0ut.de.map_service_android.viewholder.GroupDetailViewHolder;
@@ -68,7 +68,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public GroupDetailRecyclerViewAdapter(final String username, final ArrayList<String> members, final String[] mods,
-                                          final String admin, final String groupName,final FragmentManager fragmentManager, final Context context) {
+                                          final String admin, final String groupName, final FragmentManager fragmentManager, final Context context) {
         mUsername = username;
         mMembers = members;
         mMods = mods;
@@ -204,48 +204,46 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     @Override
     public void onClick(View v) {
         int id = v.getId();
+        HashMap<String, String> jsonMap = new HashMap<>();
 
         mSocket.on("status", status);
         mSocket.connect();
 
         switch (id) {
             case R.id.removeMember:
-                mSocket.emit("kickUser",
-                        JSONCreator.createJSON("kickUser",
-                                "{ 'user' : '" + mUsername +
-                                        "', 'name': '" + mGroupName +
-                                        "', 'kick': '" + mMemberName +
-                                        "' }"));
+                jsonMap.clear();
+                jsonMap.put("user", mUsername);
+                jsonMap.put("name", mGroupName);
+                jsonMap.put("kick", mMemberName);
+                mSocket.emit("kickUser", JSONCreator.createJSON("kickUser", jsonMap).toString());
                 break;
             case R.id.promoteMember:
-                mSocket.emit("setGroupMod",
-                        JSONCreator.createJSON("setGroupMod",
-                                "{ 'user' : '" + mMemberName +
-                                        "', 'name': '" + mGroupName +
-                                        "' }"));
+                jsonMap.clear();
+                jsonMap.put("user", mUsername);
+                jsonMap.put("set", mMemberName);
+                jsonMap.put("name", mGroupName);
+                mSocket.emit("setGroupMod", JSONCreator.createJSON("setGroupMod", jsonMap).toString());
                 break;
             case R.id.demoteMember:
+                jsonMap.clear();
+                jsonMap.put("user", mUsername);
+                jsonMap.put("unset", mMemberName);
+                jsonMap.put("name", mGroupName);
                 mSocket.emit("unsetGroupMod",
-                        JSONCreator.createJSON("unsetGroupMod",
-                                "{ 'user' : '" + mMemberName +
-                                        "', 'name': '" + mGroupName +
-                                        "' }"));
+                        JSONCreator.createJSON("unsetGroupMod", jsonMap).toString());
                 break;
             case R.id.buttonDeleteGroup:
-                mSocket.emit("deleteGroup",
-                        JSONCreator.createJSON("deleteGroup",
-                                "{ 'user' : '" + mUsername +
-                                        "', 'name': '" + mGroupName +
-                                        "' }"));
+                jsonMap.clear();
+                jsonMap.put("user", mUsername);
+                jsonMap.put("name", mGroupName);
+                mSocket.emit("deleteGroup", JSONCreator.createJSON("deleteGroup", jsonMap).toString());
                 break;
             case R.id.buttonLeaveGroup:
-                mSocket.emit("leaveGroup",
-                        JSONCreator.createJSON("leaveGroup",
-                                "{ 'user' : '" + mUsername +
-                                        "', 'name': '" + mGroupName +
-                                        "' }"));
+                jsonMap.clear();
+                jsonMap.put("user", mUsername);
+                jsonMap.put("name", mGroupName);
+                mSocket.emit("leaveGroup", JSONCreator.createJSON("leaveGroup", jsonMap).toString());
                 break;
-
         }
     }
 

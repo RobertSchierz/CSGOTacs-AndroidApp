@@ -20,14 +20,6 @@ public class Status {
     @Expose
     String status;
     @Expose
-    String user;
-    @Expose
-    String member;
-    @Expose
-    String admin;
-    @Expose
-    String mods;
-    @Expose
     Group[] groups;
 
     public static Status getCurrentStatus(Context context) {
@@ -51,38 +43,6 @@ public class Status {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getMember() {
-        return member;
-    }
-
-    public void setMember(String member) {
-        this.member = member;
-    }
-
-    public String getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(String admin) {
-        this.admin = admin;
-    }
-
-    public String getMods() {
-        return mods;
-    }
-
-    public void setMods(String mods) {
-        this.mods = mods;
     }
 
     public Group[] getGroups() {

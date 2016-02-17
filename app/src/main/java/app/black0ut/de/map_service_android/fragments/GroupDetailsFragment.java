@@ -7,9 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -20,13 +18,12 @@ import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.JSONCreator;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.GroupDetailRecyclerViewAdapter;
 import app.black0ut.de.map_service_android.data.Group;
@@ -106,9 +103,12 @@ public class GroupDetailsFragment extends Fragment {
     }
 
     void refreshItems(String username) {
+        HashMap<String, String> getGroupsMap = new HashMap<>();
+        getGroupsMap.put("user", username);
+
         mSocket.on("status", status);
         mSocket.connect();
-        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", "{ \"user\" : \"" + username + "\" }"));
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
     }
 
     void onItemsLoadComplete() {

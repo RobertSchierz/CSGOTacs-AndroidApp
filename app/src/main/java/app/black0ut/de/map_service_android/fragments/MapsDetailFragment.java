@@ -1,44 +1,52 @@
 package app.black0ut.de.map_service_android.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.CompoundButton;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.ToggleButton;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import app.black0ut.de.map_service_android.DrawingView;
+import app.black0ut.de.map_service_android.adapter.GroupDialogAdapter;
+import app.black0ut.de.map_service_android.data.Status;
+import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
+import app.black0ut.de.map_service_android.views.DrawingView;
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.data.Map;
+import app.black0ut.de.map_service_android.data.Strategy;
+import app.black0ut.de.map_service_android.data.User;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by Jan-Philipp Altenhof on 03.01.16.
@@ -49,7 +57,7 @@ import io.socket.client.Socket;
  * Die 'ImageView' für die Callouts kann bei Bedarf durch den Nutzer an- und abgeschaltet werden.
  */
 
-@EFragment(R.layout.fragment_maps_detail)
+@EFragment(R.layout.fragment_map_detail)
 public class MapsDetailFragment extends Fragment {
 
     @ViewById(R.id.map_image)
@@ -63,266 +71,290 @@ public class MapsDetailFragment extends Fragment {
 
     @ViewById
     FloatingActionButton fabShowCallouts;
-
-    private int BITMAP_WIDHT = 1024;
-    private int BITMAP_HEIGHT = 1024;
+    @ViewById
+    FloatingActionButton fabSaveStrat;
+    @ViewById
+    FloatingActionButton fabEditStrat;
+    @ViewById
+    FloatingActionButton fabLiveMode;
 
     public int mapImageHeight;
     public int mapImageWidth;
     public Bitmap bitmap;
     private boolean showCalloutsClicked = false;
+    private boolean editStratClicked = false;
+    private boolean liveModeClicked = false;
+
+    public LocalStrategy localStrategy;
+    SharedPreferences sharedPreferences;
+    private static String mUsername;
+    private DrawingView mDrawingView;
+
+    //Live Modus Dialog Variablen
+    private AlertDialog mBuilder;
+    private String mClickedGroup;
+    private GroupDialogAdapter mAdapter;
+    private ArrayList<String> myGroups = new ArrayList<>();
+    private Status gsonStatus;
+
+    //Live Content Variablen
+    private static String mRoom;
+
+    //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
+    @InstanceState
+    Long stratId;
+    @InstanceState
+    String stratUser;
+    @InstanceState
+    String stratMap;
+    @InstanceState
+    String stratName;
+    @InstanceState
+    String stratGroup;
+    @InstanceState
+    boolean[] stratDrag;
+    @InstanceState
+    double[] stratX;
+    @InstanceState
+    double[] stratY;
+
+    private Socket mSocket;
+
+    {
+        try {
+            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            //mSocket = IO.socket("http://chat.socket.io");
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
+        }
+    }
 
     @AfterViews
     public void afterViews() {
+        if (getArguments() != null) {
+            stratId = getArguments().getLong("stratId");
+            stratUser = getArguments().getString("stratUser");
+            stratMap = getArguments().getString("stratMap");
+            stratName = getArguments().getString("stratName");
+            stratGroup = getArguments().getString("stratGroup");
+            stratDrag = getArguments().getBooleanArray("stratDrag");
+            stratX = getArguments().getDoubleArray("stratX");
+            stratY = getArguments().getDoubleArray("stratY");
+        }
 
-        checkMapName();
+        Map.checkMapName(mapImage, mapCallouts, getResources());
 
-        /*
-        ViewTreeObserver vto = mapImage.getViewTreeObserver();
-        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            public boolean onPreDraw() {
-                mapImage.getViewTreeObserver().removeOnPreDrawListener(this);
-                Log.d("TEST", " MeasuredHeight: " + mapImage.getMeasuredHeight() + " Width: " + mapImage.getMeasuredHeight());
-                Log.d("TEST", " Height: " + mapImage.getHeight() + " Width: " + mapImage.getHeight());
-                mapImageHeight = mapImage.getHeight();
-                mapImageWidth = mapImage.getWidth();
-                //DrawingView.mapImageWidth = mapImageWidth;
-                //DrawingView.mapImageHeight = mapImageHeight;
+        sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        mUsername = sharedPreferences.getString(User.USERNAME, null);
 
-                return true;
-            }
-        });
-        */
-        //Log.d("TEST", "Height: " + mapImage.getHeight() + "Widht: "+ mapImage.getWidth());
-        /*
-        showCallouts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        // get the center for the clipping circle
-                        int cx = mapCallouts.getWidth() / 2;
-                        int cy = mapCallouts.getHeight() / 2;
-                        // get the final radius for the clipping circle
-                        float finalRadius = (float) Math.hypot(cx, cy);
-                        // create the animator for this view (the start radius is zero)
-                        Animator anim =
-                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, 0, finalRadius);
-                        // make the view visible and start the animation
-                        mapCallouts.setVisibility(View.VISIBLE);
-                        anim.start();
-                    } else {
-                        mapCallouts.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        int cx = mapCallouts.getWidth() / 2;
-                        int cy = mapCallouts.getHeight() / 2;
-                        float initialRadius = (float) Math.hypot(cx, cy);
-                        Animator anim =
-                                ViewAnimationUtils.createCircularReveal(mapCallouts, cx, cy, initialRadius, 0);
-                        anim.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                mapCallouts.setVisibility(View.GONE);
-                            }
-                        });
-                        anim.start();
-                    } else {
-                        // The toggle is disabled
-                        mapCallouts.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-        */
-        DrawingView.mPaint.setAntiAlias(true);
-        DrawingView.mPaint.setDither(true);
-        DrawingView.mPaint.setColor(Color.GREEN);
-        DrawingView.mPaint.setStyle(Paint.Style.STROKE);
-        DrawingView.mPaint.setStrokeJoin(Paint.Join.ROUND);
-        DrawingView.mPaint.setStrokeCap(Paint.Cap.ROUND);
-        DrawingView.mPaint.setStrokeWidth(12);
+        DrawingView.sPaint.setAntiAlias(true);
+        DrawingView.sPaint.setDither(true);
+        DrawingView.sPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
+        DrawingView.sPaint.setStyle(Paint.Style.STROKE);
+        DrawingView.sPaint.setStrokeJoin(Paint.Join.ROUND);
+        DrawingView.sPaint.setStrokeCap(Paint.Cap.ROUND);
+        DrawingView.sPaint.setStrokeWidth(pxToDp(14));
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
     }
 
-    public void loadMapBitmap(int resId, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        task.execute(resId);
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public void loadCalloutBitmap(int resId, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        task.execute(resId);
-    }
-
-    /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param options
-     * @param reqWidth
-     * @param reqHeight
-     * @return
-     */
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
+    public static int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
     /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param res
-     * @param resId
-     * @param reqWidth
-     * @param reqHeight
-     * @return
+     * Klick Listener für den Button, welcher den Modus des Zeichnens auf einer Karte aktiviert.
      */
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    /**
-     * Prüft den Namen der geklickten Karte und setzt dann die ImageResource der ImageView auf das passende Bild.
-     */
-    private void checkMapName() {
-        switch (Map.clickedMapName) {
-            case Map.ASSAULT:
-                //Picasso.with(getContext()).load(R.drawable.cs_assault_radar).into(mapImage);
-                loadMapBitmap(R.drawable.cs_assault_radar, mapImage);
-                break;
-            case Map.AZTEC:
-                //Picasso.with(getContext()).load(R.drawable.de_aztec_radar_spectate).into(mapImage);
-                loadMapBitmap(R.drawable.de_aztec_radar_spectate, mapImage);
-                break;
-            case Map.CACHE:
-                //Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_cache_radar_spectate_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_cache_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_cache_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.COBBLESTONE:
-                //Picasso.with(getContext()).load(R.drawable.de_cbble_radar).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_cbble_radar_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_cbble_radar, mapImage);
-                loadCalloutBitmap(R.drawable.de_cbble_radar_callout, mapCallouts);
-                break;
-            case Map.DUST:
-                //Picasso.with(getContext()).load(R.drawable.de_dust_radar_spectate).into(mapImage);
-                loadMapBitmap(R.drawable.de_dust_radar_spectate, mapImage);
-                break;
-            case Map.DUST2:
-                //Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_dust2_radar_spectate_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_dust2_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_dust2_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.INFERNO:
-                //Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_inferno_radar_spectate_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_inferno_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_inferno_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.ITALY:
-                //Picasso.with(getContext()).load(R.drawable.cs_italy_radar).into(mapImage);
-                loadMapBitmap(R.drawable.cs_italy_radar, mapImage);
-                break;
-            case Map.MILITIA:
-                //Picasso.with(getContext()).load(R.drawable.cs_militia_radar_spectate).into(mapImage);
-                loadMapBitmap(R.drawable.cs_militia_radar_spectate, mapImage);
-                break;
-            case Map.MIRAGE:
-                //Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_mirage_radar_spectate_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_mirage_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.NUKE:
-                //Picasso.with(getContext()).load(R.drawable.de_nuke_radar_spectate).into(mapImage);
-                loadMapBitmap(R.drawable.de_nuke_radar_spectate, mapImage);
-                break;
-            case Map.OFFICE:
-                //Picasso.with(getContext()).load(R.drawable.cs_office_radar).into(mapImage);
-                loadMapBitmap(R.drawable.cs_office_radar, mapImage);
-                break;
-            case Map.OVERPASS:
-                //Picasso.with(getContext()).load(R.drawable.de_overpass_radar).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_overpass_radar_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_overpass_radar, mapImage);
-                loadCalloutBitmap(R.drawable.de_overpass_radar_callout, mapCallouts);
-                break;
-            case Map.TRAIN:
-                //Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate).into(mapImage);
-                //Picasso.with(getContext()).load(R.drawable.de_train_radar_spectate_callout).into(mapCallouts);
-                loadMapBitmap(R.drawable.de_train_radar_spectate, mapImage);
-                loadCalloutBitmap(R.drawable.de_train_radar_spectate_callout, mapCallouts);
-                break;
-            case Map.VERTIGO:
-                //Picasso.with(getContext()).load(R.drawable.de_vertigo_radar).into(mapImage);
-                loadMapBitmap(R.drawable.de_vertigo_radar, mapImage);
-                break;
-            default:
-                Log.d("MAP CLICK", "No image for the clicked Map.");
-        }
-    }
-
     @Click
     public void fabEditStratClicked() {
-        mapImageWidth = mapImage.getWidth();
-        mapImageHeight = mapImage.getHeight();
+        if (!editStratClicked) {
+            editStratClicked = true;
 
-        DrawingView mDrawingView = new DrawingView(getContext());
+            mapImageWidth = mapImage.getWidth();
+            mapImageHeight = mapImage.getHeight();
+
+            DrawingView.isStrategy = false;
+            DrawingView.isLiveMode = false;
+
+            addDrawingViewToCanvas();
+
+            fabSaveStrat.setVisibility(View.VISIBLE);
+            fabEditStrat.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+
+            Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
+        } else {
+            editStratClicked = false;
+            mDrawingView.clearDrawingView();
+            mDrawingView = null;
+            canvas.removeAllViews();
+            fabSaveStrat.setVisibility(View.GONE);
+            fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
+
+        }
+    }
+
+    private void addDrawingViewToCanvas() {
+        mDrawingView = new DrawingView(getContext());
         //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
         canvas.addView(mDrawingView, params);
-
-        Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
     }
 
+    /**
+     * Klick Listener für den Button, welcher die Callouts anzeigt.
+     */
     @Click
-    public void fabShowCalloutsClicked(){
-        if (!showCalloutsClicked){
+    public void fabShowCalloutsClicked() {
+        if (!showCalloutsClicked) {
             mapCallouts.setVisibility(View.VISIBLE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
             showCalloutsClicked = true;
-        }else{
+        } else {
             mapCallouts.setVisibility(View.GONE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
             showCalloutsClicked = false;
         }
+    }
+
+    /**
+     * Klick Listener für den Button, welcher eine gezeichnete Strategie speichert.
+     */
+    @Click
+    public void fabSaveStratClicked() {
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            showDialog();
+        }else{
+            Toast.makeText(getContext(), "Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Klick Listener für den Button, welcher den Live Modus startet.
+     */
+    @Click
+    public void fabLiveModeClicked() {
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            if (!liveModeClicked) {
+                liveModeClicked = true;
+                mapImageWidth = mapImage.getWidth();
+                mapImageHeight = mapImage.getHeight();
+                fabLiveMode.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+                fabEditStrat.setVisibility(View.GONE);
+                showLiveModeDialog();
+            } else {
+                liveModeClicked = false;
+                fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+                fabEditStrat.setVisibility(View.VISIBLE);
+                mDrawingView.clearDrawingView();
+                mDrawingView.closeSocket();
+                mDrawingView = null;
+                canvas.removeAllViews();
+                leaveGroupLive();
+            }
+        } else {
+            Toast.makeText(getContext(), "Um den Live Modus zu starten, musst du Dich anmelden.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Zeigt einen Dialog zum auswählen einer Gruppe. Dabei werden die Gruppen angezeigt, in welchen
+     * sich der Nutzer befindet. Beim Klick auf eine Gruppe wird der Live Modus mit dieser Gruppe
+     * gestartet.
+     */
+    private void showLiveModeDialog() {
+        HashMap<String, String> getGroupsMap = new HashMap<>();
+        getGroupsMap.put("user", mUsername);
+
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
+
+        LayoutInflater factory = LayoutInflater.from(getContext());
+        final View chooseGroupLayout = factory.inflate(R.layout.group_dialog, null);
+        final ListView groupDialogListView =
+                (ListView) chooseGroupLayout.findViewById(R.id.groupDialogListView);
+        mAdapter = new GroupDialogAdapter(myGroups, getContext());
+        groupDialogListView.setAdapter(mAdapter);
+        groupDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mClickedGroup = mAdapter.getItem(position);
+                DrawingView.isStrategy = false;
+                DrawingView.isLiveMode = true;
+                HashMap<String, String> joinGroupLive = new HashMap<>();
+                joinGroupLive.put("user", mUsername);
+                joinGroupLive.put("group", mClickedGroup);
+                joinGroupLive.put("map", Map.clickedMapName);
+                mSocket.on("status", status);
+                mSocket.connect();
+                mSocket.emit("joinGroupLive", JSONCreator.createJSON("joinGroupLive", joinGroupLive).toString());
+            }
+        });
+
+        mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                .setTitle("Live Modus starten.")
+                .setMessage("Wähle eine Gruppe für den Live Modus: ")
+                .setView(chooseGroupLayout)
+                .create();
+        mBuilder.show();
+    }
+
+    /**
+     * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
+     */
+    private void showDialog() {
+        localStrategy = LocalStrategy.getInstance();
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newStratLayout = factory.inflate(R.layout.new_strat, null);
+            final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setTitle("Strategie speichern")
+                    .setView(newStratLayout)
+                    .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            String stratName = etStratName.getText().toString();
+                            if (stratName.equals("")) {
+                                Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
+                            } else {
+                                prepareStrategyJson(stratName);
+                            }
+                        }
+                    })
+                    .setNegativeButton("Abbrechen", null)
+                    .create();
+            builder.show();
+        } else {
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void prepareStrategyJson(String stratName) {
+        localStrategy = LocalStrategy.getInstance();
+        ArrayList<Boolean> dragList = localStrategy.getDragList();
+        Boolean[] dragArray = dragList.toArray(new Boolean[dragList.size()]);
+        ArrayList<Double> xList = localStrategy.getListX();
+        Double[] xArray = xList.toArray(new Double[xList.size()]);
+        ArrayList<Double> yList = localStrategy.getListY();
+        Double[] yArray = yList.toArray(new Double[yList.size()]);
+        Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName,
+                stratName, null, dragArray, xArray, yArray);
+        Gson gson = new Gson();
+        String createTac = gson.toJson(strategy);
+        Log.d("TEST", createTac);
+
+        mSocket.on("status", status);
+        mSocket.connect();
+        mSocket.emit("createTac", createTac);
     }
 
     @Override
@@ -334,35 +366,129 @@ public class MapsDetailFragment extends Fragment {
         mapCallouts.setVisibility(View.GONE);
     }
 
-    /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     */
-    class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
-        private final WeakReference<ImageView> imageViewReference;
-        private int data = 0;
-
-        public BitmapWorkerTask(ImageView imageView) {
-            // Use a WeakReference to ensure the ImageView can be garbage collected
-            imageViewReference = new WeakReference<ImageView>(imageView);
-        }
-
-        // Decode image in background.
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            data = params[0];
-            return decodeSampledBitmapFromResource(getResources(), data, BITMAP_WIDHT, BITMAP_HEIGHT);
-        }
-
-        // Once complete, see if ImageView is still around and set bitmap.
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if (imageViewReference != null && bitmap != null) {
-                final ImageView imageView = imageViewReference.get();
-                if (imageView != null) {
-                    imageView.setImageBitmap(bitmap);
-                }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            if (mDrawingView != null) {
+                mDrawingView.clearDrawingView();
+                mDrawingView.closeSocket();
+                mDrawingView = null;
             }
+            canvas.removeAllViews();
+            leaveGroupLive();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            if (mDrawingView != null) {
+                mDrawingView.clearDrawingView();
+                mDrawingView.closeSocket();
+                mDrawingView = null;
+            }
+            canvas.removeAllViews();
+            leaveGroupLive();
+        }
+    }
+
+    private void leaveGroupLive() {
+        HashMap<String, String> leaveGroupLive = new HashMap<>();
+        leaveGroupLive.put("room", mRoom);
+        mSocket.emit("leaveGroupLive", JSONCreator.createJSON("leaveGroupLive", leaveGroupLive).toString());
+        mSocket.disconnect();
+        mSocket.off();
+    }
+
+    private Emitter.Listener status = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            if (getActivity() == null)
+                return;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String emitterStatus;
+                    try {
+                        emitterStatus = data.getString("status");
+                    } catch (JSONException e) {
+                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
+                        return;
+                    }
+                    if (emitterStatus.equals("createTacSuccess")) {
+                        Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
+                        mSocket.disconnect();
+                        mSocket.off();
+                    } else if (emitterStatus.equals("createTacFailed")) {
+                        Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                        mSocket.disconnect();
+                        mSocket.off();
+                    }
+                    if (emitterStatus.equals("provideGroups")) {
+                        getGsonStatus(data.toString());
+                    }
+                    if (emitterStatus.equals("connectedClients")) {
+                        addDrawingViewToCanvas();
+                        mBuilder.cancel();
+                    }
+                    if (emitterStatus.equals("provideRoomName")) {
+                        try {
+                            mRoom = data.getString("room");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (emitterStatus.equals("liveContent")) {
+                        try {
+                            mRoom = data.getString("room");
+                            String user = data.getString("user");
+                            double startX = data.getDouble("startX");
+                            double startY = data.getDouble("startY");
+                            double x = data.getDouble("x");
+                            double y = data.getDouble("y");
+                            boolean drag = data.getBoolean("drag");
+                            mDrawingView.drawLiveContent(drag, x, y, startX, startY);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            });
+        }
+    };
+
+    public void getGsonStatus(String data) {
+        //Mapped den ankommenden JSON in ein neues Status Objekt
+        gsonStatus = new Gson().fromJson(data, Status.class);
+        myGroups.clear();
+        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+            myGroups.add(gsonStatus.getGroups()[i].getName());
+        }
+        Status.setCurrentStatus(gsonStatus, getContext());
+        onItemsLoadComplete();
+    }
+
+    void onItemsLoadComplete() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public static String getRoom() {
+        return mRoom;
+    }
+
+    public static String getUsername() {
+        return mUsername;
     }
 
 }

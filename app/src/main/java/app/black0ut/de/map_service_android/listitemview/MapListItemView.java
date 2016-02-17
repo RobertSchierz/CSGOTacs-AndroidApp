@@ -1,4 +1,4 @@
-package app.black0ut.de.map_service_android;
+package app.black0ut.de.map_service_android.listitemview;
 
 import android.content.Context;
 import android.widget.ImageView;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
+import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Map;
 
 /**
