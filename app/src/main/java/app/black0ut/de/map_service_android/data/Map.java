@@ -40,12 +40,7 @@ public class Map {
         this.mapPreviewId = mapPreviewId;
     }
 
-    public static void loadMapBitmap(int resId, ImageView imageView, Resources resources) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView, resources);
-        task.execute(resId);
-    }
-
-    public static void loadCalloutBitmap(int resId, ImageView imageView, Resources resources) {
+    public static void loadBitmap(int resId, ImageView imageView, Resources resources) {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView, resources);
         task.execute(resId);
     }
@@ -56,64 +51,64 @@ public class Map {
     public static void checkMapName(ImageView mapImage, ImageView mapCallouts, Resources resources) {
         switch (Map.clickedMapName) {
             case Map.ASSAULT:
-                loadMapBitmap(R.drawable.cs_assault_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_assault_radar, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.AZTEC:
-                loadMapBitmap(R.drawable.de_aztec_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_aztec_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.CACHE:
-                loadMapBitmap(R.drawable.de_cache_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_cache_radar_spectate_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_cache_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.de_cache_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.COBBLESTONE:
-                loadMapBitmap(R.drawable.de_cbble_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_cbble_radar_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_cbble_radar, mapImage, resources);
+                loadBitmap(R.drawable.de_cbble_radar_callout, mapCallouts, resources);
                 break;
             case Map.DUST:
-                loadMapBitmap(R.drawable.de_dust_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_dust_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.DUST2:
-                loadMapBitmap(R.drawable.de_dust2_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_dust2_radar_spectate_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_dust2_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.de_dust2_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.INFERNO:
-                loadMapBitmap(R.drawable.de_inferno_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_inferno_radar_spectate_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_inferno_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.de_inferno_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.ITALY:
-                loadMapBitmap(R.drawable.cs_italy_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_italy_radar, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.MILITIA:
-                loadMapBitmap(R.drawable.cs_militia_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_militia_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.MIRAGE:
-                loadMapBitmap(R.drawable.de_mirage_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_mirage_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.NUKE:
-                loadMapBitmap(R.drawable.de_nuke_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_nuke_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.OFFICE:
-                loadMapBitmap(R.drawable.cs_office_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_office_radar, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             case Map.OVERPASS:
-                loadMapBitmap(R.drawable.de_overpass_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_overpass_radar_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_overpass_radar, mapImage, resources);
+                loadBitmap(R.drawable.de_overpass_radar_callout, mapCallouts, resources);
                 break;
             case Map.TRAIN:
-                loadMapBitmap(R.drawable.de_train_radar_spectate, mapImage, resources);
-                loadCalloutBitmap(R.drawable.de_train_radar_spectate_callout, mapCallouts, resources);
+                loadBitmap(R.drawable.de_train_radar_spectate, mapImage, resources);
+                loadBitmap(R.drawable.de_train_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.VERTIGO:
-                loadMapBitmap(R.drawable.de_vertigo_radar, mapImage, resources);
-                loadCalloutBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_vertigo_radar, mapImage, resources);
+                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
                 break;
             default:
                 Log.d("MAP CLICK", "No image for the clicked Map.");
