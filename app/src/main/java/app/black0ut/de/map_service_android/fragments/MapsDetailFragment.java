@@ -211,14 +211,14 @@ public class MapsDetailFragment extends Fragment {
      */
     @Click
     public void fabShowCalloutsClicked() {
-        if (!showCalloutsClicked) {
+        if (showCalloutsClicked) {
             mapCallouts.setVisibility(View.VISIBLE);
-            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
-            showCalloutsClicked = true;
-        } else {
-            mapCallouts.setVisibility(View.GONE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
             showCalloutsClicked = false;
+        } else {
+            mapCallouts.setVisibility(View.GONE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
+            showCalloutsClicked = true;
         }
     }
 
