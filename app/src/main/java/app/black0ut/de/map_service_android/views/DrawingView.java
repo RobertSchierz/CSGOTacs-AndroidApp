@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.View;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.fragments.MapsDetailFragment;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
@@ -83,6 +85,14 @@ public class DrawingView extends View {
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
+
+        sPaint.setAntiAlias(true);
+        sPaint.setDither(true);
+        sPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
+        sPaint.setStyle(Paint.Style.STROKE);
+        sPaint.setStrokeJoin(Paint.Join.ROUND);
+        sPaint.setStrokeCap(Paint.Cap.ROUND);
+        sPaint.setStrokeWidth(pxToDp(14));
 
         mLivePaint = new Paint();
         mLivePaint.setAntiAlias(true);
@@ -239,9 +249,6 @@ public class DrawingView extends View {
     //Live Drawing
     private void touchStartLive(float x, float y, float startY, float startX) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
-            mLocalStrategy.addListX((x / mCanvas.getWidth()));
-            mLocalStrategy.addListY((y / mCanvas.getHeight()));
-            mLocalStrategy.addDragList(false);
 
             mLivePath.moveTo(x, y);
             mLivePath.lineTo(x, y);
@@ -253,18 +260,7 @@ public class DrawingView extends View {
     }
 
     private void touchMoveLive(float x, float y, float startX, float startY) {
-        if (x > mCanvas.getWidth() || x < 0) {
-            mCanvas.drawPath(mLivePath, sPaint);
-            return;
-        } else if (y > mCanvas.getHeight() || y < 0) {
-            mCanvas.drawPath(mLivePath, sPaint);
-            return;
-        }
-
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
-            mLocalStrategy.addListX((x / mCanvas.getWidth()));
-            mLocalStrategy.addListY((y / mCanvas.getHeight()));
-            mLocalStrategy.addDragList(true);
 
             float dx = Math.abs(x - mLiveX);
             float dy = Math.abs(y - mLiveY);
@@ -278,11 +274,6 @@ public class DrawingView extends View {
     }
 
     private void touchUpLive() {
-        if ((mLiveX < mCanvas.getWidth() && mLiveX >= 0) && (mLiveY < mCanvas.getHeight() && mLiveY >= 0)) {
-            mLocalStrategy.addListX((mX / mCanvas.getWidth()));
-            mLocalStrategy.addListY((mY / mCanvas.getHeight()));
-            mLocalStrategy.addDragList(true);
-        }
         mPath.lineTo(mLiveX, mLiveY);
         circlePath.reset();
         // commit the path to our offscreen
