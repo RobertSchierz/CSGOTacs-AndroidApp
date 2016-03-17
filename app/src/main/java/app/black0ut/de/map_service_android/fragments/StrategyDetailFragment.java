@@ -79,26 +79,16 @@ public class StrategyDetailFragment extends Fragment {
     private AlertDialog mBuilder;
     private String mClickedGroup;
 
-    //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
-
     Long stratId;
-
     String stratUser;
-
     String stratMap;
-
     String stratName;
-
     String stratGroup;
-
     boolean[] stratDrag;
-
     double[] stratX;
-
     double[] stratY;
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
