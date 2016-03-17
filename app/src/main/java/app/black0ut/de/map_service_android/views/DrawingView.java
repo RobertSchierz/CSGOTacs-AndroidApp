@@ -109,6 +109,10 @@ public class DrawingView extends View {
         mLocalStrategy.clearListY();
         mLocalStrategy.clearDragList();
 
+        //sDrag;
+        //sX;
+        //sY;
+
         mBitmap.eraseColor(Color.TRANSPARENT);
         mPath.reset();
         invalidate();
@@ -134,11 +138,9 @@ public class DrawingView extends View {
             for (int i = 0; i < sDrag.length; i++) {
                 if (!sDrag[i]) {
                     touchStart((float) sX[i] * w, (float) sY[i] * h);
-                    Log.d("TEST", "onSizeChanged start");
                     invalidate();
                 } else {
                     touchMove((float) sX[i] * w, (float) sY[i] * h);
-                    Log.d("TEST", "onSizeChanged move");
                     invalidate();
                 }
             }

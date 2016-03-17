@@ -361,14 +361,14 @@ public class MapsDetailFragment extends Fragment {
             liveModeClicked = false;
             fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
             fabEditStrat.setVisibility(View.VISIBLE);
-            if (mDrawingView != null) {
-                mDrawingView.clearDrawingView();
-                mDrawingView.closeSocket();
-                mDrawingView = null;
-            }
-            canvas.removeAllViews();
             leaveGroupLive();
         }
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
     }
 
     @Override
@@ -378,14 +378,14 @@ public class MapsDetailFragment extends Fragment {
             liveModeClicked = false;
             fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
             fabEditStrat.setVisibility(View.VISIBLE);
-            if (mDrawingView != null) {
-                mDrawingView.clearDrawingView();
-                mDrawingView.closeSocket();
-                mDrawingView = null;
-            }
-            canvas.removeAllViews();
             leaveGroupLive();
         }
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
     }
 
     private void leaveGroupLive() {

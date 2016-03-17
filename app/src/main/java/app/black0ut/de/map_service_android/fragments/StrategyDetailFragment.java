@@ -80,21 +80,21 @@ public class StrategyDetailFragment extends Fragment {
     private String mClickedGroup;
 
     //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
-    @InstanceState
+
     Long stratId;
-    @InstanceState
+
     String stratUser;
-    @InstanceState
+
     String stratMap;
-    @InstanceState
+
     String stratName;
-    @InstanceState
+
     String stratGroup;
-    @InstanceState
+
     boolean[] stratDrag;
-    @InstanceState
+
     double[] stratX;
-    @InstanceState
+
     double[] stratY;
 
     private Socket mSocket;
@@ -130,6 +130,7 @@ public class StrategyDetailFragment extends Fragment {
             stratDrag = getArguments().getBooleanArray("stratDrag");
             stratX = getArguments().getDoubleArray("stratX");
             stratY = getArguments().getDoubleArray("stratY");
+            getArguments().clear();
             DrawingView.sDrag = stratDrag;
             DrawingView.sX = stratX;
             DrawingView.sY = stratY;
@@ -293,6 +294,28 @@ public class StrategyDetailFragment extends Fragment {
         mapImage.setImageDrawable(null);
         mapCallouts.setImageDrawable(null);
         mapCallouts.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
     }
 
     private Emitter.Listener status = new Emitter.Listener() {
