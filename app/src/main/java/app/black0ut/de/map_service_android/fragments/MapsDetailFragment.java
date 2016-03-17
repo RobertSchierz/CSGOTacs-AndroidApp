@@ -175,14 +175,17 @@ public class MapsDetailFragment extends Fragment {
 
             Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
         } else {
-            editStratClicked = false;
-            mDrawingView.clearDrawingView();
-            mDrawingView = null;
-            canvas.removeAllViews();
-            fabSaveStrat.setVisibility(View.GONE);
-            fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
-
+            resetStrat();
         }
+    }
+
+    private void resetStrat(){
+        editStratClicked = false;
+        mDrawingView.clearDrawingView();
+        mDrawingView = null;
+        canvas.removeAllViews();
+        fabSaveStrat.setVisibility(View.GONE);
+        fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
     }
 
     private void addDrawingViewToCanvas() {
@@ -414,6 +417,7 @@ public class MapsDetailFragment extends Fragment {
                     }
                     if (emitterStatus.equals("createTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
+                        resetStrat();
                         mSocket.disconnect();
                         mSocket.off();
                     } else if (emitterStatus.equals("createTacFailed")) {
