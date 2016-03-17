@@ -27,7 +27,7 @@ import io.socket.client.Socket;
  */
 
 public class DrawingView extends View {
-    public static Paint sPaint = new Paint();
+    public Paint sPaint = new Paint();
     public static boolean isStrategy = false;
     public static boolean isLiveMode = false;
     private static final float TOUCH_TOLERANCE = 4;

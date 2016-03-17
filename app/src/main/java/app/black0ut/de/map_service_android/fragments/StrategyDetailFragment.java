@@ -114,14 +114,6 @@ public class StrategyDetailFragment extends Fragment {
 
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
-
-        DrawingView.sPaint.setAntiAlias(true);
-        DrawingView.sPaint.setDither(true);
-        DrawingView.sPaint.setColor(ContextCompat.getColor(getContext(), R.color.orangePrimary));
-        DrawingView.sPaint.setStyle(Paint.Style.STROKE);
-        DrawingView.sPaint.setStrokeJoin(Paint.Join.ROUND);
-        DrawingView.sPaint.setStrokeCap(Paint.Cap.ROUND);
-        DrawingView.sPaint.setStrokeWidth(pxToDp(14));
         loadStrat();
 
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);

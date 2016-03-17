@@ -71,7 +71,7 @@ public class StrategiesFragment extends Fragment {
         refreshItems();
     }
 
-    void refreshItems() {
+    private void refreshItems() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
             HashMap<String, String> getTacsMap = new HashMap<>();
             getTacsMap.put("user", mUsername);
@@ -164,7 +164,6 @@ public class StrategiesFragment extends Fragment {
                             Toast.makeText(getContext(), "Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.", Toast.LENGTH_LONG).show();
                         }
                     }
-                    adapter.notifyDataSetChanged();
                     mSocket.disconnect();
                     mSocket.off();
                 }
@@ -213,6 +212,9 @@ public class StrategiesFragment extends Fragment {
         }
         if (strategies.size() > 0){
             noStrats.setVisibility(View.GONE);
+        }else{
+            noStrats.setVisibility(View.VISIBLE);
         }
+        adapter.notifyDataSetChanged();
     }
 }

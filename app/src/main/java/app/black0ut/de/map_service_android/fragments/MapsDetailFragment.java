@@ -119,11 +119,9 @@ public class MapsDetailFragment extends Fragment {
     double[] stratY;
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-            //mSocket = IO.socket("http://chat.socket.io");
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
