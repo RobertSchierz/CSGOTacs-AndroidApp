@@ -109,10 +109,6 @@ public class DrawingView extends View {
         mLocalStrategy.clearListY();
         mLocalStrategy.clearDragList();
 
-        //sDrag;
-        //sX;
-        //sY;
-
         mBitmap.eraseColor(Color.TRANSPARENT);
         mPath.reset();
         invalidate();

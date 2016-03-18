@@ -152,12 +152,12 @@ public class StrategyDetailFragment extends Fragment {
     }
 
     /**
-     * Klick Listener für den Button, welcher den Modus des Zeichnens auf einer Karte aktiviert.
+     * Klick Listener für den Button, welcher die gespeicherte Strategie zurücksetzt.
      */
     @Click
     public void fabEditStratClicked() {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Taktik zurücksetzen")
+                .setTitle("Strategie zurücksetzen")
                 .setMessage("Möchtest Du deine Zeichnung löschen und von vorn beginnen?")
                 .setPositiveButton("Zurücksetzen", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
@@ -175,14 +175,14 @@ public class StrategyDetailFragment extends Fragment {
      */
     @Click
     public void fabShowCalloutsClicked() {
-        if (!showCalloutsClicked) {
+        if (showCalloutsClicked) {
             mapCallouts.setVisibility(View.VISIBLE);
-            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
-            showCalloutsClicked = true;
-        } else {
-            mapCallouts.setVisibility(View.GONE);
             fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
             showCalloutsClicked = false;
+        } else {
+            mapCallouts.setVisibility(View.GONE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
+            showCalloutsClicked = true;
         }
     }
 
@@ -239,13 +239,13 @@ public class StrategyDetailFragment extends Fragment {
     }
 
     /**
-     * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
+     * Zeigt einen Dialog zum speichern einer bearbeiteten Strategie.
      */
 
     private void showSaveDialog() {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
                 .setTitle("Strategie speichern")
-                .setMessage("Möchtest Du den aktuellen Stand speichern?")
+                .setMessage("Möchtest Du den aktuellen Stand speichern? Dies kann nicht rückgängig gemacht werden.")
                 .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
@@ -326,7 +326,7 @@ public class StrategyDetailFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("changeTacSuccess")) {
-                        Toast.makeText(getContext(), "Strategie erfolgreich geändert.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Strategie erfolgreich bearbeitet.", Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("bindTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie '" + stratName +
