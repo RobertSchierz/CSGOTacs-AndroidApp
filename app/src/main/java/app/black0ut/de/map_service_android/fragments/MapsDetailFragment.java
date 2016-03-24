@@ -450,7 +450,7 @@ public class MapsDetailFragment extends Fragment {
                             double x = data.getDouble("x");
                             double y = data.getDouble("y");
                             boolean drag = data.getBoolean("drag");
-                            mDrawingView.drawLiveContent(drag, x, y, startX, startY);
+                            mDrawingView.drawLiveContent(drag, x, y);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

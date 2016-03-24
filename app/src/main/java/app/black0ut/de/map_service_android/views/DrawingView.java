@@ -41,7 +41,6 @@ public class DrawingView extends View {
 
     private float mX, mY;
     private float mLiveX, mLiveY;
-    private boolean lastDrag;
 
     public LocalStrategy mLocalStrategy;
 
@@ -76,7 +75,6 @@ public class DrawingView extends View {
         context = c;
         mPath = new Path();
         mLivePath = new Path();
-        lastDrag = false;
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
         circlePath = new Path();
@@ -146,20 +144,21 @@ public class DrawingView extends View {
         }
     }
 
-    public void drawLiveContent(boolean drag, double x, double y, double startX, double startY) {
-        Log.d("liveContent", "------- drag: " + drag + " x: " + x + " y: " + y + " startX: " + startX + " startY: " + startY);
-
+    /**
+     * Methode zum Zeichnen der Live Daten anderer Nutzer.
+     * @param drag boolean Variable zum erkennen, ob es sich um einen Startpunkt handelt
+     * @param x X-Koordinate
+     * @param y Y-Koordinate
+     */
+    public void drawLiveContent(boolean drag, double x, double y) {
         if (!drag) {
             touchUpLive();
-            touchStartLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
-                    (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
+            touchStartLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
             invalidate();
         } else {
-            touchMoveLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
-                    (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
+            touchMoveLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight());
             invalidate();
         }
-        lastDrag = drag;
     }
 
     @Override
@@ -242,7 +241,7 @@ public class DrawingView extends View {
     }
 
     //Live Drawing
-    private void touchStartLive(float x, float y, float startY, float startX) {
+    private void touchStartLive(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
 
             mLivePath.moveTo(x, y);
@@ -253,7 +252,7 @@ public class DrawingView extends View {
         }
     }
 
-    private void touchMoveLive(float x, float y, float startX, float startY) {
+    private void touchMoveLive(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
 
             float dx = Math.abs(x - mLiveX);
