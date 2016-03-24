@@ -153,7 +153,8 @@ public class DrawingView extends View {
             touchStartLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
                     (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
             invalidate();
-        } else if (lastDrag == true && drag == false) {
+        }
+        if (lastDrag == true && drag == false) {
             touchUpLive();
         } else {
             touchMoveLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
@@ -236,8 +237,6 @@ public class DrawingView extends View {
         mLocalStrategy.addListY((mY / mCanvas.getHeight()));
         mLocalStrategy.addDragList(true);
 
-        mPath.lineTo(mX, mY);
-        circlePath.reset();
         // commit the path to our offscreen
         mCanvas.drawPath(mPath, sPaint);
         // kill this so we don't double draw
@@ -249,7 +248,6 @@ public class DrawingView extends View {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
 
             mLivePath.moveTo(x, y);
-            mLivePath.lineTo(x, y);
 
             mLiveX = x;
             mLiveY = y;
@@ -273,7 +271,6 @@ public class DrawingView extends View {
 
     private void touchUpLive() {
         mPath.lineTo(mLiveX, mLiveY);
-        circlePath.reset();
         // commit the path to our offscreen
         mCanvas.drawPath(mLivePath, mLivePaint);
         // kill this so we don't double draw
