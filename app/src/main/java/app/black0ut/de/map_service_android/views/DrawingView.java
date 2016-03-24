@@ -150,12 +150,10 @@ public class DrawingView extends View {
         Log.d("liveContent", "------- drag: " + drag + " x: " + x + " y: " + y + " startX: " + startX + " startY: " + startY);
 
         if (!drag) {
+            touchUpLive();
             touchStartLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
                     (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
             invalidate();
-        }
-        if (lastDrag == true && drag == false) {
-            touchUpLive();
         } else {
             touchMoveLive((float) x * mCanvas.getWidth(), (float) y * mCanvas.getHeight(),
                     (float) startX * mCanvas.getWidth(), (float) startY * mCanvas.getHeight());
@@ -270,10 +268,7 @@ public class DrawingView extends View {
     }
 
     private void touchUpLive() {
-        mPath.lineTo(mLiveX, mLiveY);
-        // commit the path to our offscreen
         mCanvas.drawPath(mLivePath, mLivePaint);
-        // kill this so we don't double draw
         mLivePath.reset();
     }
 
