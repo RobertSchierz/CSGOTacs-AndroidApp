@@ -14,6 +14,10 @@ import app.black0ut.de.map_service_android.listitemview.StrategyListItemView_;
 /**
  * Created by Jan-Philipp Altenhof on 11.02.2016.
  */
+
+/**
+ * ListViewAdapter, welcher die Inhalte der Strategienliste zur Verfügung stellt.
+ */
 public class StrategiesListViewAdapter extends BaseAdapter {
 
     private Context mContext;

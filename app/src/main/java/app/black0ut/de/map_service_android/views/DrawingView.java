@@ -24,8 +24,14 @@ import io.socket.client.Socket;
 
 /**
  * Created by Jan-Philipp Altenhof on 08.01.2016.
+ *
+ * Bei dieser Klasse wurde die FingerPaint Demo von Google zur Hilfe genommen.
+ * Quelle: https://android.googlesource.com/platform/development/+/master/samples/ApiDemos/src/com/example/android/apis/graphics/FingerPaint.java
  */
 
+/**
+ * Klasse, welche das Zeichnen per Finger auf dem Bildschirm ermöglicht.
+ */
 public class DrawingView extends View {
     public Paint sPaint = new Paint();
     public static boolean isStrategy = false;
@@ -68,7 +74,7 @@ public class DrawingView extends View {
     /**
      * Konstruktor
      *
-     * @param c Kontext der instanziierenden Klasse
+     * @param c Kontext der instanziierenden Klasse.
      */
     public DrawingView(Context c) {
         super(c);
@@ -102,6 +108,9 @@ public class DrawingView extends View {
         mLocalStrategy = LocalStrategy.getInstance();
     }
 
+    /**
+     * Leert den Inhalt der DrawingView und des LocalStrategy Objekts.
+     */
     public void clearDrawingView() {
         mLocalStrategy.clearListX();
         mLocalStrategy.clearListY();
@@ -112,10 +121,20 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    /**
+     * Wandelt dp in px um.
+     * @param dp Der dp-Wert als int, welcher in px umgewandelt werden soll.
+     * @return
+     */
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
+    /**
+     * Wandelt px in dp um.
+     * @param px Der px-Wert als int, welcher in dp umgewandelt werden soll.
+     * @return
+     */
     public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
@@ -127,6 +146,8 @@ public class DrawingView extends View {
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
 
+        //Wenn es sich um eine Strategie handelt, wird die DrawingView geleert
+        //und die entsprechende Strategie gezeichnet.
         if (isStrategy) {
             clearDrawingView();
             for (int i = 0; i < sDrag.length; i++) {
@@ -139,6 +160,7 @@ public class DrawingView extends View {
                 }
             }
         }
+        //Wenn es sich um den Livemodus handelt wird die Server Verbindung hergestellt
         if (isLiveMode) {
             mSocket.connect();
         }
@@ -171,6 +193,13 @@ public class DrawingView extends View {
         canvas.drawPath(circlePath, circlePaint);
     }
 
+    /**
+     * Speichert die übergebenen Koordinaten normalisiert in das LocalStrategy Objekt.
+     * Setzt den Startpunkt des Path Objekts und sendet, wenn es sich um den Livemodus handelt,
+     * die Koordinaten an den Server.
+     * @param x X-Koordinate vom Typ float.
+     * @param y Y-Koordinate vom Typ float.
+     */
     private void touchStart(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
             mLocalStrategy.addListX((x / mCanvas.getWidth()));
@@ -198,6 +227,12 @@ public class DrawingView extends View {
         }
     }
 
+    /**
+     * Speichert die übergebenen Koordinaten normalisiert in das LocalStrategy Objekt.
+     * Zeichnet eine Kurve zwischen den übergebenen Koordinaten.
+     * @param x X-Koordinate vom Typ float.
+     * @param y Y-Koordinate vom Typ float.
+     */
     private void touchMove(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
             mLocalStrategy.addListX((x / mCanvas.getWidth()));
@@ -229,6 +264,10 @@ public class DrawingView extends View {
         }
     }
 
+    /**
+     * Speichert die Koordinaten aus den Variablen 'mX' und 'mY' in das LocalStrategy Objekt.
+     * Zeichnet das Path Objekt auf das Canvas und setzt es danach zurück.
+     */
     private void touchUp() {
         mLocalStrategy.addListX((mX / mCanvas.getWidth()));
         mLocalStrategy.addListY((mY / mCanvas.getHeight()));
@@ -240,7 +279,11 @@ public class DrawingView extends View {
         mPath.reset();
     }
 
-    //Live Drawing
+    /**
+     * Setzt den Startpunkt des Path Objektes auf die Koordinaten aus dem Livemodus.
+     * @param x
+     * @param y
+     */
     private void touchStartLive(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
 
@@ -252,6 +295,11 @@ public class DrawingView extends View {
         }
     }
 
+    /**
+     * Zeichnet eine Kurve zwischen den übergebenen Koordinaten aus dem Livemodus.
+     * @param x X-Koordinate vom Typ float.
+     * @param y Y-Koordinate vom Typ float.
+     */
     private void touchMoveLive(float x, float y) {
         if ((x < mCanvas.getWidth() && x >= 0) && (y < mCanvas.getHeight() && y >= 0)) {
 
@@ -266,6 +314,9 @@ public class DrawingView extends View {
         }
     }
 
+    /**
+     * Zeichnet das Path Objekt auf das Canvas und setzt es danach zurück.
+     */
     private void touchUpLive() {
         mCanvas.drawPath(mLivePath, mLivePaint);
         mLivePath.reset();
@@ -293,6 +344,9 @@ public class DrawingView extends View {
         return true;
     }
 
+    /**
+     * Trennt die Socket Verbindung.
+     */
     public void closeSocket() {
         mSocket.disconnect();
     }

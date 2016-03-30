@@ -16,6 +16,10 @@ import app.black0ut.de.map_service_android.data.Strategy;
 /**
  * Created by Jan-Philipp Altenhof on 13.02.2016.
  */
+
+/**
+ * Klasse für die View der Listenelemente der Strategienliste.
+ */
 @EViewGroup(R.layout.strategies_listview_text)
 public class StrategyListItemView extends RelativeLayout{
     @ViewById

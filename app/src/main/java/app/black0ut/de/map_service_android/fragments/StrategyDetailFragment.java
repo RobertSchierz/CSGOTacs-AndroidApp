@@ -48,6 +48,9 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Jan-Philipp Altenhof on 13.02.2016.
  */
+/**
+ * Fragment zum Anzeigen geladener Strategien.
+ */
 @EFragment(R.layout.fragment_strategy_detail)
 public class StrategyDetailFragment extends Fragment {
     @ViewById(R.id.strat_map_image)
@@ -98,6 +101,14 @@ public class StrategyDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
     @AfterViews
     public void afterViews() {
         Map.checkMapName(mapImage, mapCallouts, getResources());
@@ -109,7 +120,10 @@ public class StrategyDetailFragment extends Fragment {
         //LinearLayout canvas = (LinearLayout)getView().findViewById(R.id.canvas);
     }
 
-
+    /**
+     * Lädt die anzuzeigende Strategie aus dem Bundle und erzeugt eine neue DrawingView, welche
+     * die Strategie zeichnet.
+     */
     public void loadStrat() {
         if (getArguments() != null) {
             stratId = getArguments().getLong("stratId");
@@ -131,9 +145,6 @@ public class StrategyDetailFragment extends Fragment {
             mapImageWidth = metrics.widthPixels;
             mapImageHeight = metrics.widthPixels;
 
-            Log.d("TEST", "Width: " + mapImageWidth);
-            Log.d("TEST", "Height: " + mapImageHeight);
-
             mDrawingView = new DrawingView(getContext());
             //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
@@ -141,14 +152,6 @@ public class StrategyDetailFragment extends Fragment {
             //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
             canvas.addView(mDrawingView, params);
         }
-    }
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
     /**
@@ -194,6 +197,9 @@ public class StrategyDetailFragment extends Fragment {
         showSaveDialog();
     }
 
+    /**
+     * Klick Listener für den Button, welcher eine Strategie mit einer Gruppe teilt.
+     */
     @Click
     public void fabShareStratClicked() {
         showShareDialog();
@@ -241,7 +247,6 @@ public class StrategyDetailFragment extends Fragment {
     /**
      * Zeigt einen Dialog zum speichern einer bearbeiteten Strategie.
      */
-
     private void showSaveDialog() {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
                 .setTitle("Strategie speichern")
@@ -257,6 +262,9 @@ public class StrategyDetailFragment extends Fragment {
         builder.show();
     }
 
+    /**
+     * Bereitet die JSON für die Übermittlung an den Server vor.
+     */
     private void prepareStrategyJson() {
         localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
@@ -280,7 +288,6 @@ public class StrategyDetailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         mapImage.setImageDrawable(null);
         mapCallouts.setImageDrawable(null);
         mapCallouts.setVisibility(View.GONE);
@@ -308,6 +315,9 @@ public class StrategyDetailFragment extends Fragment {
         canvas.removeAllViews();
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -344,6 +354,10 @@ public class StrategyDetailFragment extends Fragment {
         }
     };
 
+    /**
+     * Wandelt eine JSON in ein Java Objekt vom Typ Status um.
+     * @param data String mit der JSON.
+     */
     public void getGsonStatus(String data) {
         //Mapped den ankommenden JSON in ein neues Status Objekt
         gsonStatus = new Gson().fromJson(data, Status.class);
@@ -356,6 +370,9 @@ public class StrategyDetailFragment extends Fragment {
         onItemsLoadComplete();
     }
 
+    /**
+     * Aktualisiert den Datensatz der Liste.
+     */
     void onItemsLoadComplete() {
         mAdapter.notifyDataSetChanged();
     }

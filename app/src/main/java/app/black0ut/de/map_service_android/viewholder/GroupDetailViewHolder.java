@@ -10,9 +10,10 @@ import app.black0ut.de.map_service_android.R;
 /**
  * Created by Jan-Philipp Altenhof on 09.02.2016.
  */
-// Provide a reference to the views for each data item
-// Complex data items may need more than one view per item, and
-// you provide access to all the views for a data item in a view holder
+
+/**
+ * Wird als ViewHolder für die einzelnen Listenelemente der Mitgliederliste verwendet.
+ */
 public class GroupDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public RelativeLayout groupDetailRelativeLayout;
     public TextView memberName;
@@ -35,6 +36,9 @@ public class GroupDetailViewHolder extends RecyclerView.ViewHolder implements Vi
         }
     }
 
+    /**
+     * Interface für die Implementierung eines Klick-Listeners.
+     */
     public interface ViewHolderClicks {
         void onLayout(View caller);
     }

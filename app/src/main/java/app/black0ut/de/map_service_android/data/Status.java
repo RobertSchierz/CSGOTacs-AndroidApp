@@ -9,10 +9,11 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by Jan-Philipp Altenhof on 28.01.2016.
  */
+
+/**
+ * Klasse, welche zum Umwandeln einer JSON in diese Klasse verwendet wird.
+ */
 public class Status {
-    /*"{ 'status' : 'provideGroups', 'user' : null, 'member' : null, 'admin' : null, 'mods' : null, " +
-            "'groups' : [{ 'name' : 'Gruppenname', 'member' : '[] Gruppenmitglieder', 'admin' : 'Guppenadministrator', " +
-            "'mods' : '[] Gruppenmoderatoren' }], 'name' : null, 'group' : 'null', 'groups' : null }"*/
 
     private static SharedPreferences sharedPrefs;
     public static String CURRENT_STATUS_KEY = "currentStatus";

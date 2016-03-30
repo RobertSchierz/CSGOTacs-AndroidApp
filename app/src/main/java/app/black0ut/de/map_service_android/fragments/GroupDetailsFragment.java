@@ -68,6 +68,14 @@ public class GroupDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
     @AfterViews
     public void afterViews() {
         clickedGroup = getArguments().getString("clickedGroup");
@@ -81,27 +89,25 @@ public class GroupDetailsFragment extends Fragment {
         mMods = currentGroup.getMods();
         mAdmin = currentGroup.getAdmin();
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         mGroupsDetailsRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mGroupsDetailsRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
         mAdapter = new GroupDetailRecyclerViewAdapter(username, mMembers, mMods, mAdmin, currentGroup.getName(),getActivity().getSupportFragmentManager(), getContext());
         mGroupsDetailsRecyclerView.setAdapter(mAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
                 refreshItems(username);
             }
         });
     }
 
+    /**
+     * Aktualisiert die Liste der Gruppen.
+     */
     void refreshItems(String username) {
         HashMap<String, String> getGroupsMap = new HashMap<>();
         getGroupsMap.put("user", username);
@@ -111,13 +117,17 @@ public class GroupDetailsFragment extends Fragment {
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
     }
 
+    /**
+     * Aktualisiert den Datensatz des Adapters und stoppt die Animation des SwipeRefreshLayout.
+     */
     void onItemsLoadComplete() {
-        // Update the adapter and notify data set changed
         mAdapter.notifyDataSetChanged();
-        // Stop refresh animation
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {

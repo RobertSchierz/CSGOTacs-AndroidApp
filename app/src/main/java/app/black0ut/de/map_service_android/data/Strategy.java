@@ -5,6 +5,11 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by Jan-Philipp Altenhof on 10.02.2016.
  */
+
+/**
+ * Klasse, welche eine Strategie repräsentiert.
+ * Sie wird verwendet, um eine JSON mittels Gson in diese Klasse umzuwandeln.
+ */
 public class Strategy {
     @Expose
     public long id;

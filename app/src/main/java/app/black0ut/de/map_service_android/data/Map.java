@@ -11,6 +11,11 @@ import app.black0ut.de.map_service_android.tasks.BitmapWorkerTask;
 /**
  * Created by Jan-Philipp Altenhof on 02.01.2016.
  */
+
+/**
+ * Klasse, welche ein Spielfeld repräsentiert.
+ * Sie beinhaltet alle Namen der benötigten Spielfelder.
+ */
 public class Map {
 
     public static final String DUST2 = "Dust2";
@@ -40,6 +45,12 @@ public class Map {
         this.mapPreviewId = mapPreviewId;
     }
 
+    /**
+     * Lädt die Bitmap im Hintergrund unter Verwendung der BitmapWorkerTask Klasse.
+     * @param resId Id der Bitmap.
+     * @param imageView ImageView, welche die Bitmap anzeigen soll.
+     * @param resources Anwendungsressourcen.
+     */
     public static void loadBitmap(int resId, ImageView imageView, Resources resources) {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView, resources);
         task.execute(resId);

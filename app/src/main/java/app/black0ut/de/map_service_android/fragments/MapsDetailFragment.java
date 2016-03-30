@@ -127,6 +127,14 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
     @AfterViews
     public void afterViews() {
         if (getArguments() != null) {
@@ -144,14 +152,6 @@ public class MapsDetailFragment extends Fragment {
 
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
-    }
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
     /**
@@ -179,6 +179,9 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Setzt eine gezeichnete Strategie zurück.
+     */
     private void resetStrat(){
         editStratClicked = false;
         mDrawingView.clearDrawingView();
@@ -188,6 +191,9 @@ public class MapsDetailFragment extends Fragment {
         fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
     }
 
+    /**
+     * Fügt dem RelativeLayout eine DrawingView hinzu.
+     */
     private void addDrawingViewToCanvas() {
         mDrawingView = new DrawingView(getContext());
         //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
@@ -331,6 +337,9 @@ public class MapsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Bereitet die JSON für die Übermittlung an den Server vor.
+     */
     private void prepareStrategyJson(String stratName) {
         localStrategy = LocalStrategy.getInstance();
         ArrayList<Boolean> dragList = localStrategy.getDragList();
@@ -343,7 +352,6 @@ public class MapsDetailFragment extends Fragment {
                 stratName, null, dragArray, xArray, yArray);
         Gson gson = new Gson();
         String createTac = gson.toJson(strategy);
-        Log.d("TEST", createTac);
 
         mSocket.on("status", status);
         mSocket.connect();
@@ -393,6 +401,9 @@ public class MapsDetailFragment extends Fragment {
         canvas.removeAllViews();
     }
 
+    /**
+     * Methode, welche den Socket Raum verlässt und die Socket Verbindung trennt.
+     */
     private void leaveGroupLive() {
         HashMap<String, String> leaveGroupLive = new HashMap<>();
         leaveGroupLive.put("room", mRoom);
@@ -401,6 +412,9 @@ public class MapsDetailFragment extends Fragment {
         mSocket.off();
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -461,6 +475,10 @@ public class MapsDetailFragment extends Fragment {
         }
     };
 
+    /**
+     * Wandelt eine JSON in ein Java Objekt vom Typ Status um.
+     * @param data String mit der JSON.
+     */
     public void getGsonStatus(String data) {
         //Mapped den ankommenden JSON in ein neues Status Objekt
         gsonStatus = new Gson().fromJson(data, Status.class);
@@ -473,14 +491,25 @@ public class MapsDetailFragment extends Fragment {
         onItemsLoadComplete();
     }
 
+    /**
+     * Aktualisiert den Datensatz des Adapters.
+     */
     void onItemsLoadComplete() {
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Liefert den aktuellen Socket Raum.
+     * @return Raum als String.
+     */
     public static String getRoom() {
         return mRoom;
     }
 
+    /**
+     * Liefert den aktuellen Nutzernamen.
+     * @return Nutzername als String.
+     */
     public static String getUsername() {
         return mUsername;
     }

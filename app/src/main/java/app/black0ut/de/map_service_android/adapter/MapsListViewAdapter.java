@@ -23,6 +23,9 @@ import app.black0ut.de.map_service_android.listitemview.MapListItemView_;
  * Created by Jan-Philipp Altenhof on 02.01.2016.
  */
 
+/**
+ * ListViewAdapter, welcher die Inhalte der Kartenliste zur Verfügung stellt.
+ */
 @EBean
 public class MapsListViewAdapter extends BaseAdapter{
 

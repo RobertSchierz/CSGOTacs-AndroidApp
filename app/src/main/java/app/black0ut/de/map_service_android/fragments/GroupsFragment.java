@@ -44,6 +44,9 @@ import io.socket.emitter.Emitter;
  * Created by Jan-Philipp Altenhof on 30.12.2015.
  */
 
+/**
+ * Fragment, für die Anzeige einer Gruppenliste.
+ */
 @EFragment(R.layout.fragment_groups)
 public class GroupsFragment extends Fragment {
 
@@ -66,7 +69,6 @@ public class GroupsFragment extends Fragment {
     private ArrayList<Integer> memberCount = new ArrayList<>();
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -75,6 +77,14 @@ public class GroupsFragment extends Fragment {
         }
     }
 
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
     @AfterViews
     public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
@@ -87,16 +97,11 @@ public class GroupsFragment extends Fragment {
             pullToRefreshText.setVisibility(View.GONE);
         }
 
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         mGroupsRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getContext());
         mGroupsRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
         mAdapter = new GroupsRecyclerViewAdapter(myGroups, memberCount, getActivity().getSupportFragmentManager(), getContext());
         mGroupsRecyclerView.setAdapter(mAdapter);
 
@@ -105,15 +110,16 @@ public class GroupsFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
                 refreshItems();
             }
         });
     }
 
+    /**
+     * Aktualisiert die Liste der Gruppen.
+     */
     void refreshItems() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-            Log.d("TEST", "refreshItems");
             myGroups.clear();
             memberCount.clear();
             HashMap<String, String> getGroupsMap = new HashMap<>();
@@ -122,20 +128,24 @@ public class GroupsFragment extends Fragment {
             mSocket.on("status", status);
             mSocket.connect();
             mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
-            // Load complete
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Aktualisiert den Datensatz des Adapters und stoppt die Animation des SwipeRefreshLayout.
+     */
     void onItemsLoadComplete() {
         pullToRefreshText.setVisibility(View.GONE);
-        // Update the adapter and notify data set changed
         mAdapter.notifyDataSetChanged();
-        // Stop refresh animation
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    /**
+     * Klick-Listener für den Button zum Erstellen einer neuen Gruppe.
+     * Er öffnet einen Dialog, der nach dem Gruppennamen und dem Passwort fragt.
+     */
     @Click
     public void fabNewGroupClicked() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
@@ -173,6 +183,10 @@ public class GroupsFragment extends Fragment {
         }
     }
 
+    /**
+     * Klick-Listener für den Button zum Beitreten einer neuen Gruppe.
+     * Er öffnet einen Dialog, der nach dem Gruppennamen und dem Passwort fragt.
+     */
     @Click
     public void fabJoinGroupClicked() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
@@ -210,16 +224,9 @@ public class GroupsFragment extends Fragment {
         }
     }
 
-    public void swapFragment() {
-        Fragment fragment = new GroupDetailsFragment_();
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
-                .replace(R.id.mainFrame, fragment)
-                .commit();
-        fragmentManager.executePendingTransactions();
-    }
-
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -254,6 +261,10 @@ public class GroupsFragment extends Fragment {
         }
     };
 
+    /**
+     * Wandelt eine JSON in ein Java Objekt vom Typ Status um.
+     * @param data String mit der JSON.
+     */
     public void getGsonStatus(String data) {
         //Mapped den ankommenden JSON in ein neues Status Objekt
         gsonStatus = new Gson().fromJson(data, Status.class);

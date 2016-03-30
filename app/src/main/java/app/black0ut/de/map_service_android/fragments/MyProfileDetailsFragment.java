@@ -27,6 +27,10 @@ import app.black0ut.de.map_service_android.data.User;
 /**
  * Created by Jan-Philipp Altenhof on 20.01.2016.
  */
+
+/**
+ * Fragment für die Profilseite eines angemeldeten Nutzers
+ */
 @EFragment(R.layout.fragment_my_profile_details)
 public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
 
@@ -55,29 +59,6 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
     public void afterViews() {
         sharedPrefs = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         username.setText(sharedPrefs.getString(User.USERNAME, null));
-        /*fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
-
-                editTextNameSignedIn.setText(MyProfileFragment.username);
-                editTextPasswordSignedIn.setText(MyProfileFragment.password);
-                avatarImage.setText("+");
-                username.setVisibility(View.GONE);
-                editTextRelativeLayout.animate()
-                        .alpha(1.0f)
-                        .translationY(-username.getHeight())
-                        .setDuration(500)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                                super.onAnimationStart(animation);
-                                editTextRelativeLayout.setVisibility(View.VISIBLE);
-                            }
-                        });
-            }
-        });*/
     }
 
     @Click

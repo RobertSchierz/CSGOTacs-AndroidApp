@@ -11,10 +11,12 @@ import app.black0ut.de.map_service_android.R;
 /**
  * Created by Jan-Philipp Altenhof on 09.02.2016.
  */
+
+/**
+ * Wird als ViewHolder für die Buttons am Ende der Mitgliederliste verwendet.
+ */
 public class GroupDetailFooterViewHolder extends RecyclerView.ViewHolder {
-// Provide a reference to the views for each data item
-// Complex data items may need more than one view per item, and
-// you provide access to all the views for a data item in a view holder
+
 
     public LinearLayout mLeaveDeleteLayout;
     public TextView mLeaveGroup;
@@ -28,5 +30,3 @@ public class GroupDetailFooterViewHolder extends RecyclerView.ViewHolder {
     }
 
 }
-
-

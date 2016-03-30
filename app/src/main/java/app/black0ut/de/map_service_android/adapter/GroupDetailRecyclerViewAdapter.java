@@ -35,6 +35,16 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Jan-Philipp Altenhof on 03.02.2016.
  */
+
+/**
+ * Klasse, welche die Daten für die Mitgliederliste einer Gruppe bereitstellt.
+ * Sie fügt dem Ende der Liste außerdem ein Layout hinzu, welches zwei Buttons beinhaltet.
+ * Die Buttons ermöglichen das Löschen und Verlassen einer Gruppe.
+ * Des Weiteren ermöglicht die Klasse die Nutzerverwaltung einer Gruppe. Sie stellt einen Dialog
+ * zur Verfügung, der bei einem Klick auf ein Gruppenmitglied geöffnet wird.
+ * Je nach Nutzerstatus (Administrator, Moderator oder Mitglied) können bestimmte Operationen zur
+ * Nutzerverwaltung ausgeführt werden.
+ */
 public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
 
     private static final int TYPE_ITEM = 0;
@@ -52,7 +62,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     private FragmentManager mFragmentManager;
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
@@ -61,12 +70,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         }
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-
-
-    // Provide a suitable constructor (depends on the kind of dataset)
     public GroupDetailRecyclerViewAdapter(final String username, final ArrayList<String> members, final String[] mods,
                                           final String admin, final String groupName, final FragmentManager fragmentManager, final Context context) {
         mUsername = username;
@@ -91,7 +94,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                 public void onLayout(View caller) {
                     TextView textView = (TextView) caller.findViewById(R.id.memberName);
                     mMemberName = textView.getText().toString();
-                    Toast.makeText(caller.getContext(), "Member '" + mMemberName + "' clicked.", Toast.LENGTH_SHORT).show();
                     openDialog(caller);
                 }
             });
@@ -103,6 +105,12 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         return null;
     }
 
+    /**
+     * Öffnet einen Dialog zur Nutzerverwaltung.
+     * Er ermöglicht, je nach Nutzerstatus, das Ernennen von Moderatoren oder das entfernen
+     * von Mitgliedern aus einer Gruppe.
+     * @param caller
+     */
     private void openDialog(View caller) {
         LayoutInflater factory = LayoutInflater.from(caller.getContext());
         final View manageUser = factory.inflate(R.layout.member_management, null);
@@ -123,7 +131,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
 
         if (mMods.length > 0) {
             for (String mMod : mMods) {
-                Log.d("TEST", "mMod: " + mMod);
                 if (mMemberName.equals(mMod)) {
                     memberIsMod = true;
                 }
@@ -147,11 +154,8 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         mBuilder.show();
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
         if (holder instanceof GroupDetailFooterViewHolder) {
             GroupDetailFooterViewHolder footerHolder = (GroupDetailFooterViewHolder) holder;
             footerHolder.mDeleteGroup.setOnClickListener(this);
@@ -172,7 +176,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             }
             if (mMods.length != 0) {
                 for (String mMod : mMods) {
-                    Log.d("TEST", "mMod: " + mMod);
                     if (currentMember.equals(mMod)) {
                         itemHolder.userStatus.setVisibility(View.VISIBLE);
                         itemHolder.userStatus.setText("Moderator");
@@ -186,7 +189,6 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         return mMembers.get(position);
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return mMembers.size() + 1;
@@ -201,6 +203,10 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     }
 
 
+    /**
+     * Klick-Listener für die Buttons des Dialogs zur Nutzerverwaltung.
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -247,6 +253,9 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         }
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -293,14 +302,12 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                     }
                     if (emitterStatus.equals("leaveGroupSuccess")) {
                         mFragmentManager.popBackStack();
-                        //swapFragment();
                     }
                     if (emitterStatus.equals("leaveGroupFailed")) {
                         Toast.makeText(mContext, "Die Gruppe konnte nicht verlassen werden.", Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("deleteGroupSuccess")) {
                         mFragmentManager.popBackStack();
-                        //swapFragment();
                     }
                     if (emitterStatus.equals("leaveGroupFailed")) {
                         Toast.makeText(mContext, "Die Gruppe konnte nicht gelöscht werden.", Toast.LENGTH_SHORT).show();
@@ -313,13 +320,4 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             });
         }
     };
-
-    public void swapFragment() {
-        Fragment fragment = new GroupsFragment_();
-        mFragmentManager.beginTransaction()
-                .disallowAddToBackStack()
-                .replace(R.id.mainFrame, fragment)
-                .commit();
-        mFragmentManager.executePendingTransactions();
-    }
 }

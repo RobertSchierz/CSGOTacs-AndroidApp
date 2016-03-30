@@ -24,6 +24,13 @@ import app.black0ut.de.map_service_android.fragments.GroupDetailsFragment_;
  * Created by Jan-Philipp Altenhof on 25.01.2016.
  */
 
+/**
+ * Diese Klasse wurde mit Hilfe einer Anleitung von Google entwickelt.
+ * Quelle: http://developer.android.com/training/material/lists-cards.html#CardView
+ *
+ * Sie stellt die Daten für die RecyclerView mit den Gruppen eines Benutzers zur Verfügung.
+ * Außerdem ermöglicht sie, dass einzelne Listenelemente der View auf Klicks reagieren.
+ */
 public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.GroupsViewHolder> {
 
     private ArrayList<String> mDataset = new ArrayList<>();
@@ -32,9 +39,6 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     private FragmentManager mFragmentManager;
     public String clickedGroup;
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class GroupsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RelativeLayout groupRelativeLayout;
         public TextView groupName;
@@ -62,7 +66,6 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
     public GroupsRecyclerViewAdapter(ArrayList<String> myDataset, ArrayList<Integer> memberCount, FragmentManager fragmentManager, Context context) {
         mDataset = myDataset;
         mMemberCount = memberCount;
@@ -70,11 +73,9 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         mFragmentManager = fragmentManager;
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public GroupsViewHolder onCreateViewHolder(ViewGroup parent,
                                                int viewType) {
-        // create a new view
         final View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.groups_cardview, parent, false);
         GroupsViewHolder vh = new GroupsViewHolder(v, new GroupsViewHolder.ViewHolderClicks() {
@@ -86,16 +87,12 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(GroupsViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
         holder.groupName.setText(mDataset.get(position));
         holder.groupMemberCount.setText(mMemberCount.get(position).toString());
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return mDataset.size();
@@ -104,7 +101,6 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     public void getClickedGroup(View caller) {
         TextView textView = (TextView) caller.findViewById(R.id.groupName);
         clickedGroup = textView.getText().toString();
-        Log.d("TEST", "Clicked group: " + clickedGroup);
 
         if (clickedGroup.equals("")) {
             return;
@@ -112,6 +108,9 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         swapFragment();
     }
 
+    /**
+     * Tauscht das Fragment aus.
+     */
     public void swapFragment() {
         Bundle bundle = new Bundle();
         bundle.putString("clickedGroup", clickedGroup);

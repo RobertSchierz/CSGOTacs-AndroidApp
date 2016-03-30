@@ -26,7 +26,9 @@ import app.black0ut.de.map_service_android.fragments.MyProfileDetailsFragment_;
 import app.black0ut.de.map_service_android.fragments.MyProfileFragment_;
 import app.black0ut.de.map_service_android.fragments.StrategiesFragment_;
 
-
+/**
+ * MainActivity, welche die Toolbar und das Hauptmenü implementiert.
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
@@ -50,17 +52,6 @@ public class MainActivity extends AppCompatActivity
             mCurrentFragment = new MainContentFragment_();
             mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
         }
-
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
@@ -90,22 +81,10 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-    */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Toast.makeText(this, "Settings pressed", Toast.LENGTH_SHORT).show();
             return true;
@@ -116,12 +95,10 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         //Fragments ersetzen
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        //ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         if (id == R.id.nav_home) {
             mCurrentFragment = MainContentFragment_.builder().build();
@@ -154,7 +131,6 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Tauscht die gelieferten Fragments mit dem mainFrame aus
-     *
      * @param fragment Das mit dem mainFrame auszutauschende Fragment.
      */
     protected void swapFragment(final Fragment fragment) {
@@ -170,6 +146,9 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.executePendingTransactions();
     }
 
+    /**
+     * Ändert, je nach Backstack, das Burger-Icon zu einem Pfeil.
+     */
     @Override
     public void onBackStackChanged() {
         mToggle.setDrawerIndicatorEnabled(mFt.getBackStackEntryCount() == 0);

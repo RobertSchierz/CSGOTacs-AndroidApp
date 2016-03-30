@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 
 /**
+ * Diese Klasse ist mit Hilfe einer Anleitung von Google entstanden.
+ * Sie ermöglicht das Laden von Bitmaps in einem Hintergrund-Thread.
  * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
  */
 public class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
@@ -48,11 +50,10 @@ public class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
     }
 
     /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param options
-     * @param reqWidth
-     * @param reqHeight
+     * Kalkuliert den Skalierungsfaktor.
+     * @param options Options Objekt.
+     * @param reqWidth Breite, zu der skaliert werden soll.
+     * @param reqHeight Höhe, zu der skaliert werden soll.
      * @return
      */
     public static int calculateInSampleSize(
@@ -79,13 +80,12 @@ public class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
     }
 
     /**
-     * Quelle: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-     *
-     * @param res
-     * @param resId
-     * @param reqWidth
-     * @param reqHeight
-     * @return
+     * Dekodiert die Bitmap.
+     * @param res Anwendungsresourcen.
+     * @param resId Id des zu dekodierenden Bildes.
+     * @param reqWidth Breite, zu der skaliert wird.
+     * @param reqHeight Höhe, zu der skaliert wird.
+     * @return Skalierte Bitmap.
      */
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                          int reqWidth, int reqHeight) {

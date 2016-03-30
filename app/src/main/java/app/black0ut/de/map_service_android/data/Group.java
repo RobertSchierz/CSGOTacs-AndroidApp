@@ -5,6 +5,11 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by Jan-Philipp Altenhof on 28.01.2016.
  */
+
+/**
+ * Klasse, welche eine Gruppe repräsentiert.
+ * Sie wird verwendet, um eine JSON in diese umzuwandeln.
+ */
 public class Group {
     @Expose
     String name;
@@ -22,10 +27,6 @@ public class Group {
         this.mods = mods;
     }
 
-    /**
-     * Gibt den Gruppennamen zurück.
-     * @return Der Gruppenname als String.
-     */
     public String getName() {
         return name;
     }

@@ -29,10 +29,12 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Jan-Philipp Altenhof on 19.01.2016.
  */
+
+/**
+ * Fragment zum Anmelden oder Registrieren eines neuen Benutzerkontos.
+ */
 @EFragment(R.layout.fragment_my_profile)
 public class MyProfileFragment extends Fragment {
-
-    SharedPreferences sharedPreferences;
 
     public static String username;
     public static String password;
@@ -50,18 +52,12 @@ public class MyProfileFragment extends Fragment {
     TextView navHeaderUsername;
 
     private Socket mSocket;
-
     {
         try {
             mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
-    }
-
-    @AfterViews
-    public void afterViews() {
-
     }
 
     //androidannotations erkennt die ID automatisch durch den Namen
@@ -75,12 +71,14 @@ public class MyProfileFragment extends Fragment {
 
     Quelle: https://github.com/excilys/androidannotations/wiki/InferringIDFromMethodName
     */
+
+    /**
+     * Klick-Listener für den Anmelde-Button.
+     */
     @Click
     public void submitButtonClicked() {
         setupSocket();
-        //{ user : 'Benutzername', pw : 'Passwort' }
         setUsernamePassword();
-        Log.d("TEST", "Username: " + username + " Password: " + password);
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
         } else {
@@ -91,6 +89,9 @@ public class MyProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Klick-Listener für Registrieren-Button
+     */
     @Click
     public void registerButtonClicked() {
         setupSocket();
@@ -105,15 +106,20 @@ public class MyProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
     private void setupSocket() {
         mSocket.on("status", status);
         mSocket.connect();
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            //Activity activity = (Activity) getContext();
             if (getActivity() == null)
                 return;
             getActivity().runOnUiThread(new Runnable() {
@@ -162,9 +168,8 @@ public class MyProfileFragment extends Fragment {
 
     /**
      * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
-     *
      * @param isLoggedIn Boolean, ob der nutzer eingeloggt ist oder nicht.
-     * @param username   Der Username des Benutzers.
+     * @param username Der Username des Benutzers.
      */
     private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username) {
         User.setsIsLoggedIn(isLoggedIn);
@@ -175,20 +180,24 @@ public class MyProfileFragment extends Fragment {
 
     /**
      * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
-     *
      * @param status Der zu setztende Status.
      */
     public void setStatus(String status) {
         if (status != null && status.isEmpty())
-            Log.d("TEST", "Current status: " + status);
         this.mCurrentStatus = status;
     }
 
+    /**
+     * Ließt den Nutzernamen und das Passwort aus den Eingabefeldern aus.
+     */
     public void setUsernamePassword() {
         username = editTextName.getText().toString();
         password = editTextPassword.getText().toString();
     }
 
+    /**
+     * Tauscht das MyProfileFragment mit einem MyProfileDetailsFragment.
+     */
     public void swapFragment() {
         Fragment fragment = new MyProfileDetailsFragment_();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();

@@ -14,6 +14,10 @@ import app.black0ut.de.map_service_android.data.Strategy;
 /**
  * Created by Jan-Philipp Altenhof on 14.02.2016.
  */
+
+/**
+ * Klasse für die View der Listenelemente des Gruppendialogs.
+ */
 @EViewGroup(R.layout.group_dialog_listview_item)
 public class GroupDialogListItemView extends LinearLayout{
     @ViewById
@@ -24,7 +28,7 @@ public class GroupDialogListItemView extends LinearLayout{
     }
 
     /**
-     * Bindet die Daten aus dem Objekt strategy an die TextView.
+     * Bindet die Daten aus dem Objekt group an die TextView.
      * @param group Ein Parameter vom Typ Group.
      */
     public void bind(String group){

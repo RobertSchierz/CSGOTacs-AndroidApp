@@ -13,6 +13,10 @@ import app.black0ut.de.map_service_android.listitemview.GroupDialogListItemView_
 /**
  * Created by Jan-Philipp Altenhof on 14.02.2016.
  */
+
+/**
+ * Klasse, welche die Daten für die Liste im Gruppenauswahldialog zur Verfügung stellt.
+ */
 public class GroupDialogAdapter extends BaseAdapter {
     private Context mContext;
     private List<String> groups;

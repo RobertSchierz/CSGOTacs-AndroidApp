@@ -17,6 +17,10 @@ import app.black0ut.de.map_service_android.data.Map;
 /**
  * Created by Jan-Philipp Altenhof on 02.01.2016.
  */
+
+/**
+ * Fragment für die Liste der auswählbaren Karten.
+ */
 @EFragment(R.layout.fragment_maps)
 public class MapsFragment extends Fragment {
 

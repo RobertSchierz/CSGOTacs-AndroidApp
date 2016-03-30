@@ -5,7 +5,11 @@ import java.util.ArrayList;
 /**
  * Created by Jan-Philipp Altenhof on 10.02.2016.
  */
-//Singleton
+
+/**
+ * Singleton Klasse, welche eine lokale Strategie repräsentiert.
+ * Sie wurde als Singleton implementiert, da es in jedem Fall nur eine lokale Strategie geben kann.
+ */
 public class LocalStrategy {
 
     private static ArrayList<Double> initListX = new ArrayList<>();
@@ -22,8 +26,6 @@ public class LocalStrategy {
         this.listX = listX;
         this.listY = listY;
         this.dragList = dragList;
-        //this.stratName = stratName;
-        //this.mapName = mapName;
     }
 
     private static LocalStrategy ourInstance = new LocalStrategy(initListX, initListY, initDragList);

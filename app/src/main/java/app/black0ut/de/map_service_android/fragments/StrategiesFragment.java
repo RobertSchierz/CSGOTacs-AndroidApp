@@ -39,6 +39,9 @@ import io.socket.emitter.Emitter;
  * Created by Jan-Philipp Altenhof on 30.12.2015.
  */
 
+/**
+ * Fragment für die Liste der Strategien eines Nutzers.
+ */
 @EFragment(R.layout.fragment_strategies)
 public class StrategiesFragment extends Fragment {
 
@@ -62,6 +65,14 @@ public class StrategiesFragment extends Fragment {
 
     private StrategiesListViewAdapter adapter;
 
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
     @AfterViews
     public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
@@ -71,6 +82,9 @@ public class StrategiesFragment extends Fragment {
         refreshItems();
     }
 
+    /**
+     * Lädt die gespeicherten Strategien eines Nutzers vom Server.
+     */
     private void refreshItems() {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
             HashMap<String, String> getTacsMap = new HashMap<>();
@@ -121,6 +135,11 @@ public class StrategiesFragment extends Fragment {
         fragmentManager.executePendingTransactions();
     }
 
+    /**
+     * Wandelt ein Array der Wrapper Klasse Boolean in ein Array des primitven Datentyps boolean um.
+     * @param booleanArray Array, welches umgewandelt wird.
+     * @return Umgewandeltes Array.
+     */
     private boolean[] toPrimitiveArray(final Boolean [] booleanArray) {
         final boolean[] primitives = new boolean[booleanArray.length];
         int index = 0;
@@ -130,6 +149,11 @@ public class StrategiesFragment extends Fragment {
         return primitives;
     }
 
+    /**
+     * Wandelt ein Array der Wrapper Klasse Double in ein Array des primitven Datentyps double um.
+     * @param doubleArray Array, welches umgewandelt wird.
+     * @return Umgewandeltes Array.
+     */
     private double[] toPrimitiveArray(final Double [] doubleArray) {
         final double[] primitives = new double[doubleArray.length];
         int index = 0;
@@ -139,6 +163,9 @@ public class StrategiesFragment extends Fragment {
         return primitives;
     }
 
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -171,6 +198,10 @@ public class StrategiesFragment extends Fragment {
         }
     };
 
+    /**
+     * Ließt die Daten eines JSONArrays aus und speichert diese in ein Strategy Objekt.
+     * @param jsonArray Auszulesendes JSONArray
+     */
     void readJsonData(JSONArray jsonArray){
         strategies.clear();
         for (int i = 0; i < jsonArray.length(); i++) {
