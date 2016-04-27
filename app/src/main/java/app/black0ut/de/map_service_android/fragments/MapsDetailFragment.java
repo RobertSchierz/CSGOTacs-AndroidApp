@@ -20,6 +20,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
@@ -48,6 +50,8 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+
+
 /**
  * Created by Jan-Philipp Altenhof on 03.01.16.
  * <p/>
@@ -59,6 +63,9 @@ import io.socket.emitter.Emitter;
 
 @EFragment(R.layout.fragment_map_detail)
 public class MapsDetailFragment extends Fragment {
+
+    @ViewById
+    AdView adView;
 
     @ViewById(R.id.map_image)
     ImageView mapImage;
@@ -152,6 +159,13 @@ public class MapsDetailFragment extends Fragment {
 
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
+
+        setupAd();
+    }
+
+    private void setupAd(){
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 
     /**

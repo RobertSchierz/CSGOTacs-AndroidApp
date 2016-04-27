@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:background="@color/maps_details_background">
 
     <RelativeLayout
@@ -31,20 +32,20 @@
             android:id="@+id/canvas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabEditStrat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/fabShowCallouts"
+        android:layout_toStartOf="@+id/fabShowCallouts"
         android:clickable="true"
         android:src="@drawable/ic_gesture_orange_600_24dp"
         android:tint="@color/colorPrimary"
@@ -70,10 +71,10 @@
         android:id="@+id/fabSaveStrat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="16dp"
-        android:layout_toLeftOf="@+id/fabShowCallouts"
-        android:layout_toStartOf="@+id/fabShowCallouts"
+        android:layout_toLeftOf="@+id/fabEditStrat"
+        android:layout_toStartOf="@+id/fabEditStrat"
         android:clickable="true"
         android:src="@drawable/ic_save_orange_600_24dp"
         android:tint="@color/colorPrimary"
@@ -84,7 +85,7 @@
         android:id="@+id/fabLiveMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_margin="16dp"
@@ -92,6 +93,17 @@
         android:src="@drawable/ic_fiber_manual_record_orange_600_24dp"
         android:tint="@color/colorPrimary"
         app:fabSize="mini" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_map_detail_bottom">
+    </com.google.android.gms.ads.AdView>
+
 
 
 </RelativeLayout>

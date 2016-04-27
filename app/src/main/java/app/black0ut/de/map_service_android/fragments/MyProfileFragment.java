@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.User;
@@ -52,13 +53,6 @@ public class MyProfileFragment extends Fragment {
     TextView navHeaderUsername;
 
     private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-        } catch (URISyntaxException e) {
-            Log.d("FEHLER", "mSocket nicht verbunden!");
-        }
-    }
 
     //androidannotations erkennt die ID automatisch durch den Namen
     //Der Name der Methode muss dafür genau dem Namen der ID entsprechen
@@ -110,6 +104,15 @@ public class MyProfileFragment extends Fragment {
      * Stellt eine Socket Verbindung zum Server her.
      */
     private void setupSocket() {
+        try {
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
+        }
+
         mSocket.on("status", status);
         mSocket.connect();
     }
@@ -168,8 +171,9 @@ public class MyProfileFragment extends Fragment {
 
     /**
      * Setzt den Username und den Login Status des Benutzers in den Sharedpreferences.
+     *
      * @param isLoggedIn Boolean, ob der nutzer eingeloggt ist oder nicht.
-     * @param username Der Username des Benutzers.
+     * @param username   Der Username des Benutzers.
      */
     private void setUserStatusAndUsernameInPrefs(boolean isLoggedIn, @Nullable String username) {
         User.setsIsLoggedIn(isLoggedIn);
@@ -180,11 +184,12 @@ public class MyProfileFragment extends Fragment {
 
     /**
      * Setzt den Klassenweiten Status einer Registrierung oder einer Anmeldung.
+     *
      * @param status Der zu setztende Status.
      */
     public void setStatus(String status) {
         if (status != null && status.isEmpty())
-        this.mCurrentStatus = status;
+            this.mCurrentStatus = status;
     }
 
     /**
