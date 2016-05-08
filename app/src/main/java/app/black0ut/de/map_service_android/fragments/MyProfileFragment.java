@@ -73,6 +73,9 @@ public class MyProfileFragment extends Fragment {
     public void submitButtonClicked() {
         setupSocket();
         setUsernamePassword();
+
+        Log.d("TEST", "" + mSocket.connected());
+
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
         } else {
@@ -108,6 +111,7 @@ public class MyProfileFragment extends Fragment {
             IO.Options opts = new IO.Options();
             opts.forceNew = true;
             opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
             mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
@@ -115,6 +119,16 @@ public class MyProfileFragment extends Fragment {
 
         mSocket.on("status", status);
         mSocket.connect();
+
+        Log.d("TEST", "" + mSocket.connected());
+
+        /*
+        if (!mSocket.connected()){
+            Toast.makeText(getContext(), "Es konnte leider keine Verbindung hergestellt werden. Bitte überprüfe die App auf Aktualisierungen.", Toast.LENGTH_SHORT).show();
+            mSocket.off();
+            mSocket.disconnect();
+        }
+        */
     }
 
     /**
@@ -132,6 +146,7 @@ public class MyProfileFragment extends Fragment {
                     String emitterStatus;
                     try {
                         emitterStatus = data.getString("status");
+                        Log.d("TEST", emitterStatus);
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
