@@ -1,11 +1,15 @@
 package app.black0ut.de.map_service_android.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -13,8 +17,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.LongClick;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +56,7 @@ public class StrategiesFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private List<Strategy> strategies = new ArrayList<>();
     private String mUsername;
+    private Strategy mClickedStrategy;
 
     @ViewById
     public ListView strategiesListView;
@@ -121,6 +129,59 @@ public class StrategiesFragment extends Fragment {
         swapFragment(strategy);
     }
 
+    @ItemLongClick
+    void strategiesListViewItemLongClicked(Strategy strategy){
+        showDeleteDialog(strategy);
+    }
+
+    /**
+     * Zeigt einen Dialog zum speichern einer bearbeiteten Strategie.
+     */
+    private void showDeleteDialog(final Strategy longClickedStrategy) {
+        final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                .setTitle("Strategie löschen")
+                .setMessage("Möchtest Du die aktuelle Strategie löschen? Dies kann nicht rückgängig gemacht werden.")
+                .setPositiveButton("Löschen", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        deleteTac(longClickedStrategy.id);
+                        mClickedStrategy = longClickedStrategy;
+                    }
+                })
+                .setNegativeButton("Abbrechen", null)
+                .create();
+        builder.show();
+    }
+
+    private void deleteTac(long stratId){
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            HashMap<String, Long> deleteTacMap = new HashMap<>();
+            deleteTacMap.put("id", stratId);
+            setupSocket();
+            mSocket.emit("deleteTac", JSONCreator.createJSON("deleteTac", deleteTacMap).toString());
+        } else {
+            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Zum anzeigen eines Progressdialogs der 2 sekunden wartet
+     */
+    private void showProgressDialog(){
+        final ProgressDialog progress = ProgressDialog.show(getContext(), "", "Loading. Please wait...", true);
+
+        progress.show();
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+            }};
+
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(r, 2000);
+    }
+
     /**
      * Ersetzt das aktuelle Fragment durch ein MapsDetailFragment, welches das Bild mit der geklickten
      * Strategie anzeigt.
@@ -188,10 +249,12 @@ public class StrategiesFragment extends Fragment {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     String emitterStatus;
-                    JSONArray jsonArray;
+                    JSONArray jsonArray = null;
                     try {
                         emitterStatus = data.getString("status");
-                        jsonArray = data.getJSONArray("tacs");
+                        if (data.has("tacs")) {
+                            jsonArray = data.getJSONArray("tacs");
+                        }
                     } catch (JSONException e) {
                         Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
                         return;
@@ -203,6 +266,14 @@ public class StrategiesFragment extends Fragment {
                             Toast.makeText(getContext(), "Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.", Toast.LENGTH_LONG).show();
                         }
                     }
+                    if (emitterStatus.equals("deleteTacSuccess")) {
+                        Toast.makeText(getContext(), "Deine Taktik wurde erfolgreich gelöscht.", Toast.LENGTH_SHORT).show();
+                        strategies.remove(mClickedStrategy);
+                        adapter.notifyDataSetChanged();
+                    } else if (emitterStatus.equals("deleteTacFailed")) {
+                        Toast.makeText(getContext(), "Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.", Toast.LENGTH_SHORT).show();
+                    }
+                    refreshItems();
                     mSocket.disconnect();
                     mSocket.off();
                 }
