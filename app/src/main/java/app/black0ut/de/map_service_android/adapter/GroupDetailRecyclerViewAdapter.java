@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.data.Status;
@@ -62,12 +63,33 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     private FragmentManager mFragmentManager;
 
     private Socket mSocket;
-    {
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+
+        mSocket.on("status", status);
+        mSocket.connect();
+
+        Log.d("TEST", "" + mSocket.connected());
+
+        /*
+        if (!mSocket.connected()){
+            Toast.makeText(getContext(), "Es konnte leider keine Verbindung hergestellt werden. Bitte überprüfe die App auf Aktualisierungen.", Toast.LENGTH_SHORT).show();
+            mSocket.off();
+            mSocket.disconnect();
+        }
+        */
     }
 
     public GroupDetailRecyclerViewAdapter(final String username, final ArrayList<String> members, final String[] mods,
@@ -212,8 +234,9 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         int id = v.getId();
         HashMap<String, String> jsonMap = new HashMap<>();
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
 
         switch (id) {
             case R.id.removeMember:

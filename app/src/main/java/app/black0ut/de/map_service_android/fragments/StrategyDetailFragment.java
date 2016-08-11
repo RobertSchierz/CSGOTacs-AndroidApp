@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.views.DrawingView;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
@@ -92,13 +93,33 @@ public class StrategyDetailFragment extends Fragment {
     double[] stratY;
 
     private Socket mSocket;
-    {
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-            //mSocket = IO.socket("http://chat.socket.io");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+
+        mSocket.on("status", status);
+        mSocket.connect();
+
+        Log.d("TEST", "" + mSocket.connected());
+
+        /*
+        if (!mSocket.connected()){
+            Toast.makeText(getContext(), "Es konnte leider keine Verbindung hergestellt werden. Bitte überprüfe die App auf Aktualisierungen.", Toast.LENGTH_SHORT).show();
+            mSocket.off();
+            mSocket.disconnect();
+        }
+        */
     }
 
     /**
@@ -214,8 +235,9 @@ public class StrategyDetailFragment extends Fragment {
         HashMap<String, String> getGroupsMap = new HashMap<>();
         getGroupsMap.put("user", mUsername);
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
 
         LayoutInflater factory = LayoutInflater.from(getContext());
@@ -231,8 +253,9 @@ public class StrategyDetailFragment extends Fragment {
                 HashMap<String, Object> bindTac = new HashMap<>();
                 bindTac.put("id", stratId);
                 bindTac.put("group", mClickedGroup);
-                mSocket.on("status", status);
-                mSocket.connect();
+                //mSocket.on("status", status);
+                //mSocket.connect();
+                setupSocket();
                 mSocket.emit("bindTac", JSONCreator.createJSON("bindTac", bindTac).toString());
             }
         });
@@ -280,8 +303,9 @@ public class StrategyDetailFragment extends Fragment {
         changeTac.put("x", xArray);
         changeTac.put("y", yArray);
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
         mSocket.emit("changeTac", JSONCreator.createJSON("changeTac", changeTac).toString());
     }
 

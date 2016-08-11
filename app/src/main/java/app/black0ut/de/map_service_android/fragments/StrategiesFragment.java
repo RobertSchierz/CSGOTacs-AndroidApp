@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.StrategiesListViewAdapter;
@@ -45,15 +46,6 @@ import io.socket.emitter.Emitter;
 @EFragment(R.layout.fragment_strategies)
 public class StrategiesFragment extends Fragment {
 
-    private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-        } catch (URISyntaxException e) {
-            Log.d("FEHLER", "mSocket nicht verbunden!");
-        }
-    }
-
     private SharedPreferences sharedPreferences;
     private List<Strategy> strategies = new ArrayList<>();
     private String mUsername;
@@ -64,6 +56,25 @@ public class StrategiesFragment extends Fragment {
     public TextView noStrats;
 
     private StrategiesListViewAdapter adapter;
+
+    private Socket mSocket;
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
+        try {
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
+        }
+        mSocket.on("status", status);
+        mSocket.connect();
+    }
 
     /**
      * Methode, die beim Starten des Fragments ausgeführt wird.
@@ -90,8 +101,9 @@ public class StrategiesFragment extends Fragment {
             HashMap<String, String> getTacsMap = new HashMap<>();
             getTacsMap.put("user", mUsername);
 
-            mSocket.on("status", status);
-            mSocket.connect();
+            //mSocket.on("status", status);
+            //mSocket.connect();
+            setupSocket();
             mSocket.emit("getTacs", JSONCreator.createJSON("getTacs", getTacsMap).toString());
         } else {
             Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();

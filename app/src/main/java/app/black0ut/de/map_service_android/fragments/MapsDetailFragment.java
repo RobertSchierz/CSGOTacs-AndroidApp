@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import app.black0ut.de.map_service_android.adapter.GroupDialogAdapter;
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.data.Status;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.views.DrawingView;
@@ -64,8 +65,8 @@ import io.socket.emitter.Emitter;
 @EFragment(R.layout.fragment_map_detail)
 public class MapsDetailFragment extends Fragment {
 
-    //@ViewById
-    //AdView adView;
+    @ViewById
+    AdView adView;
 
     @ViewById(R.id.map_image)
     ImageView mapImage;
@@ -126,12 +127,23 @@ public class MapsDetailFragment extends Fragment {
     double[] stratY;
 
     private Socket mSocket;
-    {
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+
+        mSocket.on("status", status);
+        mSocket.connect();
     }
 
     /**
@@ -160,15 +172,15 @@ public class MapsDetailFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
 
-        //setupAd();
+        setupAd();
     }
 
-    /*
+
     private void setupAd(){
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
     }
-    */
+
 
     /**
      * Klick Listener für den Button, welcher den Modus des Zeichnens auf einer Karte aktiviert.
@@ -286,8 +298,9 @@ public class MapsDetailFragment extends Fragment {
         HashMap<String, String> getGroupsMap = new HashMap<>();
         getGroupsMap.put("user", mUsername);
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
 
         LayoutInflater factory = LayoutInflater.from(getContext());
@@ -306,8 +319,9 @@ public class MapsDetailFragment extends Fragment {
                 joinGroupLive.put("user", mUsername);
                 joinGroupLive.put("group", mClickedGroup);
                 joinGroupLive.put("map", Map.clickedMapName);
-                mSocket.on("status", status);
-                mSocket.connect();
+                //mSocket.on("status", status);
+                //mSocket.connect();
+                setupSocket();
                 mSocket.emit("joinGroupLive", JSONCreator.createJSON("joinGroupLive", joinGroupLive).toString());
             }
         });
@@ -369,8 +383,9 @@ public class MapsDetailFragment extends Fragment {
         Gson gson = new Gson();
         String createTac = gson.toJson(strategy);
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
         mSocket.emit("createTac", createTac);
     }
 
