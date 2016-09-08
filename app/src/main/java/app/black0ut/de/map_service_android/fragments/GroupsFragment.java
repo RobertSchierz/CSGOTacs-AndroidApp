@@ -152,7 +152,7 @@ public class GroupsFragment extends Fragment {
             setupSocket();
             mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,7 +189,7 @@ public class GroupsFragment extends Fragment {
                             //mSocket.connect();
                             setupSocket();
                             if (groupName.equals("") || groupPassword.equals("")) {
-                                Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getText(R.string.group_name_or_password_empty), Toast.LENGTH_SHORT).show();
                             } else {
                                 HashMap<String, String> createGroupMap = new HashMap<>();
                                 createGroupMap.put("user", mUsername);
@@ -203,7 +203,7 @@ public class GroupsFragment extends Fragment {
                     .create();
             builder.show();
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -231,7 +231,7 @@ public class GroupsFragment extends Fragment {
                             //mSocket.connect();
                             setupSocket();
                             if (groupName.equals("") || groupPassword.equals("")) {
-                                Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getText(R.string.group_name_or_password_empty), Toast.LENGTH_SHORT).show();
                             } else {
                                 HashMap<String, String> joinGroupMap = new HashMap<>();
                                 joinGroupMap.put("user", mUsername);
@@ -245,7 +245,7 @@ public class GroupsFragment extends Fragment {
                     .create();
             builder.show();
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -271,7 +271,7 @@ public class GroupsFragment extends Fragment {
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
                             refreshItems();
-                            Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), String.format(getResources().getString(R.string.group_created), groupName), Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("provideGroups")) {

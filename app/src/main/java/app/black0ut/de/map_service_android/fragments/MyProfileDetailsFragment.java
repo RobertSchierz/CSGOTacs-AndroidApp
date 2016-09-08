@@ -36,12 +36,14 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
 
     public SharedPreferences sharedPrefs;
 
+    /*
     @ViewById
     FloatingActionButton fabEdit;
     @ViewById
     FloatingActionButton fabCancel;
-    @ViewById
-    TextView avatarImage;
+    */
+    //@ViewById
+    //TextView avatarImage;
     @ViewById
     TextView username;
     @ViewById
@@ -61,10 +63,12 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
         username.setText(sharedPrefs.getString(User.USERNAME, null));
     }
 
+    /*
     @Click
     public void avatarImageClicked(){
         Toast.makeText(getContext(), "Add new avatar image", Toast.LENGTH_SHORT).show();
     }
+    */
 
     @Click
     public void logoutButtonClicked(){
@@ -81,9 +85,10 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
                 .replace(R.id.mainFrame, fragment)
                 .commit();
         fragmentManager.executePendingTransactions();
-        Toast.makeText(getContext(), "Du hast Dich erfolgreich ausgeloggt.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getResources().getText(R.string.toast_logout_successful), Toast.LENGTH_SHORT).show();
     }
 
+    /*
     @Click
     public void fabEditClicked(){
         //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -91,7 +96,7 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
         //Animation Quelle: http://stackoverflow.com/questions/22454839/android-adding-simple-animations-while-setvisibilityview-gone
         editTextNameSignedIn.setText(sharedPrefs.getString(User.USERNAME, null));
         editTextPasswordSignedIn.setText(MyProfileFragment.password);
-        avatarImage.setText("+");
+        //avatarImage.setText("+");
         username.setVisibility(View.GONE);
         logoutButton.setVisibility(View.GONE);
         //Animation Quelle: http://stackoverflow.com/questions/22454839/android-adding-simple-animations-while-setvisibilityview-gone
@@ -109,14 +114,16 @@ public class MyProfileDetailsFragment extends android.support.v4.app.Fragment {
         fabEdit.setVisibility(View.GONE);
         fabCancel.setVisibility(View.VISIBLE);
     }
+
     @Click
     public void fabCancelClicked(){
         editTextRelativeLayout.setVisibility(View.GONE);
         fabCancel.setVisibility(View.GONE);
-        avatarImage.setText("Avatar");
+        //avatarImage.setText("Avatar");
         fabEdit.setVisibility(View.VISIBLE);
         username.setVisibility(View.VISIBLE);
         logoutButton.setVisibility(View.VISIBLE);
 
     }
+    */
 }

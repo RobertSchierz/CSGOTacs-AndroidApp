@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity
 
         //Initiales Fragment erstellen
         if (savedInstanceState == null) {
-            mCurrentFragment = new MainContentFragment_();
+            mCurrentFragment = new MapsFragment_();
             mFt.beginTransaction().add(R.id.mainFrame, mCurrentFragment).commit();
         }
 
@@ -100,10 +100,11 @@ public class MainActivity extends AppCompatActivity
         //Fragments ersetzen
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        if (id == R.id.nav_home) {
-            mCurrentFragment = MainContentFragment_.builder().build();
-            getSupportActionBar().setTitle(R.string.nav_home);
-        } else if (id == R.id.nav_maps) {
+        //if (id == R.id.nav_home) {
+        //    mCurrentFragment = MainContentFragment_.builder().build();
+        //    getSupportActionBar().setTitle(R.string.nav_home);
+        //} else
+        if (id == R.id.nav_maps) {
             mCurrentFragment = MapsFragment_.builder().build();
             getSupportActionBar().setTitle(R.string.nav_maps);
         } else if (id == R.id.nav_groups) {

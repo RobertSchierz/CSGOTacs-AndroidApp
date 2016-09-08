@@ -270,10 +270,11 @@ public class StrategiesFragment extends Fragment {
                         Toast.makeText(getContext(), "Deine Taktik wurde erfolgreich gelöscht.", Toast.LENGTH_SHORT).show();
                         strategies.remove(mClickedStrategy);
                         adapter.notifyDataSetChanged();
+                        refreshItems();
                     } else if (emitterStatus.equals("deleteTacFailed")) {
                         Toast.makeText(getContext(), "Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.", Toast.LENGTH_SHORT).show();
                     }
-                    refreshItems();
+
                     mSocket.disconnect();
                     mSocket.off();
                 }

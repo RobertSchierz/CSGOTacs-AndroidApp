@@ -282,7 +282,7 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     private Emitter.Listener status = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Activity activity = (Activity) mContext;
+            final Activity activity = (Activity) mContext;
             if (activity == null)
                 return;
             activity.runOnUiThread(new Runnable() {
@@ -327,13 +327,13 @@ public class GroupDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                         mFragmentManager.popBackStack();
                     }
                     if (emitterStatus.equals("leaveGroupFailed")) {
-                        Toast.makeText(mContext, "Die Gruppe konnte nicht verlassen werden.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, activity.getResources().getText(R.string.leave_group_failed), Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("deleteGroupSuccess")) {
                         mFragmentManager.popBackStack();
                     }
-                    if (emitterStatus.equals("leaveGroupFailed")) {
-                        Toast.makeText(mContext, "Die Gruppe konnte nicht gelöscht werden.", Toast.LENGTH_SHORT).show();
+                    if (emitterStatus.equals("deleteGroupFailed")) {
+                        Toast.makeText(mContext, activity.getResources().getText(R.string.delete_group_failed), Toast.LENGTH_SHORT).show();
                     }
                     notifyDataSetChanged();
                     mSocket.disconnect();

@@ -1,0 +1,57 @@
+<resources>
+    <string name="banner_map_detail_bottom">ca-app-pub-9861090111595732/1355888600</string>
+    
+    <string name="app_name">GO:tacs</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings1</string>
+
+    <!-- Main Content -->
+    <string name="no_main_content">Zur Zeit gibt es leider keine Aktivitäten.</string>
+
+    <!-- Strategies Fragment -->
+    <string name="no_strategies">Du hast leider keine Strategien gespeichert.</string>
+    <string name="strat_name_hint">Strategiename</string>
+    <string name="strat_group">Gruppe: %s</string>
+
+    <!-- Nav menu -->
+    <string name="nav_home">Home</string>
+    <string name="nav_maps">Karten</string>
+    <string name="nav_groups">Gruppen</string>
+    <string name="nav_strategies">Strategien</string>
+    <string name="nav_profile">Mein Profil</string>
+
+    <!-- My Profile Login -->
+    <string name="my_profile_login_description">Bitte melde Dich mit Deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
+    <string name="my_profile_submit_button">Anmelden</string>
+    <string name="my_profile_logout_button">Abmelden</string>
+    <string name="my_profile_register_button">Registrieren</string>
+    <string name="password_hint">Passwort</string>
+    <string name="username_hint">Benutzername</string>
+    <string name="toast_logout_successful">Du hast Dich erfolgreich ausgeloggt.</string>
+
+    <!-- Check login status -->
+    <string name="check_login_status">Du bist leider nicht angemeldet. Bitte melde Dich an.</string>
+
+    <!-- Groups -->
+    <string name="group_name_hint">Gruppenname</string>
+    <string name="group_password_hint">Gruppenpasswort</string>
+    <string name="group_member_count">%s Mitglieder</string>
+    <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
+    <string name="button_leave_group">Gruppe verlassen</string>
+    <string name="button_delete_group">Gruppe löschen</string>
+    <string name="leave_group_failed">Die Gruppe konnte nicht verlassen werden.</string>
+    <string name="delete_group_failed">Die Gruppe konnte nicht gelöscht werden.</string>
+    <string name="group_name_or_password_empty">Der Gruppenname/das Passwort darf nicht leer sein.</string>
+    <string name="group_created">Du hast die Gruppe %s erfolgreich erstellt.</string>
+
+    <!-- Member Management -->
+    <string name="remove_member">\"%s\" entfernen</string>
+    <string name="promote_member">Zum Gruppenmoderator machen</string>
+    <string name="demote_member">Als Gruppenmoderator entfernen</string>
+    <string name="no_possible_action">Keine Aktion verfügbar.</string>
+
+
+</resources>
