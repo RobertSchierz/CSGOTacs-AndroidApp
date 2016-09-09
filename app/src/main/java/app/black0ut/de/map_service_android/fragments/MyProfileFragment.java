@@ -49,8 +49,8 @@ public class MyProfileFragment extends Fragment {
     EditText editTextName;
     @ViewById
     EditText editTextPassword;
-    @ViewById
-    TextView navHeaderUsername;
+    //@ViewById
+    //TextView navHeaderUsername;
 
     private Socket mSocket;
 

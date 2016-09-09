@@ -53,5 +53,21 @@
     <string name="demote_member">Als Gruppenmoderator entfernen</string>
     <string name="no_possible_action">Keine Aktion verfügbar.</string>
 
+    <!-- NEU - MUSS NOCH IN DIE ENGLISCHE STRINGS DATEI -->
+
+    <!-- Dialogs -->
+    <string name="strat_save_title">Strategie speichern</string>
+    <string name="strat_save_button">Speichern</string>
+    <string name="start_live_mode_title">Live Modus starten.</string>
+    <string name="start_live_mode_message">Wähle eine Gruppe für den Live Modus: </string>
+
+    <string name="dialog_abort">Abbrechen</string>
+
+    <!-- Toasts -->
+    <string name="create_tac_success">Strategie erfolgreich gespeichert.</string>
+    <string name="create_tac_failed">Strategie konnte nicht gespeichert werden.</string>
+    <string name="strat_no_name">Du musst deiner Strategie einen Namen geben.</string>
+    <string name="start_live_mode_without_login">Um den Live Modus zu starten, musst du Dich anmelden.</string>
+
 
 </resources>

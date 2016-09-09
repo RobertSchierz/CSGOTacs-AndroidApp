@@ -291,6 +291,7 @@ public class GroupsFragment extends Fragment {
      * @param data String mit der JSON.
      */
     public void getGsonStatus(String data) {
+        Log.d("TEST", data);
         //Mapped den ankommenden JSON in ein neues Status Objekt
         gsonStatus = new Gson().fromJson(data, Status.class);
         myGroups.clear();

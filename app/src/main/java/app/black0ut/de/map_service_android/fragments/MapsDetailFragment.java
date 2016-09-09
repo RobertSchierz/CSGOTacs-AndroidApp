@@ -65,8 +65,8 @@ import io.socket.emitter.Emitter;
 @EFragment(R.layout.fragment_map_detail)
 public class MapsDetailFragment extends Fragment {
 
-    @ViewById
-    AdView adView;
+    //@ViewById
+    //AdView adView;
 
     @ViewById(R.id.map_image)
     ImageView mapImage;
@@ -177,8 +177,8 @@ public class MapsDetailFragment extends Fragment {
 
 
     private void setupAd(){
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        //AdRequest adRequest = new AdRequest.Builder().build();
+        //adView.loadAd(adRequest);
     }
 
 
@@ -255,7 +255,7 @@ public class MapsDetailFragment extends Fragment {
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
             showDialog();
         }else{
-            Toast.makeText(getContext(), "Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -285,7 +285,7 @@ public class MapsDetailFragment extends Fragment {
                 leaveGroupLive();
             }
         } else {
-            Toast.makeText(getContext(), "Um den Live Modus zu starten, musst du Dich anmelden.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.start_live_mode_without_login), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -327,8 +327,8 @@ public class MapsDetailFragment extends Fragment {
         });
 
         mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Live Modus starten.")
-                .setMessage("Wähle eine Gruppe für den Live Modus: ")
+                .setTitle(getResources().getText(R.string.start_live_mode_title))
+                .setMessage(getResources().getText(R.string.start_live_mode_message))
                 .setView(chooseGroupLayout)
                 .create();
         mBuilder.show();
@@ -346,24 +346,24 @@ public class MapsDetailFragment extends Fragment {
             final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
 
             final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                    .setTitle("Strategie speichern")
+                    .setTitle(getResources().getText(R.string.strat_save_title))
                     .setView(newStratLayout)
-                    .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getResources().getText(R.string.strat_save_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog,
                                             int whichButton) {
                             String stratName = etStratName.getText().toString();
                             if (stratName.equals("")) {
-                                Toast.makeText(getContext(), "Du musst deiner Strategie einen Namen geben", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getText(R.string.strat_no_name), Toast.LENGTH_SHORT).show();
                             } else {
                                 prepareStrategyJson(stratName);
                             }
                         }
                     })
-                    .setNegativeButton("Abbrechen", null)
+                    .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                     .create();
             builder.show();
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -463,12 +463,12 @@ public class MapsDetailFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("createTacSuccess")) {
-                        Toast.makeText(getContext(), "Strategie erfolgreich gespeichert.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.create_tac_success), Toast.LENGTH_SHORT).show();
                         resetStrat();
                         mSocket.disconnect();
                         mSocket.off();
                     } else if (emitterStatus.equals("createTacFailed")) {
-                        Toast.makeText(getContext(), "Strategie konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.create_tac_failed), Toast.LENGTH_SHORT).show();
                         mSocket.disconnect();
                         mSocket.off();
                     }

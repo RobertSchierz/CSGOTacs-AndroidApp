@@ -33,7 +33,7 @@
     <string name="toast_logout_successful">You\'ve been logged out successfully.</string>
 
     <!-- Check login status -->
-    <string name="check_login_status">You're not logged in. Please log in.</string>
+    <string name="check_login_status">You\'re not logged in. Please log in.</string>
 
     <!-- Groups -->
     <string name="group_name_hint">Group name</string>
@@ -49,8 +49,8 @@
 
     <!-- Member Management -->
     <string name="remove_member">\"%s\" remove</string>
-    <string name="promote_member">Make to group moderator</string>
-    <string name="demote_member">Remove as group moderator</string>
+    <string name="promote_member">Promote to group moderator</string>
+    <string name="demote_member">Demote group moderator</string>
     <string name="no_possible_action">No action available.</string>
 
 
