@@ -12,38 +12,46 @@
     <string name="no_main_content">Zur Zeit gibt es leider keine Aktivitäten.</string>
 
     <!-- Strategies Fragment -->
-    <string name="no_strategies">Du hast leider keine Strategien gespeichert.</string>
-    <string name="strat_name_hint">Strategiename</string>
-    <string name="strat_group">Gruppe: %s</string>
+    <string name="no_strategies">You haven\'t saved any strategies.</string>
+    <string name="strat_name_hint">Strategy name</string>
+    <string name="strat_group">Group: %s</string>
 
     <!-- Nav menu -->
     <string name="nav_home">Home</string>
-    <string name="nav_maps">Karten</string>
-    <string name="nav_groups">Gruppen</string>
-    <string name="nav_strategies">Strategien</string>
-    <string name="nav_profile">Mein Profil</string>
+    <string name="nav_maps">Maps</string>
+    <string name="nav_groups">Groups</string>
+    <string name="nav_strategies">Strategies</string>
+    <string name="nav_profile">My Profile</string>
 
     <!-- My Profile Login -->
-    <string name="my_profile_login_description">Bitte melde Dich mit Deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>
-    <string name="my_profile_submit_button">Anmelden</string>
-    <string name="my_profile_logout_button">Abmelden</string>
-    <string name="my_profile_register_button">Registrieren</string>
-    <string name="password_hint">Passwort</string>
-    <string name="username_hint">Benutzername</string>
+    <string name="my_profile_login_description">Please login with your username / password, or create a new account.</string>
+    <string name="my_profile_submit_button">Log In</string>
+    <string name="my_profile_logout_button">Sign out</string>
+    <string name="my_profile_register_button">Register</string>
+    <string name="password_hint">password</string>
+    <string name="username_hint">user name</string>
+    <string name="toast_logout_successful">You\'ve been logged out successfully.</string>
+
+    <!-- Check login status -->
+    <string name="check_login_status">You're not logged in. Please log in.</string>
 
     <!-- Groups -->
-    <string name="group_name_hint">Gruppenname</string>
-    <string name="group_password_hint">Gruppenpasswort</string>
-    <string name="group_member_count">%s Mitglieder</string>
-    <string name="pull_to_refresh">Zum Aktualisieren nach unten ziehen.</string>
-    <string name="button_leave_group">Gruppe verlassen</string>
-    <string name="button_delete_group">Gruppe löschen</string>
+    <string name="group_name_hint">Group name</string>
+    <string name="group_password_hint">Group password</string>
+    <string name="group_member_count">%s members</string>
+    <string name="pull_to_refresh">Pull down to refresh.</string>
+    <string name="button_leave_group">leave group</string>
+    <string name="button_delete_group">delete group</string>
+    <string name="leave_group_failed">Failed to leave the group.</string>
+    <string name="delete_group_failed">The group couldn\'t be deleted.</string>
+    <string name="group_name_or_password_empty">The group name / password can not be empty.</string>
+    <string name="group_created">You have successfully created the group %s.</string>
 
     <!-- Member Management -->
-    <string name="remove_member">\"%s\" entfernen</string>
-    <string name="promote_member">Zum Gruppenmoderator machen</string>
-    <string name="demote_member">Als Gruppenmoderator entfernen</string>
-    <string name="no_possible_action">Keine Aktion verfügbar.</string>
+    <string name="remove_member">\"%s\" remove</string>
+    <string name="promote_member">Make to group moderator</string>
+    <string name="demote_member">Remove as group moderator</string>
+    <string name="no_possible_action">No action available.</string>
 
 
 </resources>

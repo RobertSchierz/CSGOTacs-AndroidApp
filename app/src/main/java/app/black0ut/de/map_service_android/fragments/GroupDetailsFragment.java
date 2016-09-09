@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.GroupDetailRecyclerViewAdapter;
@@ -60,12 +61,23 @@ public class GroupDetailsFragment extends Fragment {
     String clickedGroup;
 
     private Socket mSocket;
-    {
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+
+        mSocket.on("status", status);
+        mSocket.connect();
     }
 
     /**
@@ -112,8 +124,9 @@ public class GroupDetailsFragment extends Fragment {
         HashMap<String, String> getGroupsMap = new HashMap<>();
         getGroupsMap.put("user", username);
 
-        mSocket.on("status", status);
-        mSocket.connect();
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
         mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
     }
 

@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.GroupsRecyclerViewAdapter;
@@ -69,12 +70,33 @@ public class GroupsFragment extends Fragment {
     private ArrayList<Integer> memberCount = new ArrayList<>();
 
     private Socket mSocket;
-    {
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
+
+        mSocket.on("status", status);
+        mSocket.connect();
+
+        Log.d("TEST", "" + mSocket.connected());
+
+        /*
+        if (!mSocket.connected()){
+            Toast.makeText(getContext(), "Es konnte leider keine Verbindung hergestellt werden. Bitte überprüfe die App auf Aktualisierungen.", Toast.LENGTH_SHORT).show();
+            mSocket.off();
+            mSocket.disconnect();
+        }
+        */
     }
 
     /**
@@ -125,11 +147,12 @@ public class GroupsFragment extends Fragment {
             HashMap<String, String> getGroupsMap = new HashMap<>();
             getGroupsMap.put("user", mUsername);
 
-            mSocket.on("status", status);
-            mSocket.connect();
+            //mSocket.on("status", status);
+            //mSocket.connect();
+            setupSocket();
             mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -162,10 +185,11 @@ public class GroupsFragment extends Fragment {
                                             int whichButton) {
                             groupName = etGroupName.getText().toString();
                             groupPassword = etGroupPassword.getText().toString();
-                            mSocket.on("status", status);
-                            mSocket.connect();
+                            //mSocket.on("status", status);
+                            //mSocket.connect();
+                            setupSocket();
                             if (groupName.equals("") || groupPassword.equals("")) {
-                                Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getText(R.string.group_name_or_password_empty), Toast.LENGTH_SHORT).show();
                             } else {
                                 HashMap<String, String> createGroupMap = new HashMap<>();
                                 createGroupMap.put("user", mUsername);
@@ -179,7 +203,7 @@ public class GroupsFragment extends Fragment {
                     .create();
             builder.show();
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -203,10 +227,11 @@ public class GroupsFragment extends Fragment {
                                             int whichButton) {
                             groupName = etGroupName.getText().toString();
                             groupPassword = etGroupPassword.getText().toString();
-                            mSocket.on("status", status);
-                            mSocket.connect();
+                            //mSocket.on("status", status);
+                            //mSocket.connect();
+                            setupSocket();
                             if (groupName.equals("") || groupPassword.equals("")) {
-                                Toast.makeText(getContext(), "Der Gruppenname/das Passwort darf nicht leer sein.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getText(R.string.group_name_or_password_empty), Toast.LENGTH_SHORT).show();
                             } else {
                                 HashMap<String, String> joinGroupMap = new HashMap<>();
                                 joinGroupMap.put("user", mUsername);
@@ -220,7 +245,7 @@ public class GroupsFragment extends Fragment {
                     .create();
             builder.show();
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -246,7 +271,7 @@ public class GroupsFragment extends Fragment {
                     }
                     if (emitterStatus.equals("createGroupSuccess")) {
                             refreshItems();
-                            Toast.makeText(getContext(), "Du hast die Gruppe " + groupName + " erfolgreich erstellt.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), String.format(getResources().getString(R.string.group_created), groupName), Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("createGroupFailed")) {
                         Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("provideGroups")) {

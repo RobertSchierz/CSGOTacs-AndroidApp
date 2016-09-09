@@ -96,6 +96,9 @@ public class MyProfileFragment extends Fragment {
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
         } else {
+            if (username.length() > 25 || username.length() < 3){
+
+            }
             HashMap<String, String> reg = new HashMap<>();
             reg.put("user", username);
             reg.put("pw", password);
