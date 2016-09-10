@@ -77,7 +77,7 @@ public class MyProfileFragment extends Fragment {
         Log.d("TEST", "" + mSocket.connected());
 
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
-            Toast.makeText(getContext(), "Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.login_unsuccessful), Toast.LENGTH_SHORT).show();
         } else {
             HashMap<String, String> login = new HashMap<>();
             login.put("user", username);
@@ -94,7 +94,7 @@ public class MyProfileFragment extends Fragment {
         setupSocket();
         setUsernamePassword();
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
-            Toast.makeText(getContext(), "Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.registration_unsuccessful), Toast.LENGTH_SHORT).show();
         } else {
             if (username.length() > 25 || username.length() < 3){
 
@@ -155,22 +155,22 @@ public class MyProfileFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("regSuccess")) {
-                        Toast.makeText(getContext(), "Du hast Dich erfolgreich registriert.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.registration_successful), Toast.LENGTH_SHORT).show();
                         disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("regFailed")) {
-                        Toast.makeText(getContext(), "Der Benutzername ist bereits vergeben.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.username_in_use), Toast.LENGTH_SHORT).show();
                         disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(false, null);
                     }
                     if (emitterStatus.equals("authSuccess")) {
-                        Toast.makeText(getContext(), "Du hast Dich erfolgreich angemeldet.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.login_successful), Toast.LENGTH_SHORT).show();
                         disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(true, username);
                         swapFragment();
                     } else if (emitterStatus.equals("authFailed")) {
-                        Toast.makeText(getContext(), "Benutzername oder Passwort falsch.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.username_password_wrong), Toast.LENGTH_SHORT).show();
                         disconnectSocketAndListener();
                         setUserStatusAndUsernameInPrefs(false, null);
                     }
