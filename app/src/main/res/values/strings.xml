@@ -53,5 +53,27 @@
     <string name="demote_member">Demote group moderator</string>
     <string name="no_possible_action">No action available.</string>
 
+    <!-- NEU - MUSS NOCH IN DIE ENGLISCHE STRINGS DATEI -->
+
+    <!-- Dialogs -->
+    <string name="strat_save_title">Strategie speichern</string>
+    <string name="strat_save_button">Speichern</string>
+    <string name="start_live_mode_title">Live Modus starten.</string>
+    <string name="start_live_mode_message">Wähle eine Gruppe für den Live Modus: </string>
+
+    <string name="dialog_abort">Abbrechen</string>
+
+    <!-- Toasts -->
+    <string name="create_tac_success">Strategie erfolgreich gespeichert.</string>
+    <string name="create_tac_failed">Strategie konnte nicht gespeichert werden.</string>
+    <string name="strat_no_name">Du musst deiner Strategie einen Namen geben.</string>
+    <string name="start_live_mode_without_login">Um den Live Modus zu starten, musst du Dich anmelden.</string>
+    <string name="login_unsuccessful">Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.</string>
+    <string name="login_successful">Du hast Dich erfolgreich angemeldet.</string>
+    <string name="registration_unsuccessful">Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.</string>
+    <string name="registration_successful">Du hast Dich erfolgreich registriert.</string>
+    <string name="username_in_use">Der Benutzername ist bereits vergeben.</string>
+    <string name="username_password_wrong">Benutzername oder Passwort falsch.</string>
+
 
 </resources>

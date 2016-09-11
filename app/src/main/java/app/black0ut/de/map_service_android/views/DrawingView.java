@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import app.black0ut.de.map_service_android.R;
+import app.black0ut.de.map_service_android.data.Connect;
 import app.black0ut.de.map_service_android.data.LocalStrategy;
 import app.black0ut.de.map_service_android.fragments.MapsDetailFragment;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
@@ -64,8 +65,11 @@ public class DrawingView extends View {
 
     {
         try {
-            mSocket = IO.socket("https://p4dme.shaula.uberspace.de/");
-            //mSocket = IO.socket("http://chat.socket.io");
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }

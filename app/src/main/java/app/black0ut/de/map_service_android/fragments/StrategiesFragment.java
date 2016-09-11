@@ -16,6 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
@@ -33,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import app.black0ut.de.map_service_android.data.Connect;
+import app.black0ut.de.map_service_android.data.Group;
+import app.black0ut.de.map_service_android.data.Status;
 import app.black0ut.de.map_service_android.jsoncreator.JSONCreator;
 import app.black0ut.de.map_service_android.R;
 import app.black0ut.de.map_service_android.adapter.StrategiesListViewAdapter;
@@ -64,6 +68,9 @@ public class StrategiesFragment extends Fragment {
     public TextView noStrats;
 
     private StrategiesListViewAdapter adapter;
+
+    private Status gsonStatus;
+    private ArrayList<String> myGroups = new ArrayList<>();
 
     private Socket mSocket;
 
@@ -109,12 +116,22 @@ public class StrategiesFragment extends Fragment {
             HashMap<String, String> getTacsMap = new HashMap<>();
             getTacsMap.put("user", mUsername);
 
+            HashMap<String, String> getGroupsMap = new HashMap<>();
+            getGroupsMap.put("user", mUsername);
+
             //mSocket.on("status", status);
             //mSocket.connect();
             setupSocket();
             mSocket.emit("getTacs", JSONCreator.createJSON("getTacs", getTacsMap).toString());
+            mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getTacFromGroup(Group[] groups){
+        for (int i = 0; i < groups.length; i++){
+
         }
     }
 
@@ -155,8 +172,9 @@ public class StrategiesFragment extends Fragment {
 
     private void deleteTac(long stratId){
         if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
-            HashMap<String, Long> deleteTacMap = new HashMap<>();
+            HashMap<String, Object> deleteTacMap = new HashMap<>();
             deleteTacMap.put("id", stratId);
+            deleteTacMap.put("user", mUsername);
             setupSocket();
             mSocket.emit("deleteTac", JSONCreator.createJSON("deleteTac", deleteTacMap).toString());
         } else {
@@ -275,12 +293,31 @@ public class StrategiesFragment extends Fragment {
                         Toast.makeText(getContext(), "Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.", Toast.LENGTH_SHORT).show();
                     }
 
+                    if (emitterStatus.equals("provideGroups")) {
+                        getGsonStatus(data.toString());
+                    }
+
                     mSocket.disconnect();
                     mSocket.off();
                 }
             });
         }
     };
+
+    /**
+     * Wandelt eine JSON in ein Java Objekt vom Typ Status um.
+     * @param data String mit der JSON.
+     */
+    public void getGsonStatus(String data) {
+        //Mapped den ankommenden JSON in ein neues Status Objekt
+        gsonStatus = new Gson().fromJson(data, Status.class);
+        myGroups.clear();
+        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+            myGroups.add(gsonStatus.getGroups()[i].getName());
+        }
+        Status.setCurrentStatus(gsonStatus, getContext());
+    }
 
     /**
      * Ließt die Daten eines JSONArrays aus und speichert diese in ein Strategy Objekt.
