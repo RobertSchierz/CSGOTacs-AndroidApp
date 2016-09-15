@@ -331,7 +331,8 @@ public class StrategiesFragment extends Fragment {
                 long id = arrayItem.getLong("id");
                 String map = arrayItem.getString("map");
                 String name = arrayItem.getString("name");
-                String group = arrayItem.getString("group");
+                String group = arrayItem.getString("group").replaceAll("[\"\\[\\]]", "");
+
                 //Arrays aus dem JSON
                 JSONArray jsonDragArray = arrayItem.getJSONArray("drag");
                 JSONArray jsonXArray = arrayItem.getJSONArray("x");

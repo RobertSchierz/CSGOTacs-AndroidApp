@@ -11,6 +11,7 @@
     android:paddingTop="5dp">
 
     <LinearLayout
+        android:id="@+id/linearLayoutStratNameMap"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
@@ -41,6 +42,9 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:gravity="end"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/linearLayoutStratNameMap"
         android:textColor="@android:color/darker_gray"
         android:textSize="@dimen/text_size_user_status" />
 
