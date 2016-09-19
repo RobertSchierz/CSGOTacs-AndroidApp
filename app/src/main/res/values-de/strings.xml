@@ -61,6 +61,11 @@
     <string name="start_live_mode_title">Live Modus starten.</string>
     <string name="start_live_mode_message">Wähle eine Gruppe für den Live Modus: </string>
 
+    <string name="delete_strat_title">Strategie löschen</string>
+    <string name="delete_strat_message">Möchtest Du die aktuelle Strategie löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_strat_button">Löschen</string>
+    <string name="delete_strat_abort">Abbrechen</string>
+
     <string name="dialog_abort">Abbrechen</string>
 
     <!-- Toasts -->
@@ -74,6 +79,9 @@
     <string name="registration_successful">Du hast Dich erfolgreich registriert.</string>
     <string name="username_in_use">Der Benutzername ist bereits vergeben.</string>
     <string name="username_password_wrong">Benutzername oder Passwort falsch.</string>
+    <string name="provide_tacs_failed">Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.</string>
+    <string name="delete_tacs_success">Deine Taktik wurde erfolgreich gelöscht.</string>
+    <string name="delete_tacs_failed">Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.</string>
 
 
 

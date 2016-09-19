@@ -156,16 +156,16 @@ public class StrategiesFragment extends Fragment {
      */
     private void showDeleteDialog(final Strategy longClickedStrategy) {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Strategie löschen")
-                .setMessage("Möchtest Du die aktuelle Strategie löschen? Dies kann nicht rückgängig gemacht werden.")
-                .setPositiveButton("Löschen", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getText(R.string.delete_strat_title))
+                .setMessage(getResources().getText(R.string.delete_strat_message))
+                .setPositiveButton(getResources().getText(R.string.delete_strat_button), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
                         deleteTac(longClickedStrategy.id);
                         mClickedStrategy = longClickedStrategy;
                     }
                 })
-                .setNegativeButton("Abbrechen", null)
+                .setNegativeButton(getResources().getText(R.string.delete_strat_abort), null)
                 .create();
         builder.show();
     }
@@ -178,7 +178,7 @@ public class StrategiesFragment extends Fragment {
             setupSocket();
             mSocket.emit("deleteTac", JSONCreator.createJSON("deleteTac", deleteTacMap).toString());
         } else {
-            Toast.makeText(getContext(), "Du bist leider nicht angemeldet. Bitte melde Dich an.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -281,16 +281,16 @@ public class StrategiesFragment extends Fragment {
                         if (jsonArray != null) {
                             readJsonData(jsonArray);
                         } else {
-                            Toast.makeText(getContext(), "Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), getResources().getText(R.string.provide_tacs_failed), Toast.LENGTH_LONG).show();
                         }
                     }
                     if (emitterStatus.equals("deleteTacSuccess")) {
-                        Toast.makeText(getContext(), "Deine Taktik wurde erfolgreich gelöscht.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.delete_tacs_success), Toast.LENGTH_SHORT).show();
                         strategies.remove(mClickedStrategy);
                         adapter.notifyDataSetChanged();
                         refreshItems();
                     } else if (emitterStatus.equals("deleteTacFailed")) {
-                        Toast.makeText(getContext(), "Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.delete_tacs_failed), Toast.LENGTH_SHORT).show();
                     }
 
                     if (emitterStatus.equals("provideGroups")) {
