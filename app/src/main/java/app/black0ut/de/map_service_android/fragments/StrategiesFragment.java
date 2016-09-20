@@ -165,7 +165,7 @@ public class StrategiesFragment extends Fragment {
                         mClickedStrategy = longClickedStrategy;
                     }
                 })
-                .setNegativeButton(getResources().getText(R.string.delete_strat_abort), null)
+                .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                 .create();
         builder.show();
     }

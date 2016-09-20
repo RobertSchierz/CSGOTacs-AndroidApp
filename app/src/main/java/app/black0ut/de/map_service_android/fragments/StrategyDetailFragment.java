@@ -181,15 +181,15 @@ public class StrategyDetailFragment extends Fragment {
     @Click
     public void fabEditStratClicked() {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Strategie zurücksetzen")
-                .setMessage("Möchtest Du deine Zeichnung löschen und von vorn beginnen?")
-                .setPositiveButton("Zurücksetzen", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getText(R.string.reset_strat_title))
+                .setMessage(getResources().getText(R.string.reset_strat_message))
+                .setPositiveButton(getResources().getText(R.string.reset_strat_button), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
                         mDrawingView.clearDrawingView();
                     }
                 })
-                .setNegativeButton("Abbrechen", null)
+                .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                 .create();
         builder.show();
     }
@@ -261,7 +261,7 @@ public class StrategyDetailFragment extends Fragment {
         });
 
         mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Strategie teilen")
+                .setTitle(getResources().getText(R.string.share_strat_title))
                 .setView(shareStratLayout)
                 .create();
         mBuilder.show();
@@ -272,15 +272,15 @@ public class StrategyDetailFragment extends Fragment {
      */
     private void showSaveDialog() {
         final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                .setTitle("Strategie speichern")
-                .setMessage("Möchtest Du den aktuellen Stand speichern? Dies kann nicht rückgängig gemacht werden.")
-                .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getText(R.string.strat_save_title))
+                .setMessage(getResources().getText(R.string.save_strat_message))
+                .setPositiveButton(getResources().getText(R.string.strat_save_button), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
                         prepareStrategyJson();
                     }
                 })
-                .setNegativeButton("Abbrechen", null)
+                .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                 .create();
         builder.show();
     }
@@ -360,7 +360,7 @@ public class StrategyDetailFragment extends Fragment {
                         return;
                     }
                     if (emitterStatus.equals("changeTacSuccess")) {
-                        Toast.makeText(getContext(), "Strategie erfolgreich bearbeitet.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.change_tac_success), Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("bindTacSuccess")) {
                         Toast.makeText(getContext(), "Strategie '" + stratName +

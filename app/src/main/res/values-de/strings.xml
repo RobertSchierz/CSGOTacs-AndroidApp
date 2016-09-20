@@ -58,13 +58,21 @@
     <!-- Dialogs -->
     <string name="strat_save_title">Strategie speichern</string>
     <string name="strat_save_button">Speichern</string>
+
     <string name="start_live_mode_title">Live Modus starten.</string>
     <string name="start_live_mode_message">Wähle eine Gruppe für den Live Modus: </string>
 
     <string name="delete_strat_title">Strategie löschen</string>
     <string name="delete_strat_message">Möchtest Du die aktuelle Strategie löschen? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="delete_strat_button">Löschen</string>
-    <string name="delete_strat_abort">Abbrechen</string>
+
+    <string name="reset_strat_title">Strategie zurücksetzen</string>
+    <string name="reset_strat_message">Möchtest Du deine Zeichnung löschen und von vorn beginnen?</string>
+    <string name="reset_strat_button">Zurücksetzen</string>
+
+    <string name="share_strat_title">Strategie teilen</string>
+
+    <string name="save_strat_message">Möchtest Du den aktuellen Stand speichern? Dies kann nicht rückgängig gemacht werden.</string>
 
     <string name="dialog_abort">Abbrechen</string>
 
@@ -82,6 +90,7 @@
     <string name="provide_tacs_failed">Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.</string>
     <string name="delete_tacs_success">Deine Taktik wurde erfolgreich gelöscht.</string>
     <string name="delete_tacs_failed">Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.</string>
+    <string name="change_tac_success">Strategie erfolgreich bearbeitet.</string>
 
 
 
