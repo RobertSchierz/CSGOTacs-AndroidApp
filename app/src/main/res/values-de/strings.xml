@@ -73,6 +73,12 @@
     <string name="share_strat_title">Strategie teilen</string>
 
     <string name="save_strat_message">Möchtest Du den aktuellen Stand speichern? Dies kann nicht rückgängig gemacht werden.</string>
+    
+    <string name="join_group_title">Gruppe beitreten</string>
+    <string name="join_group_button">Beitreten</string>
+
+    <string name="create_group_title">Gruppe erstellen</string>
+    <string name="create_group_button">Erstellen</string>
 
     <string name="dialog_abort">Abbrechen</string>
 
@@ -91,6 +97,8 @@
     <string name="delete_tacs_success">Deine Taktik wurde erfolgreich gelöscht.</string>
     <string name="delete_tacs_failed">Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.</string>
     <string name="change_tac_success">Strategie erfolgreich bearbeitet.</string>
+    <string name="create_group_failed">Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.</string>
+    <string name="join_group_failed">Du konntest der Gruppe %s nicht beitreten.</string>
 
 
 

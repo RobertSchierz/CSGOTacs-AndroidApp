@@ -178,9 +178,9 @@ public class GroupsFragment extends Fragment {
             final EditText etGroupPassword = (EditText) newGroupLayout.findViewById(R.id.etGroupPassword);
 
             final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                    .setTitle("Gruppe erstellen")
+                    .setTitle(getResources().getText(R.string.create_group_title))
                     .setView(newGroupLayout)
-                    .setPositiveButton("Erstellen", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getResources().getText(R.string.create_group_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog,
                                             int whichButton) {
                             groupName = etGroupName.getText().toString();
@@ -199,7 +199,7 @@ public class GroupsFragment extends Fragment {
                             }
                         }
                     })
-                    .setNegativeButton("Abbrechen", null)
+                    .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                     .create();
             builder.show();
         } else {
@@ -220,9 +220,9 @@ public class GroupsFragment extends Fragment {
             final EditText etGroupPassword = (EditText) newGroupLayout.findViewById(R.id.etGroupPassword);
 
             final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
-                    .setTitle("Gruppe beitreten")
+                    .setTitle(getResources().getText(R.string.join_group_title))
                     .setView(newGroupLayout)
-                    .setPositiveButton("Beitreten", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getResources().getText(R.string.join_group_button), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog,
                                             int whichButton) {
                             groupName = etGroupName.getText().toString();
@@ -241,7 +241,7 @@ public class GroupsFragment extends Fragment {
                             }
                         }
                     })
-                    .setNegativeButton("Abbrechen", null)
+                    .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
                     .create();
             builder.show();
         } else {
@@ -273,13 +273,13 @@ public class GroupsFragment extends Fragment {
                             refreshItems();
                             Toast.makeText(getContext(), String.format(getResources().getString(R.string.group_created), groupName), Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("createGroupFailed")) {
-                        Toast.makeText(getContext(), "Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getText(R.string.create_group_failed), Toast.LENGTH_SHORT).show();
                     } else if (emitterStatus.equals("provideGroups")) {
                         getGsonStatus(data.toString());
                     } else if (emitterStatus.equals("authGroupSuccess")) {
                         getGsonStatus(data.toString());
                     } else if (emitterStatus.equals("authGroupFailed")) {
-                        Toast.makeText(getContext(), "Du konntest der Gruppe " + groupName + " nicht beitreten.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), String.format(getResources().getString(R.string.join_group_failed), groupName), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
