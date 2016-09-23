@@ -99,6 +99,7 @@
     <string name="change_tac_success">Strategie erfolgreich bearbeitet.</string>
     <string name="create_group_failed">Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.</string>
     <string name="join_group_failed">Du konntest der Gruppe %s nicht beitreten.</string>
+    <string name="share_strat_success">Strategie \"%1$s\" erfolgreich mit der Gruppe \"%2$s\" geteilt.</string>
 
 
 

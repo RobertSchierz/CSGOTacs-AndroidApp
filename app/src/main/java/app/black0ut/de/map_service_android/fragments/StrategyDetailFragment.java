@@ -363,9 +363,10 @@ public class StrategyDetailFragment extends Fragment {
                         Toast.makeText(getContext(), getResources().getText(R.string.change_tac_success), Toast.LENGTH_SHORT).show();
                     }
                     if (emitterStatus.equals("bindTacSuccess")) {
-                        Toast.makeText(getContext(), "Strategie '" + stratName +
+                        /*Toast.makeText(getContext(), "Strategie '" + stratName +
                                 "' erfolgreich mit der Gruppe '" + mClickedGroup +
-                                "'geteilt.", Toast.LENGTH_SHORT).show();
+                                "'geteilt.", Toast.LENGTH_SHORT).show();*/
+                        Toast.makeText(getContext(), String.format(getResources().getString(R.string.share_strat_success), stratName, mClickedGroup), Toast.LENGTH_SHORT).show();
                         mBuilder.cancel();
                     }
                     if (emitterStatus.equals("provideGroups")) {
