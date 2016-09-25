@@ -1,6 +1,6 @@
 <resources>
-    <string name="banner_map_detail_bottom">ca-app-pub-9861090111595732/1355888600</string>
-    
+    <string name="banner_map_detail_bottom">ca-app-pub-9861090111595732/3860499804</string>
+
     <string name="app_name">GO:tacs</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -56,50 +56,50 @@
     <!-- NEU - MUSS NOCH IN DIE ENGLISCHE STRINGS DATEI -->
 
     <!-- Dialogs -->
-    <string name="strat_save_title">Strategie speichern</string>
-    <string name="strat_save_button">Speichern</string>
+    <string name="strat_save_title">save strategy</string>
+    <string name="strat_save_button">save</string>
 
-    <string name="start_live_mode_title">Live Modus starten.</string>
-    <string name="start_live_mode_message">Wähle eine Gruppe für den Live Modus: </string>
+    <string name="start_live_mode_title">Start live mode.</string>
+    <string name="start_live_mode_message">Choose a group for the live mode: </string>
 
-    <string name="delete_strat_title">Strategie löschen</string>
-    <string name="delete_strat_message">Möchtest Du die aktuelle Strategie löschen? Dies kann nicht rückgängig gemacht werden.</string>
-    <string name="delete_strat_button">Löschen</string>
+    <string name="delete_strat_title">delete strategy</string>
+    <string name="delete_strat_message">Do you want to delete the actual strategy? This action cannot be undone.</string>
+    <string name="delete_strat_button">delete</string>
 
-    <string name="reset_strat_title">Strategie zurücksetzen</string>
-    <string name="reset_strat_message">Möchtest Du deine Zeichnung löschen und von vorn beginnen?</string>
-    <string name="reset_strat_button">Zurücksetzen</string>
+    <string name="reset_strat_title">reset strategy</string>
+    <string name="reset_strat_message">Do you want to delete your drawing and start again?</string>
+    <string name="reset_strat_button">reset</string>
 
-    <string name="share_strat_title">Strategie teilen</string>
+    <string name="share_strat_title">share strategy</string>
 
-    <string name="save_strat_message">Möchtest Du den aktuellen Stand speichern? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="save_strat_message">Do you want to save the current progress? That can not be undone.</string>
 
-    <string name="join_group_title">Gruppe beitreten</string>
-    <string name="join_group_button">Beitreten</string>
+    <string name="join_group_title">join group</string>
+    <string name="join_group_button">join</string>
 
-    <string name="create_group_title">Gruppe erstellen</string>
-    <string name="create_group_button">Erstellen</string>
+    <string name="create_group_title">create group</string>
+    <string name="create_group_button">create</string>
 
-    <string name="dialog_abort">Abbrechen</string>
+    <string name="dialog_abort">cancel</string>
 
     <!-- Toasts -->
-    <string name="create_tac_success">Strategie erfolgreich gespeichert.</string>
-    <string name="create_tac_failed">Strategie konnte nicht gespeichert werden.</string>
-    <string name="strat_no_name">Du musst deiner Strategie einen Namen geben.</string>
-    <string name="start_live_mode_without_login">Um den Live Modus zu starten, musst du Dich anmelden.</string>
-    <string name="login_unsuccessful">Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.</string>
-    <string name="login_successful">Du hast Dich erfolgreich angemeldet.</string>
-    <string name="registration_unsuccessful">Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.</string>
-    <string name="registration_successful">Du hast Dich erfolgreich registriert.</string>
-    <string name="username_in_use">Der Benutzername ist bereits vergeben.</string>
-    <string name="username_password_wrong">Benutzername oder Passwort falsch.</string>
-    <string name="provide_tacs_failed">Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.</string>
-    <string name="delete_tacs_success">Deine Taktik wurde erfolgreich gelöscht.</string>
-    <string name="delete_tacs_failed">Deine Taktik konnte leider nicht gelöscht werden. Bitte versuche es später erneut.</string>
-    <string name="change_tac_success">Strategie erfolgreich bearbeitet.</string>
-    <string name="create_group_failed">Der Gruppenname ist leider bereits vergeben. Probiere einen anderen.</string>
-    <string name="join_group_failed">Du konntest der Gruppe %s nicht beitreten.</string>
-    <string name="share_strat_success">Strategie \"%1$s\" erfolgreich mit der Gruppe \"%2$s\" geteilt.</string>
+    <string name="create_tac_success">Strategy saved successfully.</string>
+    <string name="create_tac_failed">Strategy could not be saved.</string>
+    <string name="strat_no_name">You have to give the strategy a name.</string>
+    <string name="start_live_mode_without_login">To start the live mode you must be logged in.</string>
+    <string name="login_unsuccessful">Login failed. Incorrect username or password.</string>
+    <string name="login_successful">You signed in successfully.</string>
+    <string name="registration_unsuccessful">Registration failed. Username and password can not be empty.</string>
+    <string name="registration_successful">Registered successfully.</string>
+    <string name="username_in_use">The username is already taken.</string>
+    <string name="username_password_wrong">Wrong username or password.</string>
+    <string name="provide_tacs_failed">Failed to load strategy. Please try again later.</string>
+    <string name="delete_tacs_success">Your strategy has been deleted successfully.</string>
+    <string name="delete_tacs_failed">Your strategy unfortunately could not be deleted. Please try again later.</string>
+    <string name="change_tac_success">Strategy edited successfully.</string>
+    <string name="create_group_failed">The group name is already taken. Please try another.</string>
+    <string name="join_group_failed">You could not join the group %s.</string>
+    <string name="share_strat_success">Strategy \"%1$s\" successfully shared with the group \"%2$s\".</string>
 
 
 </resources>

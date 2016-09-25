@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <fragment
-android:name="app.black0ut.de.map_service_android.fragments.MapsDetailFragment_"
+android:name="app.black0ut.de.gotacs.fragments.MapsDetailFragment_"
 xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/mainFrame"
 android:layout_width="match_parent"

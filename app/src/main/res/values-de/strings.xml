@@ -1,5 +1,5 @@
 <resources>
-    <string name="banner_map_detail_bottom">ca-app-pub-9861090111595732/1355888600</string>
+    <string name="banner_map_detail_bottom">ca-app-pub-9861090111595732/3860499804</string>
     
     <string name="app_name">GO:tacs</string>
 
@@ -89,7 +89,7 @@
     <string name="start_live_mode_without_login">Um den Live Modus zu starten, musst du Dich anmelden.</string>
     <string name="login_unsuccessful">Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.</string>
     <string name="login_successful">Du hast Dich erfolgreich angemeldet.</string>
-    <string name="registration_unsuccessful">Registrierung fehlgeschlagen. Benutzername oder Passwort dürfen nicht leer sein.</string>
+    <string name="registration_unsuccessful">Registrierung fehlgeschlagen. Benutzername und Passwort dürfen nicht leer sein.</string>
     <string name="registration_successful">Du hast Dich erfolgreich registriert.</string>
     <string name="username_in_use">Der Benutzername ist bereits vergeben.</string>
     <string name="username_password_wrong">Benutzername oder Passwort falsch.</string>

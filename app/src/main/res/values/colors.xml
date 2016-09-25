@@ -7,9 +7,9 @@
     <color name="orangePrimary">#F98B01</color>
     <color name="maps_divider_color">#985501</color>
 
-    <color name="nav_menu_header_gradient_start">#1a1a1a</color>
+    <color name="nav_menu_header_gradient_start">#212121</color>
     <color name="nav_menu_header_gradient_center">#333333</color>
-    <color name="nav_menu_header_gradient_end">#FFFFFF</color>
+    <color name="nav_menu_header_gradient_end">#424242</color>
 
     <color name="nav_menu_background">#1a1a1a</color>
     <color name="nav_menuitem_text">#F98B01</color>

@@ -1,0 +1,544 @@
+package app.black0ut.de.gotacs.fragments;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.gson.Gson;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import app.black0ut.de.gotacs.adapter.GroupDialogAdapter;
+import app.black0ut.de.gotacs.data.Connect;
+import app.black0ut.de.gotacs.data.Status;
+import app.black0ut.de.gotacs.jsoncreator.JSONCreator;
+import app.black0ut.de.gotacs.views.DrawingView;
+import app.black0ut.de.gotacs.R;
+import app.black0ut.de.gotacs.data.LocalStrategy;
+import app.black0ut.de.gotacs.data.Map;
+import app.black0ut.de.gotacs.data.Strategy;
+import app.black0ut.de.gotacs.data.User;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+
+
+/**
+ * Created by Jan-Philipp Altenhof on 03.01.16.
+ * <p/>
+ * Diese Klasse beschreibt das Fragment, welches für das Darstellen einer ausgewählten Karte zuständig ist.
+ * Es beinhaltet ein Layout mit zwei 'ImageViews' welche zum einen das Bild der Karte ohne Callouts
+ * und zum Anderen die Karte inklusive Callouts anzeigen.
+ * Die 'ImageView' für die Callouts kann bei Bedarf durch den Nutzer an- und abgeschaltet werden.
+ */
+
+@EFragment(R.layout.fragment_map_detail)
+public class MapsDetailFragment extends Fragment {
+
+    @ViewById
+    AdView adView;
+
+    @ViewById(R.id.map_image)
+    ImageView mapImage;
+
+    @ViewById(R.id.map_callouts)
+    ImageView mapCallouts;
+
+    @ViewById(R.id.canvas)
+    RelativeLayout canvas;
+
+    @ViewById
+    FloatingActionButton fabShowCallouts;
+    @ViewById
+    FloatingActionButton fabSaveStrat;
+    @ViewById
+    FloatingActionButton fabEditStrat;
+    @ViewById
+    FloatingActionButton fabLiveMode;
+
+    public int mapImageHeight;
+    public int mapImageWidth;
+    public Bitmap bitmap;
+    private boolean showCalloutsClicked = false;
+    private boolean editStratClicked = false;
+    private boolean liveModeClicked = false;
+
+    public LocalStrategy localStrategy;
+    SharedPreferences sharedPreferences;
+    private static String mUsername;
+    private DrawingView mDrawingView;
+
+    //Live Modus Dialog Variablen
+    private AlertDialog mBuilder;
+    private String mClickedGroup;
+    private GroupDialogAdapter mAdapter;
+    private ArrayList<String> myGroups = new ArrayList<>();
+    private Status gsonStatus;
+
+    //Live Content Variablen
+    private static String mRoom;
+
+    //Quelle: https://github.com/excilys/androidannotations/wiki/Save-instance-state
+    @InstanceState
+    Long stratId;
+    @InstanceState
+    String stratUser;
+    @InstanceState
+    String stratMap;
+    @InstanceState
+    String stratName;
+    @InstanceState
+    String stratGroup;
+    @InstanceState
+    boolean[] stratDrag;
+    @InstanceState
+    double[] stratX;
+    @InstanceState
+    double[] stratY;
+
+    private Socket mSocket;
+
+    /**
+     * Stellt eine Socket Verbindung zum Server her.
+     */
+    private void setupSocket() {
+        try {
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.query = "name=" + Connect.c97809177;
+            opts.timeout = 5000;
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
+        } catch (URISyntaxException e) {
+            Log.d("FEHLER", "mSocket nicht verbunden!");
+        }
+
+        mSocket.on("status", status);
+        mSocket.connect();
+    }
+
+    /**
+     * Methode, die beim Starten des Fragments ausgeführt wird.
+     * Sie wird verwendet, um Operationen auszuführen, die vor allen anderen ausgeführt werden sollen.
+     * Zum Beispiel die Einrichtung eines startenden Fragments.
+     * Methoden mit der Annotation '@AfterViews' werden nach der 'setContentView' Methode der
+     * generierten Klasse aufgerufen
+     * (siehe dazu: https://github.com/excilys/androidannotations/wiki/injecting-views).
+     */
+    @AfterViews
+    public void afterViews() {
+        if (getArguments() != null) {
+            stratId = getArguments().getLong("stratId");
+            stratUser = getArguments().getString("stratUser");
+            stratMap = getArguments().getString("stratMap");
+            stratName = getArguments().getString("stratName");
+            stratGroup = getArguments().getString("stratGroup");
+            stratDrag = getArguments().getBooleanArray("stratDrag");
+            stratX = getArguments().getDoubleArray("stratX");
+            stratY = getArguments().getDoubleArray("stratY");
+        }
+
+        Map.checkMapName(mapImage, mapCallouts, getResources());
+
+        sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
+        mUsername = sharedPreferences.getString(User.USERNAME, null);
+
+        setupAd();
+    }
+
+
+    private void setupAd(){
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+    }
+
+
+    /**
+     * Klick Listener für den Button, welcher den Modus des Zeichnens auf einer Karte aktiviert.
+     */
+    @Click
+    public void fabEditStratClicked() {
+        if (!editStratClicked) {
+            editStratClicked = true;
+
+            mapImageWidth = mapImage.getWidth();
+            mapImageHeight = mapImage.getHeight();
+
+            DrawingView.isStrategy = false;
+            DrawingView.isLiveMode = false;
+
+            addDrawingViewToCanvas();
+
+            fabSaveStrat.setVisibility(View.VISIBLE);
+            fabEditStrat.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+
+            Log.d("TEST", "MapsDetailFragment Height: " + mapImageHeight + "Widht: " + mapImageWidth);
+        } else {
+            resetStrat();
+        }
+    }
+
+    /**
+     * Setzt eine gezeichnete Strategie zurück.
+     */
+    private void resetStrat(){
+        editStratClicked = false;
+        mDrawingView.clearDrawingView();
+        mDrawingView = null;
+        canvas.removeAllViews();
+        fabSaveStrat.setVisibility(View.GONE);
+        fabEditStrat.setImageResource(R.drawable.ic_gesture_orange_600_24dp);
+    }
+
+    /**
+     * Fügt dem RelativeLayout eine DrawingView hinzu.
+     */
+    private void addDrawingViewToCanvas() {
+        mDrawingView = new DrawingView(getContext());
+        //Layout Parameter, um die erstellte View in der Elternview zu zentrieren und auf die Größe des angezeigten Bildes anzupassen
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mapImageWidth, mapImageHeight);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        //Die DrawingView zum RelativeLayout 'canvas' hinzufügen
+        canvas.addView(mDrawingView, params);
+    }
+
+    /**
+     * Klick Listener für den Button, welcher die Callouts anzeigt.
+     */
+    @Click
+    public void fabShowCalloutsClicked() {
+        if (showCalloutsClicked) {
+            mapCallouts.setVisibility(View.VISIBLE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_orange_600_24dp);
+            showCalloutsClicked = false;
+        } else {
+            mapCallouts.setVisibility(View.GONE);
+            fabShowCallouts.setImageResource(R.drawable.ic_visibility_off_orange_600_24dp);
+            showCalloutsClicked = true;
+        }
+    }
+
+    /**
+     * Klick Listener für den Button, welcher eine gezeichnete Strategie speichert.
+     */
+    @Click
+    public void fabSaveStratClicked() {
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            showDialog();
+        }else{
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Klick Listener für den Button, welcher den Live Modus startet.
+     */
+    @Click
+    public void fabLiveModeClicked() {
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+            if (!liveModeClicked) {
+                liveModeClicked = true;
+                mapImageWidth = mapImage.getWidth();
+                mapImageHeight = mapImage.getHeight();
+                fabLiveMode.setImageResource(R.drawable.ic_clear_orange_600_24dp);
+                fabEditStrat.setVisibility(View.GONE);
+                showLiveModeDialog();
+            } else {
+                liveModeClicked = false;
+                fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+                fabEditStrat.setVisibility(View.VISIBLE);
+                if (mDrawingView != null) {
+                    mDrawingView.clearDrawingView();
+                    mDrawingView.closeSocket();
+                    mDrawingView = null;
+                }
+                canvas.removeAllViews();
+                leaveGroupLive();
+            }
+        } else {
+            Toast.makeText(getContext(), getResources().getText(R.string.start_live_mode_without_login), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Zeigt einen Dialog zum auswählen einer Gruppe. Dabei werden die Gruppen angezeigt, in welchen
+     * sich der Nutzer befindet. Beim Klick auf eine Gruppe wird der Live Modus mit dieser Gruppe
+     * gestartet.
+     */
+    private void showLiveModeDialog() {
+        HashMap<String, String> getGroupsMap = new HashMap<>();
+        getGroupsMap.put("user", mUsername);
+
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
+        mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
+
+        LayoutInflater factory = LayoutInflater.from(getContext());
+        final View chooseGroupLayout = factory.inflate(R.layout.group_dialog, null);
+        final ListView groupDialogListView =
+                (ListView) chooseGroupLayout.findViewById(R.id.groupDialogListView);
+        mAdapter = new GroupDialogAdapter(myGroups, getContext());
+        groupDialogListView.setAdapter(mAdapter);
+        groupDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mClickedGroup = mAdapter.getItem(position);
+                DrawingView.isStrategy = false;
+                DrawingView.isLiveMode = true;
+                HashMap<String, String> joinGroupLive = new HashMap<>();
+                joinGroupLive.put("user", mUsername);
+                joinGroupLive.put("group", mClickedGroup);
+                joinGroupLive.put("map", Map.clickedMapName);
+                //mSocket.on("status", status);
+                //mSocket.connect();
+                setupSocket();
+                mSocket.emit("joinGroupLive", JSONCreator.createJSON("joinGroupLive", joinGroupLive).toString());
+            }
+        });
+
+        mBuilder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                .setTitle(getResources().getText(R.string.start_live_mode_title))
+                .setMessage(getResources().getText(R.string.start_live_mode_message))
+                .setView(chooseGroupLayout)
+                .create();
+        mBuilder.show();
+    }
+
+    /**
+     * Zeigt einen Dialog zum bestimmen eines Taktiknamens und zum speichern dieser Taktik.
+     */
+    private void showDialog() {
+        localStrategy = LocalStrategy.getInstance();
+        if (sharedPreferences.getBoolean(User.IS_LOGGED_IN, false)) {
+
+            LayoutInflater factory = LayoutInflater.from(getContext());
+            final View newStratLayout = factory.inflate(R.layout.new_strat, null);
+            final EditText etStratName = (EditText) newStratLayout.findViewById(R.id.etStratName);
+
+            final AlertDialog builder = new AlertDialog.Builder(getActivity(), R.style.CreateGroup)
+                    .setTitle(getResources().getText(R.string.strat_save_title))
+                    .setView(newStratLayout)
+                    .setPositiveButton(getResources().getText(R.string.strat_save_button), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            String stratName = etStratName.getText().toString();
+                            if (stratName.equals("")) {
+                                Toast.makeText(getContext(), getResources().getText(R.string.strat_no_name), Toast.LENGTH_SHORT).show();
+                            } else {
+                                prepareStrategyJson(stratName);
+                            }
+                        }
+                    })
+                    .setNegativeButton(getResources().getText(R.string.dialog_abort), null)
+                    .create();
+            builder.show();
+        } else {
+            Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Bereitet die JSON für die Übermittlung an den Server vor.
+     */
+    private void prepareStrategyJson(String stratName) {
+        localStrategy = LocalStrategy.getInstance();
+        ArrayList<Boolean> dragList = localStrategy.getDragList();
+        Boolean[] dragArray = dragList.toArray(new Boolean[dragList.size()]);
+        ArrayList<Double> xList = localStrategy.getListX();
+        Double[] xArray = xList.toArray(new Double[xList.size()]);
+        ArrayList<Double> yList = localStrategy.getListY();
+        Double[] yArray = yList.toArray(new Double[yList.size()]);
+        Strategy strategy = new Strategy(System.currentTimeMillis(), mUsername, Map.clickedMapName,
+                stratName, null, dragArray, xArray, yArray);
+        Gson gson = new Gson();
+        String createTac = gson.toJson(strategy);
+
+        //mSocket.on("status", status);
+        //mSocket.connect();
+        setupSocket();
+        mSocket.emit("createTac", createTac);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mapImage.setImageDrawable(null);
+        mapCallouts.setImageDrawable(null);
+        mapCallouts.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            leaveGroupLive();
+        }
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (liveModeClicked) {
+            liveModeClicked = false;
+            fabLiveMode.setImageResource(R.drawable.ic_fiber_manual_record_orange_600_24dp);
+            fabEditStrat.setVisibility(View.VISIBLE);
+            leaveGroupLive();
+        }
+        if (mDrawingView != null) {
+            mDrawingView.clearDrawingView();
+            mDrawingView.closeSocket();
+            mDrawingView = null;
+        }
+        canvas.removeAllViews();
+    }
+
+    /**
+     * Methode, welche den Socket Raum verlässt und die Socket Verbindung trennt.
+     */
+    private void leaveGroupLive() {
+        HashMap<String, String> leaveGroupLive = new HashMap<>();
+        leaveGroupLive.put("room", mRoom);
+        mSocket.emit("leaveGroupLive", JSONCreator.createJSON("leaveGroupLive", leaveGroupLive).toString());
+        mSocket.disconnect();
+        mSocket.off();
+    }
+
+    /**
+     * Socket Listener, welcher auf Antworten des Servers reagiert.
+     */
+    private Emitter.Listener status = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            if (getActivity() == null)
+                return;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String emitterStatus;
+                    try {
+                        emitterStatus = data.getString("status");
+                    } catch (JSONException e) {
+                        Log.d("TEST", "Fehler beim Auslesen der Daten des JSONs");
+                        return;
+                    }
+                    if (emitterStatus.equals("createTacSuccess")) {
+                        Toast.makeText(getContext(), getResources().getText(R.string.create_tac_success), Toast.LENGTH_SHORT).show();
+                        resetStrat();
+                        mSocket.disconnect();
+                        mSocket.off();
+                    } else if (emitterStatus.equals("createTacFailed")) {
+                        Toast.makeText(getContext(), getResources().getText(R.string.create_tac_failed), Toast.LENGTH_SHORT).show();
+                        mSocket.disconnect();
+                        mSocket.off();
+                    }
+                    if (emitterStatus.equals("provideGroups")) {
+                        getGsonStatus(data.toString());
+                    }
+                    if (emitterStatus.equals("connectedClients")) {
+                        addDrawingViewToCanvas();
+                        mBuilder.cancel();
+                    }
+                    if (emitterStatus.equals("provideRoomName")) {
+                        try {
+                            mRoom = data.getString("room");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (emitterStatus.equals("liveContent")) {
+                        try {
+                            mRoom = data.getString("room");
+                            String user = data.getString("user");
+                            double startX = data.getDouble("startX");
+                            double startY = data.getDouble("startY");
+                            double x = data.getDouble("x");
+                            double y = data.getDouble("y");
+                            boolean drag = data.getBoolean("drag");
+                            mDrawingView.drawLiveContent(drag, x, y);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            });
+        }
+    };
+
+    /**
+     * Wandelt eine JSON in ein Java Objekt vom Typ Status um.
+     * @param data String mit der JSON.
+     */
+    public void getGsonStatus(String data) {
+        //Mapped den ankommenden JSON in ein neues Status Objekt
+        gsonStatus = new Gson().fromJson(data, Status.class);
+        myGroups.clear();
+        //Gruppennamen aus dem Status Objekt der ArrayList hinzufügen
+        for (int i = 0; i < gsonStatus.getGroups().length; i++) {
+            myGroups.add(gsonStatus.getGroups()[i].getName());
+        }
+        Status.setCurrentStatus(gsonStatus, getContext());
+        onItemsLoadComplete();
+    }
+
+    /**
+     * Aktualisiert den Datensatz des Adapters.
+     */
+    void onItemsLoadComplete() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Liefert den aktuellen Socket Raum.
+     * @return Raum als String.
+     */
+    public static String getRoom() {
+        return mRoom;
+    }
+
+    /**
+     * Liefert den aktuellen Nutzernamen.
+     * @return Nutzername als String.
+     */
+    public static String getUsername() {
+        return mUsername;
+    }
+
+}
