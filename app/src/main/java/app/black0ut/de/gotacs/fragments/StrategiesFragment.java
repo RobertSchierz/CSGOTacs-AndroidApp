@@ -77,11 +77,12 @@ public class StrategiesFragment extends Fragment {
      */
     private void setupSocket() {
         try {
-            IO.Options opts = new IO.Options();
-            opts.forceNew = true;
-            opts.query = "name=" + Connect.c97809177;
-            opts.timeout = 5000;
-            mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
+            //IO.Options opts = new IO.Options();
+            //opts.forceNew = true;
+            //opts.query = "name=" + Connect.c97809177;
+            //opts.timeout = 5000;
+            //mSocket = IO.socket("https://dooku.corvus.uberspace.de/", opts);
+            mSocket = IO.socket("https://dooku.corvus.uberspace.de/");
         } catch (URISyntaxException e) {
             Log.d("FEHLER", "mSocket nicht verbunden!");
         }
