@@ -8,6 +8,8 @@
 
     <string name="action_settings">Settings1</string>
 
+    <string name="disclaimer_url">https://dooku.corvus.uberspace.de/disclaimer-de</string>
+
     <!-- Main Content -->
     <string name="no_main_content">Zur Zeit gibt es leider keine Aktivitäten.</string>
 
@@ -22,6 +24,7 @@
     <string name="nav_groups">Gruppen</string>
     <string name="nav_strategies">Strategien</string>
     <string name="nav_profile">Mein Profil</string>
+    <string name="nav_disclaimer">Info</string>
 
     <!-- My Profile Login -->
     <string name="my_profile_login_description">Bitte melde Dich mit Deinem Benutzernamen/Passwort an, oder erstelle einen neuen Account.</string>

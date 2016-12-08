@@ -1,7 +1,9 @@
 package app.black0ut.de.gotacs.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -119,6 +121,9 @@ public class MainActivity extends AppCompatActivity
             }else{
                 mCurrentFragment = MyProfileFragment_.builder().build();
             }
+        } else if (id == R.id.nav_disclaimer) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.disclaimer_url)));
+            startActivity(browserIntent);
         }
 
         swapFragment(mCurrentFragment);
