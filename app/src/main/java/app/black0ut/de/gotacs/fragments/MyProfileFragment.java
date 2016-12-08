@@ -72,7 +72,7 @@ public class MyProfileFragment extends Fragment {
         setupSocket();
         setUsernamePassword();
 
-        Log.d("TEST", "" + mSocket.connected());
+        //Log.d("TEST", "" + mSocket.connected());
 
         if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
             Toast.makeText(getContext(), getResources().getText(R.string.login_unsuccessful), Toast.LENGTH_SHORT).show();
@@ -122,7 +122,7 @@ public class MyProfileFragment extends Fragment {
         mSocket.on("status", status);
         mSocket.connect();
 
-        Log.d("TEST", "" + mSocket.connected());
+        //Log.d("TEST", "" + mSocket.connected());
 
         /*
         if (!mSocket.connected()){
