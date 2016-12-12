@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import app.black0ut.de.gotacs.data.Connect;
 import app.black0ut.de.gotacs.data.Group;
 import app.black0ut.de.gotacs.data.Status;
 import app.black0ut.de.gotacs.jsoncreator.JSONCreator;
@@ -64,8 +64,10 @@ public class StrategiesFragment extends Fragment {
     public ListView strategiesListView;
     @ViewById
     public TextView noStrats;
+    @ViewById
+    SwipeRefreshLayout swipeRefreshLayout;
 
-    private StrategiesListViewAdapter adapter;
+    private StrategiesListViewAdapter mAdapter;
 
     private Status gsonStatus;
     private ArrayList<String> myGroups = new ArrayList<>();
@@ -102,9 +104,16 @@ public class StrategiesFragment extends Fragment {
     public void afterViews() {
         sharedPreferences = getContext().getSharedPreferences(User.PREFERENCES, Context.MODE_PRIVATE);
         mUsername = sharedPreferences.getString(User.USERNAME, null);
-        adapter = new StrategiesListViewAdapter(strategies, getContext());
-        strategiesListView.setAdapter(adapter);
+        //mAdapter = new StrategiesListViewAdapter(strategies, getContext());
+        //strategiesListView.setAdapter(mAdapter);
         refreshItems();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshItems();
+            }
+        });
     }
 
     /**
@@ -125,6 +134,23 @@ public class StrategiesFragment extends Fragment {
             mSocket.emit("getGroups", JSONCreator.createJSON("getGroups", getGroupsMap).toString());
         } else {
             Toast.makeText(getContext(), getResources().getText(R.string.check_login_status), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Aktualisiert den Datensatz des Adapters und stoppt die Animation des SwipeRefreshLayout.
+     */
+    void onItemsLoadComplete() {
+        if (strategies.size() > 0){
+            noStrats.setVisibility(View.GONE);
+            mAdapter = new StrategiesListViewAdapter(strategies, getContext());
+            strategiesListView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+            strategiesListView.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
+        }else{
+            noStrats.setVisibility(View.VISIBLE);
+            strategiesListView.setVisibility(View.GONE);
         }
     }
 
@@ -286,7 +312,7 @@ public class StrategiesFragment extends Fragment {
                     if (emitterStatus.equals("deleteTacSuccess")) {
                         Toast.makeText(getContext(), getResources().getText(R.string.delete_tacs_success), Toast.LENGTH_SHORT).show();
                         strategies.remove(mClickedStrategy);
-                        adapter.notifyDataSetChanged();
+                        mAdapter.notifyDataSetChanged();
                         refreshItems();
                     } else if (emitterStatus.equals("deleteTacFailed")) {
                         Toast.makeText(getContext(), getResources().getText(R.string.delete_tacs_failed), Toast.LENGTH_SHORT).show();
@@ -362,11 +388,6 @@ public class StrategiesFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-        if (strategies.size() > 0){
-            noStrats.setVisibility(View.GONE);
-        }else{
-            noStrats.setVisibility(View.VISIBLE);
-        }
-        adapter.notifyDataSetChanged();
+        onItemsLoadComplete();
     }
 }
