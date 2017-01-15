@@ -1,13 +1,18 @@
 package app.black0ut.de.gotacs.fragments;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
@@ -17,10 +22,9 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import app.black0ut.de.gotacs.data.Connect;
-import app.black0ut.de.gotacs.jsoncreator.JSONCreator;
 import app.black0ut.de.gotacs.R;
 import app.black0ut.de.gotacs.data.User;
+import app.black0ut.de.gotacs.jsoncreator.JSONCreator;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -39,6 +43,13 @@ public class MyProfileFragment extends Fragment {
     public static String password;
     public String mCurrentStatus = "";
 
+    private InputFilter [] filterArrayUsername;
+    private InputFilter [] filterArrayPassword;
+    private int maxUsernameLenght = 20;
+    private int maxPasswordLenght = 40;
+
+    @ViewById
+    RelativeLayout relativeLayout;
     @ViewById
     TextView submitButton;
     @ViewById
@@ -64,6 +75,33 @@ public class MyProfileFragment extends Fragment {
     Quelle: https://github.com/excilys/androidannotations/wiki/InferringIDFromMethodName
     */
 
+    @AfterViews
+    public void afterViews(){
+        /*filterArrayPassword = new InputFilter[2];
+        filterArrayPassword[0] = new InputFilter.LengthFilter(maxPasswordLenght);
+
+        filterArrayUsername = new InputFilter[2];
+        filterArrayUsername[0] = new InputFilter.LengthFilter(maxUsernameLenght);
+
+        InputFilter filter = new InputFilter() {
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                for (int i = start; i < end; i++) {
+                    if (!Character.isLetterOrDigit(source.charAt(i)) || Character.isSpaceChar(source.charAt(i))) { // Accept only letter & digits ; otherwise just return
+                        Toast.makeText(getContext(), getResources().getText(R.string.registration_unsuccessful), Toast.LENGTH_LONG).show();
+
+                        return source;
+                    }
+                }
+                return null;
+            }
+        };
+        filterArrayUsername[1] = filter;
+        filterArrayPassword[1] = filter;
+
+        editTextName.setFilters(filterArrayUsername);
+        editTextPassword.setFilters(filterArrayPassword);*/
+    }
+
     /**
      * Klick-Listener für den Anmelde-Button.
      */
@@ -74,9 +112,7 @@ public class MyProfileFragment extends Fragment {
 
         //Log.d("TEST", "" + mSocket.connected());
 
-        if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
-            Toast.makeText(getContext(), getResources().getText(R.string.login_unsuccessful), Toast.LENGTH_SHORT).show();
-        } else {
+        if (checkInputData(username) && checkInputData(password)) {
             HashMap<String, String> login = new HashMap<>();
             login.put("user", username);
             login.put("pw", password);
@@ -91,9 +127,10 @@ public class MyProfileFragment extends Fragment {
     public void registerButtonClicked() {
         setupSocket();
         setUsernamePassword();
-        if ((username == null || username.equals("")) || (password == null || password.equals(""))) {
-            Toast.makeText(getContext(), getResources().getText(R.string.registration_unsuccessful), Toast.LENGTH_SHORT).show();
-        } else {
+
+
+
+        if (checkInputData(username) && checkInputData(password)) {
             if (username.length() > 25 || username.length() < 3){
 
             }
@@ -102,6 +139,16 @@ public class MyProfileFragment extends Fragment {
             reg.put("pw", password);
             mSocket.emit("reg", JSONCreator.createJSON("reg", reg).toString());
         }
+    }
+
+    private boolean checkInputData(String input){
+        for (int i = 0; i < input.length(); i++) {
+            if (!Character.isLetterOrDigit(input.charAt(i)) || Character.isSpaceChar(input.charAt(i))) { // Accept only letter & digits ; otherwise just return
+                Toast.makeText(getContext(), getResources().getText(R.string.registration_unsuccessful), Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

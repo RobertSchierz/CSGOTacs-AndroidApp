@@ -92,7 +92,7 @@
     <string name="start_live_mode_without_login">To start the live mode you must be logged in.</string>
     <string name="login_unsuccessful">Login failed. Incorrect username or password.</string>
     <string name="login_successful">You signed in successfully.</string>
-    <string name="registration_unsuccessful">Registration failed. Username and password can not be empty.</string>
+    <string name="registration_unsuccessful">Username and password can only contain letters and digits.</string>
     <string name="registration_successful">Registered successfully.</string>
     <string name="username_in_use">The username is already taken.</string>
     <string name="username_password_wrong">Wrong username or password.</string>
