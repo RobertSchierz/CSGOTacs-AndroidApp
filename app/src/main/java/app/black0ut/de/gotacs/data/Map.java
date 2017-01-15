@@ -95,7 +95,7 @@ public class Map {
                 break;
             case Map.MILITIA:
                 loadBitmap(R.drawable.cs_militia_radar_spectate, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_militia_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.MIRAGE:
                 loadBitmap(R.drawable.de_mirage_radar_spectate, mapImage, resources);
@@ -107,7 +107,7 @@ public class Map {
                 break;
             case Map.OFFICE:
                 loadBitmap(R.drawable.cs_office_radar, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_office_radar_callout, mapCallouts, resources);
                 break;
             case Map.OVERPASS:
                 loadBitmap(R.drawable.de_overpass_radar, mapImage, resources);

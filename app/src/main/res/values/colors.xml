@@ -18,4 +18,6 @@
     <color name="my_profile_background">#333333</color>
     <color name="edit_text_background">#6f6f6f</color>
 
+    <color name="map_preview_text_background">#6e000000</color>
+
 </resources>

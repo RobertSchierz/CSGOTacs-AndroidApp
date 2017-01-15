@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     tools:context=".activities.MainActivity">
 
     <ListView
         android:id="@+id/maps_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
-        android:divider="@color/maps_divider_color"
-        android:dividerHeight="1dp"/>
+        android:visibility="visible"/>
 
 </FrameLayout>
