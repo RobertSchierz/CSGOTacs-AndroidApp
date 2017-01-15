@@ -43,9 +43,12 @@ public class MyProfileFragment extends Fragment {
     public static String password;
     public String mCurrentStatus = "";
 
-    private InputFilter [] filterArrayUsername;
-    private InputFilter [] filterArrayPassword;
+    private InputFilter[] filterArrayUsername;
+    private InputFilter[] filterArrayPassword;
+
     private int maxUsernameLenght = 20;
+    private int minUsernameLenght = 3;
+    private int minPasswordLenght = 6;
     private int maxPasswordLenght = 40;
 
     @ViewById
@@ -76,7 +79,7 @@ public class MyProfileFragment extends Fragment {
     */
 
     @AfterViews
-    public void afterViews(){
+    public void afterViews() {
         /*filterArrayPassword = new InputFilter[2];
         filterArrayPassword[0] = new InputFilter.LengthFilter(maxPasswordLenght);
 
@@ -112,12 +115,11 @@ public class MyProfileFragment extends Fragment {
 
         //Log.d("TEST", "" + mSocket.connected());
 
-        if (checkInputData(username) && checkInputData(password)) {
-            HashMap<String, String> login = new HashMap<>();
-            login.put("user", username);
-            login.put("pw", password);
-            mSocket.emit("auth", JSONCreator.createJSON("auth", login).toString());
-        }
+        HashMap<String, String> login = new HashMap<>();
+        login.put("user", username);
+        login.put("pw", password);
+        mSocket.emit("auth", JSONCreator.createJSON("auth", login).toString());
+
     }
 
     /**
@@ -128,12 +130,12 @@ public class MyProfileFragment extends Fragment {
         setupSocket();
         setUsernamePassword();
 
-
-
-        if (checkInputData(username) && checkInputData(password)) {
-            if (username.length() > 25 || username.length() < 3){
-
-            }
+        if (!checkInputData(username, minUsernameLenght, maxUsernameLenght)) {
+            Toast.makeText(getContext(), getResources().getText(R.string.username_error), Toast.LENGTH_LONG).show();
+        }
+        if (!checkInputData(password, minPasswordLenght, maxPasswordLenght)) {
+            Toast.makeText(getContext(), getResources().getText(R.string.password_error), Toast.LENGTH_LONG).show();
+        } else {
             HashMap<String, String> reg = new HashMap<>();
             reg.put("user", username);
             reg.put("pw", password);
@@ -141,12 +143,18 @@ public class MyProfileFragment extends Fragment {
         }
     }
 
-    private boolean checkInputData(String input){
-        for (int i = 0; i < input.length(); i++) {
-            if (!Character.isLetterOrDigit(input.charAt(i)) || Character.isSpaceChar(input.charAt(i))) { // Accept only letter & digits ; otherwise just return
-                Toast.makeText(getContext(), getResources().getText(R.string.registration_unsuccessful), Toast.LENGTH_LONG).show();
-                return false;
+    private boolean checkInputData(String input, int min, int max) {
+        if (input.isEmpty()) {
+            return false;
+        }
+        if ((input.length() >= min) && (input.length() <= max)) {
+            for (int i = 0; i < input.length(); i++) {
+                if (Character.isSpaceChar(input.charAt(i))) { // Accept only letter & digits ; otherwise just return
+                    return false;
+                }
             }
+        }else{
+            return false;
         }
         return true;
     }

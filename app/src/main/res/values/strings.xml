@@ -94,6 +94,8 @@
     <string name="login_successful">You signed in successfully.</string>
     <string name="registration_unsuccessful">Username and password can only contain letters and digits.</string>
     <string name="registration_successful">Registered successfully.</string>
+    <string name="username_error">User name must be between 3 and 25 characters long and can not contain any spaces.</string>
+    <string name="password_error">Password must be between 6 and 40 characters long and can not contain any spaces.</string>
     <string name="username_in_use">The username is already taken.</string>
     <string name="username_password_wrong">Wrong username or password.</string>
     <string name="provide_tacs_failed">Failed to load strategy. Please try again later.</string>

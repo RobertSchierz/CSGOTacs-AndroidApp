@@ -94,6 +94,8 @@
     <string name="login_successful">Du hast Dich erfolgreich angemeldet.</string>
     <string name="registration_unsuccessful">Benutzername und Passwort dürfen nur Buchstaben oder Zahlen beinhalten.</string>
     <string name="registration_successful">Du hast Dich erfolgreich registriert.</string>
+    <string name="username_error">Benutzername muss zwischen 3 und 25 Zeichen lang sein und darf keine Leerzeichen beinhalten.</string>
+    <string name="password_error">Passwort muss zwischen 6 und 40 Zeichen lang sein und darf keine Leerzeichen beinhalten.</string>
     <string name="username_in_use">Der Benutzername ist bereits vergeben.</string>
     <string name="username_password_wrong">Benutzername oder Passwort falsch.</string>
     <string name="provide_tacs_failed">Unsere Wichtel konnten Deine Strategien leider nicht laden. Bitte versuche es später erneut.</string>
