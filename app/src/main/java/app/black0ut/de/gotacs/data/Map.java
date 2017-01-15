@@ -62,12 +62,12 @@ public class Map {
     public static void checkMapName(ImageView mapImage, ImageView mapCallouts, Resources resources) {
         switch (Map.clickedMapName) {
             case Map.ASSAULT:
-                loadBitmap(R.drawable.cs_assault_radar, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_assault_radar_callout_lower_level, mapImage, resources);
+                loadBitmap(R.drawable.cs_assault_radar_callout_upper_level, mapCallouts, resources);
                 break;
             case Map.AZTEC:
                 loadBitmap(R.drawable.de_aztec_radar_spectate, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_aztec_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.CACHE:
                 loadBitmap(R.drawable.de_cache_radar_spectate, mapImage, resources);
@@ -79,7 +79,7 @@ public class Map {
                 break;
             case Map.DUST:
                 loadBitmap(R.drawable.de_dust_radar_spectate, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_dust_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.DUST2:
                 loadBitmap(R.drawable.de_dust2_radar_spectate, mapImage, resources);
@@ -91,7 +91,7 @@ public class Map {
                 break;
             case Map.ITALY:
                 loadBitmap(R.drawable.cs_italy_radar, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.cs_italy_radar_callout, mapCallouts, resources);
                 break;
             case Map.MILITIA:
                 loadBitmap(R.drawable.cs_militia_radar_spectate, mapImage, resources);
