@@ -102,8 +102,8 @@ public class Map {
                 loadBitmap(R.drawable.de_mirage_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.NUKE:
-                loadBitmap(R.drawable.de_nuke_radar_spectate, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_nuke_radar, mapImage, resources);
+                loadBitmap(R.drawable.de_nuke_radar_spectate_callout, mapCallouts, resources);
                 break;
             case Map.OFFICE:
                 loadBitmap(R.drawable.cs_office_radar, mapImage, resources);
@@ -119,7 +119,7 @@ public class Map {
                 break;
             case Map.VERTIGO:
                 loadBitmap(R.drawable.de_vertigo_radar, mapImage, resources);
-                loadBitmap(R.drawable.no_callouts_available, mapCallouts, resources);
+                loadBitmap(R.drawable.de_vertigo_radar_callout, mapCallouts, resources);
                 break;
             default:
                 Log.d("MAP CLICK", "No image for the clicked Map.");
